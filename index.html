@@ -37,6 +37,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 .yr td.pW{background:#80deea!important;color:#000}
 .yr td.pC{background:#f48fb1!important;color:#000}.yr td sup{font-size:9px;color:#b71c1c;font-weight:700}
 #t-anio textarea{width:100%;font-family:monospace;font-size:13px;box-sizing:border-box}
+/* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 </style></head><body>
 <header><h1>Florida Pick Analyzer</h1><small>v0.9.42 · funciona sin Internet</small><br><small>Datos base hasta: 2026-10-22 Día</small></header>
 <div id="alerta" class="alerta hide"></div>
@@ -805,10 +806,10 @@ function anioRender(){try{
   for(let m=1;m<=mx;m++)h+='<th class="D">D</th><th class="N">N</th>';h+='</tr>';
   for(let d=1;d<=31;d++){h+='<tr><td class="dd">'+d+'</td>';
     for(let m=1;m<=mx;m++)for(const s of ['MID','EVE']){const p=g[m]&&g[m][d]&&g[m][d][s],cl='c '+(s==='MID'?'D':'N'),ci=2*(m-1)+(s==='EVE'?1:0),pcl=pc[d+'|'+ci]?' '+pc[d+'|'+ci]:'',tg=(d===r1&&ci===c1)?P1:(d===r2&&ci===c2)?P2:null;
-      if(!p){const u=tg?[...new Set(tg.map(x=>x.v))]:[],gd=d===r1&&ci===c1?G1a:(d===r2&&ci===c2?G2a:[]),gt=[...new Set(gd.filter(x=>x.k==='T').map(x=>'T'+x.dig))].concat([...new Set(gd.filter(x=>x.k==='D').map(x=>'D'+x.dig))]);h+='<td class="'+cl+(m===nm&&d===nd&&s===ns.session?' nxt':'')+((u.length||gt.length)?' pr':'')+'" style="font-size:11px">'+(u.length?'→'+u.slice(0,2).join('/'):'')+(gt.length?(u.length?'<br>':'')+gt.slice(0,3).join(' '):'')+'</td>';continue;}
+      if(!p){const u=tg?[...new Set(tg.map(x=>x.v))]:[],gd=d===r1&&ci===c1?G1a:(d===r2&&ci===c2?G2a:[]),gt=[...new Set(gd.filter(x=>x.k==='T').map(x=>'T'+x.dig))].concat([...new Set(gd.filter(x=>x.k==='D').map(x=>'D'+x.dig))]);h+='<td class="'+cl+(m===nm&&d===nd&&s===ns.session?' nxt':'')+((u.length||gt.length)?' pr':'')+'"'+(u.length?' data-n="'+u[0]+'"':'')+' style="font-size:11px">'+(u.length?'→'+u.slice(0,2).join('/'):'')+(gt.length?(u.length?'<br>':'')+gt.slice(0,3).join(' '):'')+'</td>';continue;}
       const t=p.slice(1);h+='<td class="'+cl+(t===AN_SEL?' sel':'')+(chm[t]?' pC':'')+pcl+(mark.has(m+'|'+d+'|'+s)?' rep':'')+'" data-n="'+t+'"><i>'+p[0]+'</i><b>'+t+'</b>'+(chm[t]?'<sup>'+chm[t].join(',')+'</sup>':'')+'</td>';}
     h+='</tr>';}
-  $('an-grid').innerHTML=h+'</table>';
+  const _sl=$('an-wrap').scrollLeft,_st=$('an-wrap').scrollTop;$('an-grid').innerHTML=h+'</table>';$('an-wrap').scrollLeft=_sl;$('an-wrap').scrollTop=_st;
   // patrones activos
   const labG=G=>{if(!G.length)return '';const u={};G.forEach(x=>{(u[x.k+x.dig]=u[x.k+x.dig]||[]).push(x);});return '<div class="meth" style="margin:4px 0"><b>Dígitos repetidos en línea:</b></div>'+Object.keys(u).sort((a,b)=>u[b].length-u[a].length).slice(0,6).map(k=>'<div class="cand"><span class="num" style="font-size:16px">'+(k[0]==='T'?'Terminal ':'Decena ')+k[1]+'</span> <b>×'+u[k].length+'</b><div class="meth">'+u[k][0].src.join(' → ')+' · '+anName(u[k][0])+'</div></div>').join('');};
   const lab=(P,r,c,dt,se)=>{const u={};P.forEach(p=>{(u[p.v]=u[p.v]||[]).push(p);});const ks=Object.keys(u).sort((a,b)=>u[b].length-u[a].length||(a<b?-1:1));
