@@ -40,7 +40,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}</style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v0.9.55 · funciona sin Internet</small><br><small>Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v0.9.56 · funciona sin Internet</small><br><small>Datos base hasta: 2026-10-22 Día</small></header>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="tri">Triángulo</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
 <main>
@@ -180,7 +180,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v0.9.55</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v0.9.56</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -484,6 +484,9 @@ function folStats(rows){
 // ---- Cadenas: anterior → número → #  (sorteos consecutivos, todo el historial) ----
 const CHAIN_START='2026-10-08|MID';
 function consec(r1,r2){const n=nextSlot(r1.d,r1.s);return n.date===r2.d&&n.session===r2.s;}
+let OF_R=null;
+function chRowsAll(){try{if(!OF_R){const A=[],t0=Date.UTC(2010,0,1),n=OFI.s.length/3;for(let i=0;i<n;i++)A.push({d:new Date(t0+Math.floor(i/2)*864e5).toISOString().slice(0,10),s:i%2?'EVE':'MID',p3:OFI.s.substr(i*3,3),p4:''});OF_R=A;}
+  const lk=ordKey(OF_R[OF_R.length-1]);return OF_R.concat(ROWS.filter(r=>ordKey(r)>lk));}catch(e){return ROWS;}}
 function chainFind(rows,a,b,limit){
   limit=limit===undefined?rows.length:limit;const out=[];
   for(let i=0;i<limit-2;i++){
@@ -493,7 +496,7 @@ function chainFind(rows,a,b,limit){
 }
 function chainNow(rows){
   const L=rows.length;if(L<2||!consec(rows[L-2],rows[L-1]))return null;
-  const a=rows[L-2].p3.slice(1),b=rows[L-1].p3.slice(1);return{a,b,list:chainFind(rows,a,b)};
+  const a=rows[L-2].p3.slice(1),b=rows[L-1].p3.slice(1);return{a,b,list:chainFind(chRowsAll(),a,b)};
 }
 function chainStats(rows){
   const st=CHAIN_START.split('|'),start=st[0]+(st[1]==='MID'?'0':'1'),acc={retro:{h:0,e:0,n:0},fwd:{h:0,e:0,n:0}},prf=[];
@@ -593,16 +596,16 @@ function renderMine(){
   if(cur&&!$('mi-n').dataset.touched){$('mi-n').value=cur.N.join(' ');$('mi-d').value=cur.D;$('mi-t').value=cur.T;}
 }
 function chainHtml(a,b,L){
-  if(!L.length)return'<div class="meth">La cadena '+a+' → '+b+' → ? no ha salido antes.</div>';
+  if(!L.length)return'<div class="meth">La cadena '+a+' → '+b+' → ? no ha salido desde 2010.</div>';
   const c=new Map();for(const x of L)c.set(x.n,(c.get(x.n)||0)+1);
-  return'<div class="msg">Cadena <b>'+a+' → '+b+' → ?</b> ya salió <b>'+L.length+'</b> '+(L.length===1?'vez':'veces')+'. Después salió:</div><table>'+L.map(x=>'<tr><td>'+a+' → '+b+' → <b>'+x.n+'</b></td><td>'+x.d.slice(5)+' '+sesName(x.s)+'</td></tr>').join('')+'</table><div class="meth" style="margin-top:6px">Resumen del #: '+[...c.entries()].sort((p,q)=>(q[1]-p[1])||(p[0]<q[0]?-1:1)).map(e=>e[0]+(e[1]>1?'×'+e[1]:'')).join(', ')+'</div>';
+  return'<div class="msg">Cadena <b>'+a+' → '+b+' → ?</b> ya salió <b>'+L.length+'</b> '+(L.length===1?'vez':'veces')+'. Después salió:</div><table>'+L.map(x=>'<tr><td>'+a+' → '+b+' → <b>'+x.n+'</b></td><td>'+x.d+' '+sesName(x.s)+'</td></tr>').join('')+'</table><div class="meth" style="margin-top:6px">Resumen del #: '+[...c.entries()].sort((p,q)=>(q[1]-p[1])||(p[0]<q[0]?-1:1)).map(e=>e[0]+(e[1]>1?'×'+e[1]:'')).join(', ')+'</div>';
 }
 function renderChain(){
   const c=chainNow(ROWS),al=$('alerta');
   if(c&&c.list.length){al.innerHTML='⚠️ <b>ALERTA DE CADENA</b>: '+c.a+' → '+c.b+' → ? ya salió '+c.list.length+' '+(c.list.length===1?'vez':'veces')+'. Después salió: <b>'+[...new Set(c.list.map(x=>x.n))].join(', ')+'</b> <span class="meth">(detalle en Consulta)</span>';al.classList.remove('hide');}
   else al.classList.add('hide');
   const ca=($('ca-a').value||'').replace(/\D/g,''),cb=($('ca-b').value||'').replace(/\D/g,'');
-  if(ca&&cb)$('ca-out').innerHTML=chainHtml(ca.padStart(2,'0'),cb.padStart(2,'0'),chainFind(ROWS,ca.padStart(2,'0'),cb.padStart(2,'0')));
+  if(ca&&cb)$('ca-out').innerHTML=chainHtml(ca.padStart(2,'0'),cb.padStart(2,'0'),chainFind(chRowsAll(),ca.padStart(2,'0'),cb.padStart(2,'0')));
   else $('ca-out').innerHTML=c?chainHtml(c.a,c.b,c.list):'';
 }
 function renderFoll(){
@@ -1277,7 +1280,7 @@ $('b-del').onclick=()=>{const l=ROWS[ROWS.length-1];if(!l||!confirm('¿Borrar el
   $('m-del').className='msg ok';$('m-del').textContent='Borrado.';render();setNext();};
 $('b-show').onclick=()=>{$('ta').value=csvText();$('ta').select();};
 $('b-dl').onclick=()=>{try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csvText()],{type:'text/csv'}));a.download='pick3_copia_'+(ROWS[ROWS.length-1]||{d:''}).d+'.csv';document.body.appendChild(a);a.click();a.remove();}catch(e){}$('ta').value=csvText();};
-function fullBackup(){const o={app:'FPA',ver:'0.9.55',fecha:new Date().toISOString(),data:{}};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('fpa_')===0)o.data[k]=localStorage.getItem(k);}return JSON.stringify(o);}
+function fullBackup(){const o={app:'FPA',ver:'0.9.56',fecha:new Date().toISOString(),data:{}};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('fpa_')===0)o.data[k]=localStorage.getItem(k);}return JSON.stringify(o);}
 $('b-full').onclick=()=>{const m=$('m-imp');try{const t=fullBackup(),n=Object.keys(JSON.parse(t).data).length,a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'application/json'}));a.download='fpa_copia_completa_'+((ROWS[ROWS.length-1]||{d:''}).d)+'.json';document.body.appendChild(a);a.click();a.remove();m.className='msg ok';m.textContent='Copia completa descargada ('+n+' bloques de datos: sorteos, pronósticos congelados, patrones, cadenas, triángulo y ajustes). Para restaurar, elige ese archivo .json abajo.';}catch(e){m.className='msg bad';m.textContent='No se pudo hacer la copia: '+e.message;showErr(e,'copia completa');}};
 function doImport(text){
   if(/^\s*\{/.test(text)){const m=$('m-imp');try{const o=JSON.parse(text);if(o.app!=='FPA'||!o.data)throw new Error('no es una copia completa de esta app');Object.keys(o.data).forEach(k=>{if(k.indexOf('fpa_')===0)localStorage.setItem(k,o.data[k]);});m.className='msg ok';m.textContent='Copia completa restaurada. Recargando…';setTimeout(()=>location.reload(),900);}catch(e){m.className='msg bad';m.textContent='No se pudo restaurar: '+e.message;showErr(e,'restaurar');}return;}const r=parseCSV(text),m=$('m-imp');let np=0,nm=0;
@@ -1334,7 +1337,7 @@ function ofRender(){try{const S=ofStats(),z=+$('of-t').value,tz=z<2?' · '+(z?'N
 function ofInit(){try{const l=ROWS[ROWS.length-1],dt=l?parseDate(nextSlot(l.d,l.s).date):new Date();let a='',b='';
   [1,2,3,4,5,6,0].forEach(i=>a+='<option value="'+i+'">'+DN[i]+'</option>');['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'].forEach((x,i)=>b+='<option value="'+(i+1)+'">'+x+'</option>');
   $('of-w').innerHTML=a;$('of-m').innerHTML=b;$('of-w').value=dt.getUTCDay();$('of-m').value=dt.getUTCMonth()+1;$('of-t').value=l?(nextSlot(l.d,l.s).session==='EVE'?1:0):2;$('of-w').onchange=$('of-m').onchange=$('of-t').onchange=ofRender;ofRender();}catch(e){showErr(e,'consulta histórica');}}
-ofInit();
+ofInit();try{renderChain();}catch(e){}
 function selfCheck(){const T=[['lista de 100',()=>{const r=genList();if(!r||new Set(r.all.map(x=>x.n)).size!==100)throw new Error('la lista no tiene 100 números distintos');}],['tabla de reglas',()=>{ruleGrid().forEach(x=>{if(x.h>x.n)throw new Error(x.nm+': aciertos > sorteos');});}],['corridos',()=>{corRender();}],['pestaña Año',()=>{anioRender();}],['consulta histórica',()=>{const S=ofStats();if(S.W[2].reduce((a,g)=>a+g.n,0)!==OFI.s.length/3)throw new Error('faltan sorteos');shInfo();}]];
   T.forEach(([n,f])=>{try{f();}catch(e){showErr(e,'Autoprueba «'+n+'»');}});}
 setTimeout(selfCheck,900);
