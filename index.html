@@ -40,7 +40,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}</style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v0.9.59 · funciona sin Internet</small><br><small>Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v0.9.60 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="tri">Triángulo</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
 <main>
@@ -181,7 +181,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v0.9.59</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v0.9.60</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -581,6 +581,7 @@ const sesName=s=>s==='MID'?'Día':'Noche';
 function setNext(){const l=ROWS[ROWS.length-1];if(!l)return;const n=nextSlot(l.d,l.s);$('f-d').value=n.date;$('f-s').value=n.session;}
 function render(){
   RT_C=null;ROWS=allRows();const l=ROWS[ROWS.length-1];
+  try{const bl=BASE.reduce((a,b)=>!a||ordKey(b)>ordKey(a)?b:a,null);if(l&&bl)$('hdr-data').textContent='Datos hasta: '+l.d+' '+sesName(l.s)+(ordKey(l)>ordKey(bl)?' (base '+bl.d+' '+sesName(bl.s)+' + actualizaciones)':'');}catch(e){}
   $('last').innerHTML=l?`<span class="num">${l.p3}</span> ${l.p4?'· Pick 4 <b>'+l.p4+'</b> ':''}<div class="meth">${l.d} · ${sesName(l.s)} · ${ROWS.length} sorteos en total</div>`:'Sin datos';
   ensurePred();renderCand();genRender();triRender();hangTrack();dwRender();renderHist();renderAcier();renderFoll();renderChain();
   try{generarPanelPatrones();}catch(e){}try{anioRender();}catch(e){}try{chRender();}catch(e){}try{avisoRender();}catch(e){}try{redTrackRender();}catch(e){}try{corRender();}catch(e){}try{parRender();}catch(e){}
@@ -1326,7 +1327,7 @@ $('b-del').onclick=()=>{const l=ROWS[ROWS.length-1];if(!l||!confirm('¿Borrar el
   $('m-del').className='msg ok';$('m-del').textContent='Borrado.';render();setNext();};
 $('b-show').onclick=()=>{$('ta').value=csvText();$('ta').select();};
 $('b-dl').onclick=()=>{try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csvText()],{type:'text/csv'}));a.download='pick3_copia_'+(ROWS[ROWS.length-1]||{d:''}).d+'.csv';document.body.appendChild(a);a.click();a.remove();}catch(e){}$('ta').value=csvText();};
-function fullBackup(){const o={app:'FPA',ver:'0.9.59',fecha:new Date().toISOString(),data:{}};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('fpa_')===0)o.data[k]=localStorage.getItem(k);}return JSON.stringify(o);}
+function fullBackup(){const o={app:'FPA',ver:'0.9.60',fecha:new Date().toISOString(),data:{}};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('fpa_')===0)o.data[k]=localStorage.getItem(k);}return JSON.stringify(o);}
 $('b-full').onclick=()=>{const m=$('m-imp');try{const t=fullBackup(),n=Object.keys(JSON.parse(t).data).length,a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'application/json'}));a.download='fpa_copia_completa_'+((ROWS[ROWS.length-1]||{d:''}).d)+'.json';document.body.appendChild(a);a.click();a.remove();m.className='msg ok';m.textContent='Copia completa descargada ('+n+' bloques de datos: sorteos, pronósticos congelados, patrones, cadenas, triángulo y ajustes). Para restaurar, elige ese archivo .json abajo.';}catch(e){m.className='msg bad';m.textContent='No se pudo hacer la copia: '+e.message;showErr(e,'copia completa');}};
 function doImport(text){
   if(/^\s*\{/.test(text)){const m=$('m-imp');try{const o=JSON.parse(text);if(o.app!=='FPA'||!o.data)throw new Error('no es una copia completa de esta app');Object.keys(o.data).forEach(k=>{if(k.indexOf('fpa_')===0)localStorage.setItem(k,o.data[k]);});m.className='msg ok';m.textContent='Copia completa restaurada. Recargando…';setTimeout(()=>location.reload(),900);}catch(e){m.className='msg bad';m.textContent='No se pudo restaurar: '+e.message;showErr(e,'restaurar');}return;}const r=parseCSV(text),m=$('m-imp');let np=0,nm=0;
