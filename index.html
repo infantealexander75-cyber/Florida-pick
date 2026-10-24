@@ -40,7 +40,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}</style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v0.9.66 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v0.9.67 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="tri">Triángulo</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
@@ -177,7 +177,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v0.9.66</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v0.9.67</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -878,7 +878,7 @@ function genImg(){
 $('g-share').onclick=async()=>{const m=$('g-msg');try{
   try{const _r0=genList();if(_r0)finFreeze(_r0);}catch(e){}const cv=genImg();if(!cv){m.textContent='Todavía no hay datos.';return;}cv.style.display='block';
   const blob=await new Promise(res=>cv.toBlob(res,'image/png')),f=new File([blob],'pronostico-top10.png',{type:'image/png'});
-  if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Pronóstico Top 10',text:(function(){const _r=genList(),_s=shInfo(),_f=finGet(_r);return _s.dia+' · Decena más fuerte '+_f.d+' · Terminal más fuerte '+_f.t+'\n'+'Pronóstico ('+_f.l.length+' números): '+_f.l.map(x=>x.n).join(' ')+(_f.p.length?'\nParlés del '+(PAR_NOM[_r.wd]||'día')+': '+_f.p.map(x=>x.k).join(' · '):'');})()});m.className='msg ok';m.textContent='Listo.';}
+  if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Pronóstico'});m.className='msg ok';m.textContent='Listo.';}
   else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pronostico-top10.png';a.click();m.className='msg ok';m.textContent='Se descargó la imagen. Si no, mantén pulsada la de abajo para guardarla.';}
 }catch(e){if(e&&e.name==='AbortError')return;m.className='msg bad';m.textContent='No se pudo compartir. Mantén pulsada la imagen de abajo para guardarla.';}};
 
@@ -1369,7 +1369,7 @@ $('b-del').onclick=()=>{const l=ROWS[ROWS.length-1];if(!l||!confirm('¿Borrar el
   $('m-del').className='msg ok';$('m-del').textContent='Borrado.';render();setNext();};
 $('b-show').onclick=()=>{$('ta').value=csvText();$('ta').select();};
 $('b-dl').onclick=()=>{try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csvText()],{type:'text/csv'}));a.download='pick3_copia_'+(ROWS[ROWS.length-1]||{d:''}).d+'.csv';document.body.appendChild(a);a.click();a.remove();}catch(e){}$('ta').value=csvText();};
-function fullBackup(){const o={app:'FPA',ver:'0.9.66',fecha:new Date().toISOString(),data:{}};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('fpa_')===0)o.data[k]=localStorage.getItem(k);}return JSON.stringify(o);}
+function fullBackup(){const o={app:'FPA',ver:'0.9.67',fecha:new Date().toISOString(),data:{}};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('fpa_')===0)o.data[k]=localStorage.getItem(k);}return JSON.stringify(o);}
 $('b-full').onclick=()=>{const m=$('m-imp');try{const t=fullBackup(),n=Object.keys(JSON.parse(t).data).length,a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'application/json'}));a.download='fpa_copia_completa_'+((ROWS[ROWS.length-1]||{d:''}).d)+'.json';document.body.appendChild(a);a.click();a.remove();m.className='msg ok';m.textContent='Copia completa descargada ('+n+' bloques de datos: sorteos, pronósticos congelados, patrones, cadenas, triángulo y ajustes). Para restaurar, elige ese archivo .json abajo.';}catch(e){m.className='msg bad';m.textContent='No se pudo hacer la copia: '+e.message;showErr(e,'copia completa');}};
 function doImport(text){
   if(/^\s*\{/.test(text)){const m=$('m-imp');try{const o=JSON.parse(text);if(o.app!=='FPA'||!o.data)throw new Error('no es una copia completa de esta app');Object.keys(o.data).forEach(k=>{if(k.indexOf('fpa_')===0)localStorage.setItem(k,o.data[k]);});m.className='msg ok';m.textContent='Copia completa restaurada. Recargando…';setTimeout(()=>location.reload(),900);}catch(e){m.className='msg bad';m.textContent='No se pudo restaurar: '+e.message;showErr(e,'restaurar');}return;}const r=parseCSV(text),m=$('m-imp');let np=0,nm=0;
