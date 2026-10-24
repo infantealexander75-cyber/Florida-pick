@@ -40,7 +40,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}</style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v0.9.64 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v0.9.65 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="tri">Triángulo</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
@@ -183,7 +183,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v0.9.64</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v0.9.65</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -811,14 +811,14 @@ function finBuild(r){
   const sc=x=>{let v=0;for(const c in FC_W)if(x.f.indexOf(c)>=0)v+=FC_W[c];if(dd(x))v+=1;if(tt(x))v+=1;return v;};
   const rest=r.all.map((x,i)=>({x,i})).filter(o=>!set.has(o.x.n)).sort((a,b)=>sc(b.x)-sc(a.x)||a.i-b.i).slice(0,Math.max(0,FC_N-forced.length)).map(o=>o.x);
   return forced.concat(rest).map(x=>({n:x.n,f:x.f+(dd(x)?'D':'')+(tt(x)?'N':'')}));}
-function finGet(r){const key=r.n.date+'|'+r.n.session,z=FROZEN[key];
-  if(z)return{l:z.l,p:z.p,frozen:true};
-  return{l:finBuild(r),p:parFor(r).slice(0,9).map(x=>({k:x.k,tier:x.tier,half:x.half?1:0})),frozen:false};}
-function finFreeze(r){const key=r.n.date+'|'+r.n.session;if(FROZEN[key])return;const f=finGet(r);FROZEN[key]={l:f.l,p:f.p,t:new Date().toISOString()};store('fpa_frozen',FROZEN);}
+function finGet(r){const key=r.n.date+'|'+r.n.session,z=FROZEN[key],si=shInfo();
+  if(z)return{l:z.l,p:z.p,d:z.d!==undefined?String(z.d):String(si.d),t:z.t2!==undefined?String(z.t2):String(si.t),frozen:true};
+  return{l:finBuild(r),p:parFor(r).slice(0,9).map(x=>({k:x.k,tier:x.tier,half:x.half?1:0})),d:String(si.d),t:String(si.t),frozen:false};}
+function finFreeze(r){const key=r.n.date+'|'+r.n.session;if(FROZEN[key])return;const f=finGet(r);FROZEN[key]={l:f.l,p:f.p,d:f.d,t2:f.t,t:new Date().toISOString()};store('fpa_frozen',FROZEN);}
 function finRender(){try{const r=genList();if(!r)return;const f=finGet(r);
   $('g-fin').innerHTML='<b>Pronóstico para compartir</b> · '+DIAS[r.wd]+' '+(r.n.session==='MID'?'Día':'Noche')+' ('+f.l.length+' números)'+(f.frozen?' 🔒 congelado':'')+
    '<div class="meth">Primero los fijos de corridos y la cadena (violeta); luego, por coincidencias entre reglas (Patrón del año y Ensemble pesan un poco más; suman también la decena y el terminal más fuertes; Candidatos no cuenta). Al tocar "Compartir" se congela y el BINGO se canta contra esta lista.</div>'+
-   '<div class="chips">'+f.l.map(x=>'<span class="chip '+(/[KH]/.test(x.f)?'k':'r')+'">'+x.n+'<i>'+(x.f.replace('C','')||'&nbsp;')+'</i></span>').join('')+'</div>'+
+   '<div class="meth">Decena más fuerte: <b>'+f.d+'</b> · Terminal más fuerte: <b>'+f.t+'</b> (van en la imagen y cuentan para el BINGO)</div><div class="chips">'+f.l.map(x=>'<span class="chip '+(/[KH]/.test(x.f)?'k':'r')+'">'+x.n+'<i>'+(x.f.replace('C','')||'&nbsp;')+'</i></span>').join('')+'</div>'+
    (f.p.length?'<div class="meth"><b>Parlés:</b> '+f.p.map(x=>x.k).join(' · ')+'</div>':'');
   }catch(e){showErr(e,'pronóstico para compartir');}}
 // ---- Cartel de BINGO: contra el pronóstico compartido (congelado); si no hubo, avisa qué regla acertó ----
@@ -831,7 +831,9 @@ function bingoRender(){try{const b=$('bingo'),l=ROWS[ROWS.length-1];if(!l){b.cla
   let ti='',su='',cls='bingo',body='';
   if(fr){
     const i=fr.l.findIndex(x=>x.n===t),pl=fr.p.map(p=>{const a=p.k.split('-');return{k:p.k,a:sal.has(a[0]),b:sal.has(a[1])};}),pb=pl.filter(x=>x.a&&x.b),pu=pl.filter(x=>(x.a||x.b)&&!(x.a&&x.b));
-    if(i>=0){ti='🎉 ¡BINGO! 🎉';su='DEL PRONÓSTICO';body='<div class="by2">Estaba en tu pronóstico compartido, puesto '+(i+1)+'. Lo proporcionó:</div>'+((fr.l[i].f||'').replace(/(.)(?=.*\1)/g,'').split('').filter(Boolean).map(c=>'<div class="bh">✅ '+(FC_NOM[c]||c)+'</div>').join('')||'<div class="bh">✅ Orden de la lista</div>');}
+    const hd=fr.d!==undefined&&t[0]===String(fr.d),ht=fr.t2!==undefined&&t[1]===String(fr.t2);
+    if(i>=0){ti='🎉 ¡BINGO! 🎉';su='DEL PRONÓSTICO';body='<div class="by2">Estaba en tu pronóstico compartido, puesto '+(i+1)+'. Lo proporcionó:</div>'+((fr.l[i].f||'').replace(/(.)(?=.*\1)/g,'').split('').filter(Boolean).map(c=>'<div class="bh">✅ '+(FC_NOM[c]||c)+'</div>').join('')||'<div class="bh">✅ Orden de la lista</div>')+(hd&&!/D/.test(fr.l[i].f)?'<div class="bh">✅ Decena más fuerte '+fr.d+'</div>':'')+(ht&&!/N/.test(fr.l[i].f)?'<div class="bh">✅ Terminal más fuerte '+fr.t2+'</div>':'');}
+    else if(hd||ht){ti='🎉 ¡BINGO! 🎉';su=hd&&ht?'DE DECENA Y TERMINAL':hd?'DE DECENA '+fr.d:'DE TERMINAL '+fr.t2;body='<div class="by2">Estaba en tu pronóstico compartido:</div>'+(hd?'<div class="bh">✅ Decena más fuerte '+fr.d+'</div>':'')+(ht?'<div class="bh">✅ Terminal más fuerte '+fr.t2+'</div>':'');}
     else if(pb.length){ti='🎯 ¡BINGO! 🎯';su='DE PARLÉ';}
     else if(pu.length){ti='🎉 ¡CORRIDO! 🎉';}
     if(ti&&(pb.length||pu.length))body+='<div class="by2">Parlés del pronóstico:</div>'+pb.map(x=>'<div class="bh">🎯 bingo '+x.k+'</div>').join('')+pu.slice(0,3).map(x=>'<div class="bh">✅ corrido '+x.k+' (salió '+(x.a?x.k.split('-')[0]:x.k.split('-')[1])+')</div>').join('');
@@ -850,7 +852,7 @@ function gcStar(c,x,y,r,col){c.beginPath();for(let i=0;i<10;i++){const a=-Math.P
 function gcArrow(c,x1,y,x2){c.strokeStyle='#e53935';c.fillStyle='#e53935';c.lineWidth=8;c.lineCap='round';c.beginPath();c.moveTo(x1,y);c.lineTo(x2-12,y);c.stroke();c.beginPath();c.moveTo(x2,y);c.lineTo(x2-22,y-16);c.lineTo(x2-22,y+16);c.closePath();c.fill();}
 function gcFit(c,t,maxW,size,wt){let f=size;do{c.font=wt+' '+f+'px system-ui,Arial,sans-serif';if(c.measureText(t).width<=maxW||f<=14)break;f-=1;}while(true);}
 function genImg(){
-  const r=genList();if(!r)return null;const FN=finGet(r),PL=FN.p,list=FN.l,N=list.length,ttl='PRONÓSTICO',cv=$('g-cv'),W=1080,H=400+Math.ceil(N/5)*340+(PL.length?Math.ceil(PL.length/3)*100+20:0),c=cv.getContext('2d');
+  const r=genList();if(!r)return null;const FN=finGet(r),PL=FN.p,list=FN.l,N=list.length,ttl='PRONÓSTICO',cv=$('g-cv'),W=1080,H=400+Math.ceil(N/5)*340+110+(PL.length?Math.ceil(PL.length/3)*100+20:0),c=cv.getContext('2d');
   cv.width=W;cv.height=H;
   c.fillStyle='#fffdf5';c.fillRect(0,0,W,H);c.lineWidth=14;c.strokeStyle='#42a5f5';c.strokeRect(10,10,W-20,H-20);
   gcStar(c,70,70,38,'#ffd54f');gcStar(c,W-70,70,38,'#ffd54f');gcStar(c,70,H-70,38,'#ffd54f');gcStar(c,W-70,H-70,38,'#ffd54f');
@@ -858,7 +860,7 @@ function genImg(){
   c.fillStyle='#ffee58';c.strokeStyle='#1a237e';c.lineWidth=8;c.beginPath();c.roundRect?c.roundRect(150,50,780,110,40):c.rect(150,50,780,110);c.fill();c.stroke();
   c.fillStyle='#1a237e';c.textAlign='center';c.textBaseline='middle';gcFit(c,ttl,720,62,'800');c.fillText(ttl,W/2,105);
   c.fillStyle='#37474f';gcFit(c,'Florida Pick 3 · '+DIAS[r.wd]+' '+(r.n.session==='MID'?'Día':'Noche')+' · '+r.n.date,900,34,'700');c.fillText('Florida Pick 3 · '+DIAS[r.wd]+' '+(r.n.session==='MID'?'Día':'Noche')+' · '+r.n.date,W/2,195);
-  {const si=shInfo(),tx=si.dia+' · Decena más fuerte '+si.d+' · Terminal más fuerte '+si.t+' · '+N+' números';c.fillStyle='#455a64';gcFit(c,tx,W-60,28,'700');c.fillText(tx,W/2,228);}
+  {const si=shInfo(),tx=si.dia+' · '+N+' números';c.fillStyle='#455a64';gcFit(c,tx,W-60,28,'700');c.fillText(tx,W/2,228);}
   const cols=['#f8bbd0','#fff59d','#c8e6c9','#bbdefb','#e1bee7'],bd=['#d81b60','#f9a825','#2e7d32','#1565c0','#6a1b9a'],bw=170,bh=250,gap=(W-120-5*bw)/4;
   for(let i=0;i<N;i++){
     const row=Math.floor(i/5),col=i%5,x=60+col*(bw+gap),y=250+row*(bh+90),k=list[i].n,nm=pnNm(k)||'';
@@ -868,7 +870,9 @@ function genImg(){
     c.fillStyle='#e53935';c.beginPath();c.arc(x+22,y+28,22,0,7);c.fill();c.fillStyle='#fff';c.font='800 26px system-ui,Arial,sans-serif';c.fillText(String(i+1),x+22,y+29);
     if(col<4)gcArrow(c,x+bw-4,y+bh/2,x+bw+gap+4);
   }
-  if(PL.length){const rw=Math.ceil(N/5),y0=250+rw*340-35,tt='PARLÉS DEL '+(PAR_NOM[r.wd]||'DÍA').toUpperCase(),pw=300,ph=80,pg=30,TC=[['#ffd54f','#b45309'],['#c8e6c9','#2e7d32'],['#bbdefb','#1565c0']];
+  {const rw=Math.ceil(N/5),yd=250+rw*340-45,pw2=420,pg2=30,x2=(W-(2*pw2+pg2))/2;
+    [['DECENA  '+FN.d,'#e1bee7','#6a1b9a'],['TERMINAL  '+FN.t,'#b2dfdb','#00695c']].forEach((q,i)=>{const x=x2+i*(pw2+pg2);c.beginPath();c.roundRect?c.roundRect(x,yd,pw2,80,30):c.rect(x,yd,pw2,80);c.fillStyle=q[1];c.fill();c.lineWidth=6;c.strokeStyle=q[2];c.stroke();c.fillStyle='#1a1a1a';c.textAlign='center';c.textBaseline='middle';gcFit(c,q[0],pw2-40,46,'800');c.fillText(q[0],x+pw2/2,yd+42);});}
+  if(PL.length){const rw=Math.ceil(N/5),y0=250+rw*340-35+110,tt='PARLÉS DEL '+(PAR_NOM[r.wd]||'DÍA').toUpperCase(),pw=300,ph=80,pg=30,TC=[['#ffd54f','#b45309'],['#c8e6c9','#2e7d32'],['#bbdefb','#1565c0']];
     c.fillStyle='#1a237e';c.textAlign='center';c.textBaseline='middle';gcFit(c,tt,900,36,'800');c.fillText(tt,W/2,y0);
     PL.forEach((p,i)=>{const row=Math.floor(i/3),m=Math.min(3,PL.length-row*3),x=(W-(m*pw+(m-1)*pg))/2+(i%3)*(pw+pg),y=y0+35+row*100,tc=TC[p.tier]||TC[2],tx=(p.half?'★ ':'')+p.k;
       c.beginPath();c.roundRect?c.roundRect(x,y,pw,ph,30):c.rect(x,y,pw,ph);c.fillStyle=tc[0];c.fill();c.lineWidth=6;c.strokeStyle=tc[1];c.stroke();
@@ -880,7 +884,7 @@ function genImg(){
 $('g-share').onclick=async()=>{const m=$('g-msg');try{
   try{const _r0=genList();if(_r0)finFreeze(_r0);}catch(e){}const cv=genImg();if(!cv){m.textContent='Todavía no hay datos.';return;}cv.style.display='block';
   const blob=await new Promise(res=>cv.toBlob(res,'image/png')),f=new File([blob],'pronostico-top10.png',{type:'image/png'});
-  if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Pronóstico Top 10',text:(function(){const _r=genList(),_s=shInfo(),_f=finGet(_r);return _s.dia+' · Decena más fuerte '+_s.d+' · Terminal más fuerte '+_s.t+'\n'+'Pronóstico ('+_f.l.length+' números): '+_f.l.map(x=>x.n).join(' ')+(_f.p.length?'\nParlés del '+(PAR_NOM[_r.wd]||'día')+': '+_f.p.map(x=>x.k).join(' · '):'');})()});m.className='msg ok';m.textContent='Listo.';}
+  if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Pronóstico Top 10',text:(function(){const _r=genList(),_s=shInfo(),_f=finGet(_r);return _s.dia+' · Decena más fuerte '+_f.d+' · Terminal más fuerte '+_f.t+'\n'+'Pronóstico ('+_f.l.length+' números): '+_f.l.map(x=>x.n).join(' ')+(_f.p.length?'\nParlés del '+(PAR_NOM[_r.wd]||'día')+': '+_f.p.map(x=>x.k).join(' · '):'');})()});m.className='msg ok';m.textContent='Listo.';}
   else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pronostico-top10.png';a.click();m.className='msg ok';m.textContent='Se descargó la imagen. Si no, mantén pulsada la de abajo para guardarla.';}
 }catch(e){if(e&&e.name==='AbortError')return;m.className='msg bad';m.textContent='No se pudo compartir. Mantén pulsada la imagen de abajo para guardarla.';}};
 
@@ -1371,7 +1375,7 @@ $('b-del').onclick=()=>{const l=ROWS[ROWS.length-1];if(!l||!confirm('¿Borrar el
   $('m-del').className='msg ok';$('m-del').textContent='Borrado.';render();setNext();};
 $('b-show').onclick=()=>{$('ta').value=csvText();$('ta').select();};
 $('b-dl').onclick=()=>{try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csvText()],{type:'text/csv'}));a.download='pick3_copia_'+(ROWS[ROWS.length-1]||{d:''}).d+'.csv';document.body.appendChild(a);a.click();a.remove();}catch(e){}$('ta').value=csvText();};
-function fullBackup(){const o={app:'FPA',ver:'0.9.64',fecha:new Date().toISOString(),data:{}};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('fpa_')===0)o.data[k]=localStorage.getItem(k);}return JSON.stringify(o);}
+function fullBackup(){const o={app:'FPA',ver:'0.9.65',fecha:new Date().toISOString(),data:{}};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('fpa_')===0)o.data[k]=localStorage.getItem(k);}return JSON.stringify(o);}
 $('b-full').onclick=()=>{const m=$('m-imp');try{const t=fullBackup(),n=Object.keys(JSON.parse(t).data).length,a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'application/json'}));a.download='fpa_copia_completa_'+((ROWS[ROWS.length-1]||{d:''}).d)+'.json';document.body.appendChild(a);a.click();a.remove();m.className='msg ok';m.textContent='Copia completa descargada ('+n+' bloques de datos: sorteos, pronósticos congelados, patrones, cadenas, triángulo y ajustes). Para restaurar, elige ese archivo .json abajo.';}catch(e){m.className='msg bad';m.textContent='No se pudo hacer la copia: '+e.message;showErr(e,'copia completa');}};
 function doImport(text){
   if(/^\s*\{/.test(text)){const m=$('m-imp');try{const o=JSON.parse(text);if(o.app!=='FPA'||!o.data)throw new Error('no es una copia completa de esta app');Object.keys(o.data).forEach(k=>{if(k.indexOf('fpa_')===0)localStorage.setItem(k,o.data[k]);});m.className='msg ok';m.textContent='Copia completa restaurada. Recargando…';setTimeout(()=>location.reload(),900);}catch(e){m.className='msg bad';m.textContent='No se pudo restaurar: '+e.message;showErr(e,'restaurar');}return;}const r=parseCSV(text),m=$('m-imp');let np=0,nm=0;
