@@ -40,7 +40,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}</style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v0.9.58 · funciona sin Internet</small><br><small>Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v0.9.59 · funciona sin Internet</small><br><small>Datos base hasta: 2026-10-22 Día</small></header>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="tri">Triángulo</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
 <main>
@@ -72,6 +72,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 <section id="t-gen" class="hide">
  <div class="card"><b style="color:#d32f2f">Pronósticos (todas las fuentes en una lista)</b><div id="gen-out"></div>
   <div class="msg" id="g-cor"></div>
+  <div class="msg" id="g-par"></div>
   <div class="msg" id="g-seg"></div>
   <button class="btn" id="g-share">Compartir pronóstico (imagen)</button><div class="msg" id="g-msg"></div>
   <canvas id="g-cv" style="width:100%;border-radius:10px;display:none"></canvas></div>
@@ -180,7 +181,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v0.9.58</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v0.9.59</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -582,7 +583,7 @@ function render(){
   RT_C=null;ROWS=allRows();const l=ROWS[ROWS.length-1];
   $('last').innerHTML=l?`<span class="num">${l.p3}</span> ${l.p4?'· Pick 4 <b>'+l.p4+'</b> ':''}<div class="meth">${l.d} · ${sesName(l.s)} · ${ROWS.length} sorteos en total</div>`:'Sin datos';
   ensurePred();renderCand();genRender();triRender();hangTrack();dwRender();renderHist();renderAcier();renderFoll();renderChain();
-  try{generarPanelPatrones();}catch(e){}try{anioRender();}catch(e){}try{chRender();}catch(e){}try{avisoRender();}catch(e){}try{redTrackRender();}catch(e){}try{corRender();}catch(e){}
+  try{generarPanelPatrones();}catch(e){}try{anioRender();}catch(e){}try{chRender();}catch(e){}try{avisoRender();}catch(e){}try{redTrackRender();}catch(e){}try{corRender();}catch(e){}try{parRender();}catch(e){}
 }
 let SNAP=load('fpa_snap',{});
 function ensureSnap(){try{const l=ROWS[ROWS.length-1];if(!l)return;const n=nextSlot(l.d,l.s),k=n.date+'|'+n.session;if(SNAP[k])return;const r=genList();if(!r||r.all.length<20)return;
@@ -757,6 +758,45 @@ function corRender(){try{const l=ROWS[ROWS.length-1],r=genList();if(!l||!r)retur
    '<div class="meth"><b>Dónde están en el pronóstico</b> (fijos de corridos y números de patrones del año, juntos):</div>'+
    (li.length?'<div class="meth">'+li.join('<br>')+'</div><div class="meth">★ = coinciden corrido y patrón del año.</div>':'<div class="meth">Estos corridos no tienen fijos en la tabla ni hay patrones activos.</div>')+
    '<div class="meth">Seguimiento (regla fija desde el 22-oct Noche): el trasero salió entre los fijos de los corridos del sorteo anterior <b>'+t.h+' de '+t.n+'</b>.</div>';}catch(e){showErr(e,'corridos');}}
+// ---- Parlés del día (Excel corridos_por_dia): si un número del Top está en una pareja de la columna del día, se juega esa pareja ----
+const PAR_DIA={"Mon":["74-61","74-24","74-99","74-87","74-75","87-37","87-16","13-09","40-53","49-46","98-42","55-10","37-90","94-75","99-47","99-76","99-48","34-72","17-76","17-36","13-09","37-09","46-09","42-62","89-71","74-21","87-37","27-80","61-35","37-24","82-24","25-61","43-24","14-29","74-28"],"Tue":["35-07","55-10","60-79","58-35","58-80","58-71","58-17","58-72","74-33","74-54","74-52","81-60","81-44","81-37","50-07","33-07","20-07","20-20","20-23","20-11","20-53","11-10","80-82","80-04","60-74","90-98","44-05","44-71","77-26","77-33","77-38","50-19","11-35","38-95","74-28","66-85","94-42"],"Wed":["72-74","44-05","95-51","43-40","43-08","43-74","44-33","55-94","55-42","74-75","74-06","92-00","93-00","80-00","62-01","10-01","18-01","33-07","17-71","17-95","95-51","35-09","35-98","31-47","84-58","84-01","43-10"],"Thu":["98-42","49-04","25-09","38-74","29-88","94-27","92-00","91-00","50-19","50-48","50-09","55-21","55-62","23-27","23-75","23-88","29-47","29-22","29-27","46-66","50-19","50-48","50-09","50-64","89-11","42-74","43-24"],"Fri":["33-74","90-20","90-41","80-34","83-06","29-20","48-09","32-09","90-04","20-20","20-59","20-22","10-71","10-93","49-26","90-83","90-55","90-51","90-95","77-26","81-53","74-57","74-66","74-23","26-13","50-30","42-74"],"Sat":["55-10","83-12","49-12","49-30","38-74","74-77","80-34","78-79","29-37","29-19","29-69","97-49","97-83","97-93","45-83","89-24","89-88","74-99","74-52","74-37","84-94","35-36","35-62","35-99","87-11","70-69","25-61","25-35","25-84","25-84","25-08","85-30","85-89","49-12","49-30","86-00","17-00","55-00","87-52","87-04","87-03","87-37","87-09","30-95"],"Sun":["20-29","20-63","20-21","20-30","20-79","74-02","74-92","74-45","94-08","30-08","31-09","69-25","20-29","52-25","52-10","18-94","18-72","81-57","95-63","95-82","72-48","72-76","58-64","58-25","80-19","80-45","88-08","94-08","99-71","99-45","99-67","97-09","97-47","26-13","17-48","34-75","37-24"]};
+const PAR_START='2026-10-231',PAR_MAX=12,PAR_NOM={Mon:'lunes',Tue:'martes',Wed:'miércoles',Thu:'jueves',Fri:'viernes',Sat:'sábado',Sun:'domingo'};
+function parSalidos(r){const o=[];if(r&&r.p3)o.push(r.p3.slice(1));if(r&&r.p4&&r.p4.length>=4){o.push(r.p4.slice(0,2));o.push(r.p4.slice(2,4));}return o;}
+function parDia(r,prev){
+  const col=PAR_DIA[r.wd]||[],pos={},cnt={},org={};r.all.forEach((x,i)=>{pos[x.n]=i;});
+  col.forEach(p=>{const k=p.split('-').sort().join('-');cnt[k]=(cnt[k]||0)+1;if(!org[k])org[k]=p;});
+  const sal=new Set(parSalidos(prev)),out=[];
+  for(const k in cnt){const a=k.split('-')[0],b=k.split('-')[1],pa=pos[a],pb=pos[b];if(pa===undefined||pb===undefined)continue;
+    const ha=sal.has(a),hb=sal.has(b),half=(ha&&!hb)?b:(hb&&!ha)?a:'';
+    let tier;
+    if(half){const pp=pos[half];if(pp>=20)continue;tier=pp<10?0:1;}
+    else{const ra=pa<10,rb=pb<10;if(!ra&&!rb)continue;tier=(ra&&rb)?0:((ra&&pb<20)||(rb&&pa<20))?1:2;}
+    out.push({a,b,k:org[k],n:cnt[k],tier,pa,pb,half,done:(ha?a:'')||(hb?b:'')});}
+  out.sort((x,y)=>(y.half?1:0)-(x.half?1:0)||x.tier-y.tier||y.n-x.n||(Math.min(x.pa,x.pb)-Math.min(y.pa,y.pb)));
+  return out;}
+function parFor(r){try{const l=ROWS[ROWS.length-1],pv=(r.n.session==='EVE'&&l&&l.d===r.n.date&&l.s==='MID')?l:null;return parDia(r,pv);}catch(e){return [];}}
+var PT2_C=null;
+function parTrack(){
+  const ck=ROWS.length+'|'+(ROWS.length?slotKey(ROWS[ROWS.length-1]):'');if(PT2_C&&PT2_C.k===ck)return PT2_C.v;
+  const ord=r=>r.d+(r.s==='MID'?'0':'1'),all=ROWS.slice();let n=0,b=0,u=0;const det=[];
+  try{for(let i=1;i<all.length;i++){if(ord(all[i])<PAR_START)continue;ROWS=all.slice(0,i);const r=genList();if(!r)continue;
+    const L=parFor(r).slice(0,PAR_MAX),sal=new Set(parSalidos(all[i])),bi=L.filter(x=>sal.has(x.a)&&sal.has(x.b)),un=L.filter(x=>sal.has(x.a)||sal.has(x.b));
+    n++;if(bi.length)b++;if(un.length)u++;det.push({d:all[i].d,s:all[i].s,np:L.length,bi:bi.map(x=>x.k),un:un.map(x=>x.k)});}
+  }finally{ROWS=all;}
+  const v={n,b,u,det};PT2_C={k:ck,v};return v;}
+function parRender(){try{const l=ROWS[ROWS.length-1],r=genList();if(!l||!r)return;
+  const L=parFor(r),sh=L.slice(0,PAR_MAX),nm=PAR_NOM[r.wd]||r.wd,ses=r.n.session==='MID'?'Día':'Noche';
+  const col=i=>i<10?'rojo':i<20?'azul':(r.all[i].kadd?'violeta':'negro');
+  const ln=x=>{let t='<b>'+x.k+'</b>'+(x.n>1?' ×'+x.n:'')+' · ';
+    if(x.half){const pp=x.half===x.a?x.pa:x.pb;t+='✅ ya salió '+x.done+' en el Día, falta <b>'+x.half+'</b> (puesto '+(pp+1)+', '+col(pp)+')';}
+    else t+=x.a+': puesto '+(x.pa+1)+' ('+col(x.pa)+') · '+x.b+': puesto '+(x.pb+1)+' ('+col(x.pb)+')'+(x.tier===0?' ★ los dos en el Top':'');
+    return '<div class="meth">'+t+'</div>';};
+  const t=parTrack();
+  $('g-par').innerHTML='<b>Parlés del día</b> · columna del '+nm+' ('+ses+')<div class="meth">Parejas del Excel de ese día que traen un número del Top 10 (rojo). Se juegan tal cual como parlé; no se convierten en fijos.'+(r.n.session==='EVE'?' Para la Noche, si en el Día ya salió un número de la pareja, queda como mitad cumplida.':'')+'</div>'+
+   (sh.length?sh.map(ln).join('')+(L.length>sh.length?'<div class="meth">Se muestran '+sh.length+' de '+L.length+'.</div>':''):'<div class="meth">Ninguna pareja de este día trae números del Top 10.</div>')+
+   '<div class="meth">Seguimiento (prueba desde el 23-oct Noche, con las primeras '+PAR_MAX+' parejas): <b>bingo '+t.b+' de '+t.n+'</b> · <b>al menos un número '+t.u+' de '+t.n+'</b>. Cuenta el trasero y los dos corridos del Pick 4 de cada sorteo.</div>'+
+   (t.det.length?'<div class="meth">Últimos: '+t.det.slice(-6).map(x=>x.d.slice(5)+(x.s==='MID'?' Día ':' Noche ')+(x.bi.length?'🎯 '+x.bi.join(','):x.un.length?'✔ '+x.un.slice(0,3).join(','):'—')).join(' · ')+'</div>':'');
+  }catch(e){showErr(e,'parlés del día');}}
 // ---- Imagen para compartir: los 10 primeros (rojo) de Pronósticos + los fijos de corridos, patrones activos y cadena como números extra ----
 function gcCloud(c,x,y,w,h){const N=14,cx=x+w/2,cy=y+h/2,rx=w/2*0.92,ry=h/2*0.92;c.beginPath();
   for(let i=0;i<N;i++){const a0=i/N*2*Math.PI,a1=(i+1)/N*2*Math.PI,am=(a0+a1)/2,px=cx+rx*Math.cos(a1),py=cy+ry*Math.sin(a1),qx=cx+rx*1.14*Math.cos(am),qy=cy+ry*1.14*Math.sin(am);
@@ -765,7 +805,7 @@ function gcStar(c,x,y,r,col){c.beginPath();for(let i=0;i<10;i++){const a=-Math.P
 function gcArrow(c,x1,y,x2){c.strokeStyle='#e53935';c.fillStyle='#e53935';c.lineWidth=8;c.lineCap='round';c.beginPath();c.moveTo(x1,y);c.lineTo(x2-12,y);c.stroke();c.beginPath();c.moveTo(x2,y);c.lineTo(x2-22,y-16);c.lineTo(x2-22,y+16);c.closePath();c.fill();}
 function gcFit(c,t,maxW,size,wt){let f=size;do{c.font=wt+' '+f+'px system-ui,Arial,sans-serif';if(c.measureText(t).width<=maxW||f<=14)break;f-=1;}while(true);}
 function genImg(){
-  const r=genList();if(!r)return null;const top=r.all.slice(0,10),ext=r.all.slice(10).filter(x=>/[KRH]/.test(x.f)),list=top.concat(ext),N=list.length,ttl=ext.length?'PRONÓSTICO':'PRONÓSTICO · TOP 10',cv=$('g-cv'),W=1080,H=400+Math.ceil(N/5)*340,c=cv.getContext('2d');
+  const r=genList();if(!r)return null;const top=r.all.slice(0,10),ext=r.all.slice(10).filter(x=>/[KRH]/.test(x.f)),PL=parFor(r).slice(0,9),list=top.concat(ext),N=list.length,ttl=ext.length?'PRONÓSTICO':'PRONÓSTICO · TOP 10',cv=$('g-cv'),W=1080,H=400+Math.ceil(N/5)*340+(PL.length?Math.ceil(PL.length/3)*100+20:0),c=cv.getContext('2d');
   cv.width=W;cv.height=H;
   c.fillStyle='#fffdf5';c.fillRect(0,0,W,H);c.lineWidth=14;c.strokeStyle='#42a5f5';c.strokeRect(10,10,W-20,H-20);
   gcStar(c,70,70,38,'#ffd54f');gcStar(c,W-70,70,38,'#ffd54f');gcStar(c,70,H-70,38,'#ffd54f');gcStar(c,W-70,H-70,38,'#ffd54f');
@@ -783,6 +823,11 @@ function genImg(){
     c.fillStyle='#e53935';c.beginPath();c.arc(x+22,y+28,22,0,7);c.fill();c.fillStyle='#fff';c.font='800 26px system-ui,Arial,sans-serif';c.fillText(String(i+1),x+22,y+29);
     if(col<4)gcArrow(c,x+bw-4,y+bh/2,x+bw+gap+4);
   }
+  if(PL.length){const rw=Math.ceil(N/5),y0=250+rw*340-35,tt='PARLÉS DEL '+(PAR_NOM[r.wd]||'DÍA').toUpperCase(),pw=300,ph=80,pg=30,TC=[['#ffd54f','#b45309'],['#c8e6c9','#2e7d32'],['#bbdefb','#1565c0']];
+    c.fillStyle='#1a237e';c.textAlign='center';c.textBaseline='middle';gcFit(c,tt,900,36,'800');c.fillText(tt,W/2,y0);
+    PL.forEach((p,i)=>{const row=Math.floor(i/3),m=Math.min(3,PL.length-row*3),x=(W-(m*pw+(m-1)*pg))/2+(i%3)*(pw+pg),y=y0+35+row*100,tc=TC[p.tier]||TC[2],tx=(p.half?'★ ':'')+p.k;
+      c.beginPath();c.roundRect?c.roundRect(x,y,pw,ph,30):c.rect(x,y,pw,ph);c.fillStyle=tc[0];c.fill();c.lineWidth=6;c.strokeStyle=tc[1];c.stroke();
+      c.fillStyle='#1a1a1a';c.textAlign='center';c.textBaseline='middle';gcFit(c,tx,pw-40,52,'800');c.fillText(tx,x+pw/2,y+ph/2+2);});}
   c.fillStyle='#455a64';c.textAlign='center';c.font='700 24px system-ui,Arial,sans-serif';c.fillText('Coincidencia entre reglas. Es entretenimiento: juega con responsabilidad.',W/2,H-70);
   
   return cv;
@@ -790,7 +835,7 @@ function genImg(){
 $('g-share').onclick=async()=>{const m=$('g-msg');try{
   const cv=genImg();if(!cv){m.textContent='Todavía no hay datos.';return;}cv.style.display='block';
   const blob=await new Promise(res=>cv.toBlob(res,'image/png')),f=new File([blob],'pronostico-top10.png',{type:'image/png'});
-  if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Pronóstico Top 10',text:(function(){const _r=genList(),_s=shInfo();return _s.dia+' · Decena más fuerte '+_s.d+' · Terminal más fuerte '+_s.t+'\n'+'Pronóstico ('+(10+_r.all.slice(10).filter(x=>/[KRH]/.test(x.f)).length)+' números): '+_r.all.slice(0,10).concat(_r.all.slice(10).filter(x=>/[KRH]/.test(x.f))).map(x=>x.n).join(' ');})()});m.className='msg ok';m.textContent='Listo.';}
+  if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Pronóstico Top 10',text:(function(){const _r=genList(),_s=shInfo();return _s.dia+' · Decena más fuerte '+_s.d+' · Terminal más fuerte '+_s.t+'\n'+'Pronóstico ('+(10+_r.all.slice(10).filter(x=>/[KRH]/.test(x.f)).length)+' números): '+_r.all.slice(0,10).concat(_r.all.slice(10).filter(x=>/[KRH]/.test(x.f))).map(x=>x.n).join(' ')+(function(){const _p=parFor(_r).slice(0,9);return _p.length?'\nParlés del '+(PAR_NOM[_r.wd]||'día')+': '+_p.map(x=>x.k).join(' · '):'';})();})()});m.className='msg ok';m.textContent='Listo.';}
   else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pronostico-top10.png';a.click();m.className='msg ok';m.textContent='Se descargó la imagen. Si no, mantén pulsada la de abajo para guardarla.';}
 }catch(e){if(e&&e.name==='AbortError')return;m.className='msg bad';m.textContent='No se pudo compartir. Mantén pulsada la imagen de abajo para guardarla.';}};
 
@@ -1281,7 +1326,7 @@ $('b-del').onclick=()=>{const l=ROWS[ROWS.length-1];if(!l||!confirm('¿Borrar el
   $('m-del').className='msg ok';$('m-del').textContent='Borrado.';render();setNext();};
 $('b-show').onclick=()=>{$('ta').value=csvText();$('ta').select();};
 $('b-dl').onclick=()=>{try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csvText()],{type:'text/csv'}));a.download='pick3_copia_'+(ROWS[ROWS.length-1]||{d:''}).d+'.csv';document.body.appendChild(a);a.click();a.remove();}catch(e){}$('ta').value=csvText();};
-function fullBackup(){const o={app:'FPA',ver:'0.9.58',fecha:new Date().toISOString(),data:{}};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('fpa_')===0)o.data[k]=localStorage.getItem(k);}return JSON.stringify(o);}
+function fullBackup(){const o={app:'FPA',ver:'0.9.59',fecha:new Date().toISOString(),data:{}};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('fpa_')===0)o.data[k]=localStorage.getItem(k);}return JSON.stringify(o);}
 $('b-full').onclick=()=>{const m=$('m-imp');try{const t=fullBackup(),n=Object.keys(JSON.parse(t).data).length,a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'application/json'}));a.download='fpa_copia_completa_'+((ROWS[ROWS.length-1]||{d:''}).d)+'.json';document.body.appendChild(a);a.click();a.remove();m.className='msg ok';m.textContent='Copia completa descargada ('+n+' bloques de datos: sorteos, pronósticos congelados, patrones, cadenas, triángulo y ajustes). Para restaurar, elige ese archivo .json abajo.';}catch(e){m.className='msg bad';m.textContent='No se pudo hacer la copia: '+e.message;showErr(e,'copia completa');}};
 function doImport(text){
   if(/^\s*\{/.test(text)){const m=$('m-imp');try{const o=JSON.parse(text);if(o.app!=='FPA'||!o.data)throw new Error('no es una copia completa de esta app');Object.keys(o.data).forEach(k=>{if(k.indexOf('fpa_')===0)localStorage.setItem(k,o.data[k]);});m.className='msg ok';m.textContent='Copia completa restaurada. Recargando…';setTimeout(()=>location.reload(),900);}catch(e){m.className='msg bad';m.textContent='No se pudo restaurar: '+e.message;showErr(e,'restaurar');}return;}const r=parseCSV(text),m=$('m-imp');let np=0,nm=0;
@@ -1339,7 +1384,7 @@ function ofInit(){try{const l=ROWS[ROWS.length-1],dt=l?parseDate(nextSlot(l.d,l.
   [1,2,3,4,5,6,0].forEach(i=>a+='<option value="'+i+'">'+DN[i]+'</option>');['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'].forEach((x,i)=>b+='<option value="'+(i+1)+'">'+x+'</option>');
   $('of-w').innerHTML=a;$('of-m').innerHTML=b;$('of-w').value=dt.getUTCDay();$('of-m').value=dt.getUTCMonth()+1;$('of-t').value=l?(nextSlot(l.d,l.s).session==='EVE'?1:0):2;$('of-w').onchange=$('of-m').onchange=$('of-t').onchange=ofRender;ofRender();}catch(e){showErr(e,'consulta histórica');}}
 ofInit();try{renderChain();}catch(e){}try{avisoRender();}catch(e){}
-function selfCheck(){const T=[['lista de 100',()=>{const r=genList();if(!r||new Set(r.all.map(x=>x.n)).size!==100)throw new Error('la lista no tiene 100 números distintos');}],['tabla de reglas',()=>{ruleGrid().forEach(x=>{if(x.h>x.n)throw new Error(x.nm+': aciertos > sorteos');});}],['corridos',()=>{corRender();}],['pestaña Año',()=>{anioRender();}],['consulta histórica',()=>{const S=ofStats();if(S.W[2].reduce((a,g)=>a+g.n,0)!==OFI.s.length/3)throw new Error('faltan sorteos');shInfo();}]];
+function selfCheck(){const T=[['lista de 100',()=>{const r=genList();if(!r||new Set(r.all.map(x=>x.n)).size!==100)throw new Error('la lista no tiene 100 números distintos');}],['tabla de reglas',()=>{ruleGrid().forEach(x=>{if(x.h>x.n)throw new Error(x.nm+': aciertos > sorteos');});}],['corridos',()=>{corRender();}],['parlés del día',()=>{parRender();}],['pestaña Año',()=>{anioRender();}],['consulta histórica',()=>{const S=ofStats();if(S.W[2].reduce((a,g)=>a+g.n,0)!==OFI.s.length/3)throw new Error('faltan sorteos');shInfo();}]];
   T.forEach(([n,f])=>{try{f();}catch(e){showErr(e,'Autoprueba «'+n+'»');}});}
 setTimeout(selfCheck,900);
 setTimeout(()=>doUpdate(true),400);
