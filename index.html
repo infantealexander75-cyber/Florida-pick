@@ -584,7 +584,7 @@ function render(){
 }
 let SNAP=load('fpa_snap',{});
 function ensureSnap(){try{const l=ROWS[ROWS.length-1];if(!l)return;const n=nextSlot(l.d,l.s),k=n.date+'|'+n.session;if(SNAP[k])return;const r=genList();if(!r||r.all.length<20)return;
-  SNAP[k]={r:r.all.slice(0,10).map(x=>x.n),a:r.all.slice(10,20).map(x=>x.n),t:new Date().toISOString()};store('fpa_snap',SNAP);}catch(e){showErr(e,'foto de la lista');}}
+  SNAP[k]={r:r.top.slice(0,10).map(x=>x.n),a:r.top.slice(10,20).map(x=>x.n),t:new Date().toISOString()};store('fpa_snap',SNAP);}catch(e){showErr(e,'foto de la lista');}}
 function ensurePred(){try{ensureSnap();}catch(e){}const p=makePred(ROWS);if(!p)return;if(!PRED[p.key]){PRED[p.key]={B:p.B,F:p.F,D:p.D,T:p.T,t:new Date().toISOString()};store('fpa_pred',PRED);}else if(PRED[p.key].D===undefined){PRED[p.key].D=p.D;PRED[p.key].T=p.T;store('fpa_pred',PRED);}}
 const pct=p=>p<0.001?'<0.001':p.toFixed(3);
 function verdict(a){return '';}
@@ -605,13 +605,16 @@ function renderChain(){
   const ca=($('ca-a').value||'').replace(/\D/g,''),cb=($('ca-b').value||'').replace(/\D/g,'');
   if(ca&&cb)$('ca-out').innerHTML=chainHtml(ca.padStart(2,'0'),cb.padStart(2,'0'),chainFind(chRowsAll(),ca.padStart(2,'0'),cb.padStart(2,'0')));
   else $('ca-out').innerHTML=c?chainHtml(c.a,c.b,c.list):'';
+  if(!(ca&&cb)&&c&&c.list&&c.list.length)$('ca-out').innerHTML+=topNote(c.list.map(x=>x.n));
 }
 function renderFoll(){
   const f=followersTable(ROWS),l=ROWS[ROWS.length-1],q=($('fo-n').value||'').replace(/\D/g,''),n=q?q.padStart(2,'0'):(l?l.p3.slice(1):'');
   if(!n){$('fo-out').innerHTML='';return;}
   const L=f[n]||[];
   $('fo-out').innerHTML=L.length?'<div class="msg"><b>'+n+'</b> salió <b>'+L.length+'</b> veces desde '+FOLL_FROM+(q?'':' (último sorteo)')+'. Después salió:</div><table>'+L.map(x=>'<tr><td>'+n+' → <b>'+x.f+'</b></td><td>'+x.d.slice(5)+' '+sesName(x.s)+'</td></tr>').join('')+'</table><div class="meth" style="margin-top:6px">Resumen: '+folSummary(L).map(e=>e[0]+(e[1]>1?'×'+e[1]:'')).join(', ')+'</div>'+'<div class="meth" style="margin-top:6px">Dos pasos ('+n+' → # → #): '+(followers2(ROWS,n).map(e=>e[0]+(e[1]>1?'×'+e[1]:'')).join(', ')||'—')+'</div>':'<div class="meth">'+n+' no ha salido (con sorteo siguiente) desde '+FOLL_FROM+'.</div>';
+  if(!q&&L.length)$('fo-out').innerHTML+=topNote(L.map(x=>x.f));
 }
+function topNote(a){try{const r=genList(),tp=new Set(finGet(r).l.map(x=>x.n)),u=[...new Set(a)],ins=u.filter(x=>tp.has(x)),out=u.filter(x=>!tp.has(x));return '<div class="meth" style="margin-top:6px"><b>En el Top de pronósticos:</b> '+(ins.join(' ')||'—')+(out.length?' · fuera por el tope de 20: '+out.join(' '):'')+'</div>';}catch(e){return '';}}
 function renderFollAll(){
   const f=followersTable(ROWS);let h='';
   for(let i=0;i<100;i++){const n=String(i).padStart(2,'0'),s=folSummary(f[n]||[]);h+='<tr><td><b>'+n+'</b></td><td>'+(s.length?s.map(e=>e[0]+(e[1]>1?'×'+e[1]:'')).join(', '):'—')+'</td></tr>';}
@@ -707,7 +710,7 @@ function genList(){
   all.sort((a,b)=>b.sc-a.sc||b.cn-a.cn||b.cs-a.cs||(a.n<b.n?-1:1));
   const cad={};try{const cc=chainNow(ROWS);if(cc&&cc.list)cc.list.forEach(x=>{(cad[x.n]=cad[x.n]||[]).push(cc.a+'→'+cc.b+' ('+x.d+')');});}catch(e){showErr(e,'cadena en el pronóstico');}
   const fol={};try{folSummary(followersTable(ROWS)[base]||[]).forEach(e=>{fol[e[0]]=e[1];});}catch(e){showErr(e,'seguidores en el pronóstico');}
-  const cor=corFijos(ROWS),isx=x=>cor[x.n]||pat[x.n]||cad[x.n]||fol[x.n],mk=x=>{if(cor[x.n])x.f+='K';if(pat[x.n])x.f+='R';if(cad[x.n])x.f+='H';if(fol[x.n])x.f+='S';};all.slice(0,20).forEach(mk);const kx=all.slice(20).filter(isx);kx.forEach(x=>{mk(x);x.kadd=true;});const all2=all.slice(0,20).concat(kx,all.slice(20).filter(x=>!isx(x)));const yp=c.filter(x=>yhas(x)).map(x=>x.n);return{n,wd,base,pr,c,tri,en,un,ah,all:all2,yp,cor,pat,cad,fol,kx:kx.length};
+  const cor=corFijos(ROWS),isx=x=>cor[x.n]||pat[x.n]||cad[x.n]||fol[x.n],mk=x=>{if(cor[x.n])x.f+='K';if(pat[x.n])x.f+='R';if(cad[x.n])x.f+='H';if(fol[x.n])x.f+='S';};all.slice(0,20).forEach(mk);const kx=all.slice(20).filter(isx);kx.forEach(x=>{mk(x);x.kadd=true;});const all2=all.slice(0,20).concat(kx,all.slice(20).filter(x=>!isx(x)));const yp=c.filter(x=>yhas(x)).map(x=>x.n);const R0={n,wd,base,pr,c,tri,en,un,ah,all:all2,yp,cor,pat,cad,fol,kx:kx.length};R0.top=finBuild(R0);return R0;
 }
 function genRender(){try{
   const r=genList();if(!r)return;
@@ -715,9 +718,10 @@ function genRender(){try{
   const grp={};for(const e of r.un){const L=e[1].length;(grp[L]=grp[L]||[]).push(e[0]);}
   const tab=Object.keys(grp).map(Number).sort((a,b)=>b-a).map(L=>'<div class="meth">×'+L+': <b>'+grp[L].join(' ')+'</b></div>').join('');
   const cs=r.c.slice().sort((a,b)=>b.nm-a.nm||b.score-a.score).slice(0,12).map(x=>x.n+'('+x.nm+')').join(' ');
+  const TP=finGet(r).l,TPS=new Set(TP.map(x=>x.n)),RS=r.all.filter(x=>!TPS.has(x.n)),RV=RS.filter(x=>/[KRHS]/.test(x.f)),RN=RS.filter(x=>!/[KRHS]/.test(x.f));
   $('gen-out').innerHTML=
-   '<div class="msg">Para el sorteo: <b>'+r.n.date+' ('+DIAS[r.wd]+') · '+sesName(r.n.session)+'</b><div class="meth">Último trasero '+r.base+'. Prioridad: 1 Pronóstico · 2 Candidatos · 3 Triángulo · 4 Ensemble · 5 Patrones del año · 6 Tablas. Las letras de cada número dicen qué fuentes lo traen: P Pronóstico, C Candidatos, T Triángulo, E Ensemble, U Tablas, A Ahorcado, Y Patrón del año, K Corrido, S Seguidor (número que salió después de este último trasero), H Cadena (número que salió después de esta misma cadena), R Patrón activo del calendario (número que sale en un patrón activado): si no estaba en el rojo ni en el azul, se agrega en violeta.</div></div>'+
-   '<div class="pg r">Rojo · del 1 al 10</div>'+g(r.all.slice(0,10),'r')+'<div class="pg a">Azul · del 11 al 20</div>'+g(r.all.slice(10,20),'a')+(r.kx?'<div class="pg k">Violeta · fijos de corridos, seguidores, patrones activos y cadena ('+r.kx+')</div>'+g(r.all.slice(20,20+r.kx),'k'):'')+'<div class="pg">Negro · el resto</div>'+g(r.all.slice(20+(r.kx||0)),'n')+
+   '<div class="msg">Para el sorteo: <b>'+r.n.date+' ('+DIAS[r.wd]+') · '+sesName(r.n.session)+'</b><div class="meth">Último trasero '+r.base+'. El TOP lleva hasta 20 números: primero los de la cadena, los corridos, los seguidores y los activados en el Año (sin repetir), y se completa hasta 12 con las demás fuentes (Pronóstico, Candidatos, Triángulo, Ensemble, Patrones del año, Tablas, decena y terminal más fuertes). Las letras de cada número dicen qué fuentes lo traen: P Pronóstico, C Candidatos, T Triángulo, E Ensemble, U Tablas, A Ahorcado, Y Patrón del año, D Decena fuerte, N Terminal fuerte, K Corrido, S Seguidor (número que salió después de este último trasero), H Cadena (número que salió después de esta misma cadena), R Patrón activo del calendario (número que sale en un patrón activado). Los de K, S, H y R entran siempre al Top, hasta el tope de 20.</div></div>'+
+   '<div class="pg r">TOP · Rojo · del 1 al 10</div>'+g(TP.slice(0,10),'r')+(TP.length>10?'<div class="pg a">TOP · Azul · del 11 al '+TP.length+'</div>'+g(TP.slice(10),'a'):'')+(RV.length?'<div class="pg k">Violeta · fijos, seguidores, patrones o cadena que no caben en el tope de 20 ('+RV.length+')</div>'+g(RV,'k'):'')+'<div class="pg">Negro · el resto</div>'+g(RN,'n')+
    '<div class="msg"><b>Por fuente</b></div>'+
    '<div class="meth"><b>1 · Pronóstico:</b> '+(r.pr.B.join(' · ')||'—')+(r.pr.D!==undefined&&r.pr.D!==''?' · decena '+r.pr.D+' · terminal '+r.pr.T:'')+'</div>'+
    '<div class="meth"><b>2 · Candidatos</b> (los que traen más reglas): '+(cs||'—')+'</div>'+
@@ -737,7 +741,7 @@ function redTrack(st){
   const sk=(st||RED_START),key=r=>r.d+'|'+r.s,ord=r=>r.d+(r.s==='MID'?'0':'1'),o=sk.replace('|MID','0').replace('|EVE','1'),all=ROWS.slice();
   let n=0,hr=0,ha=0,nf=0;const det=[];
   try{
-    for(let i=1;i<all.length;i++){if(ord(all[i])<o)continue;const sn=SNAP[slotKey(all[i])];let R,A;if(sn){R=sn.r;A=sn.a;nf++;}else{ROWS=all.slice(0,i);const r=genList();if(!r)continue;R=r.all.slice(0,10).map(x=>x.n);A=r.all.slice(10,20).map(x=>x.n);}const t=all[i].p3.slice(1);n++;det.push({k:slotKey(all[i]),hr:R.includes(t),ha:A.includes(t),f:!!sn});if(R.includes(t))hr++;else if(A.includes(t))ha++;}
+    for(let i=1;i<all.length;i++){if(ord(all[i])<o)continue;const sn=SNAP[slotKey(all[i])];let R,A;if(sn){R=sn.r;A=sn.a;nf++;}else{ROWS=all.slice(0,i);const r=genList();if(!r)continue;R=r.top.slice(0,10).map(x=>x.n);A=r.top.slice(10,20).map(x=>x.n);}const t=all[i].p3.slice(1);n++;det.push({k:slotKey(all[i]),hr:R.includes(t),ha:A.includes(t),f:!!sn});if(R.includes(t))hr++;else if(A.includes(t))ha++;}
   }finally{ROWS=all;}
   const v={n,hr,ha,det,nf};if(ck)RT_C={k:ck,v};return v;}
 function redTrackRender(){try{const t=redTrack();$('g-seg').innerHTML='<b>Seguimiento de la lista</b> (regla fija desde el 22-oct Día, sin mirar el futuro)<div class="meth">Rojo (1 al 10): <b>'+t.hr+' de '+t.n+'</b> · Azul (11 al 20): <b>'+t.ha+' de '+t.n+'</b> · Rojo o azul: <b>'+(t.hr+t.ha)+' de '+t.n+'</b></div><div class="meth">Con la lista tal como se mostró ese día: <b>'+t.nf+'</b> de '+t.n+'. Los otros '+(t.n-t.nf)+' se recalcularon con las reglas de hoy (aún no había foto guardada).</div>';}catch(e){showErr(e,'seguimiento de la lista');}}
@@ -763,14 +767,14 @@ const PAR_DIA={"Mon":["74-61","74-24","74-99","74-87","74-75","87-37","87-16","1
 const PAR_START='2026-10-231',PAR_MAX=12,PAR_NOM={Mon:'lunes',Tue:'martes',Wed:'miércoles',Thu:'jueves',Fri:'viernes',Sat:'sábado',Sun:'domingo'};
 function parSalidos(r){const o=[];if(r&&r.p3)o.push(r.p3.slice(1));if(r&&r.p4&&r.p4.length>=4){o.push(r.p4.slice(0,2));o.push(r.p4.slice(2,4));}return o;}
 function parDia(r,prev){
-  const col=PAR_DIA[r.wd]||[],pos={},cnt={},org={};r.all.forEach((x,i)=>{pos[x.n]=i;});
+  const col=PAR_DIA[r.wd]||[],pos={},cnt={},org={};r.all.forEach((x,i)=>{pos[x.n]=100+i;});(r.top||finBuild(r)).forEach((x,i)=>{pos[x.n]=i;});
   col.forEach(p=>{const k=p.split('-').sort().join('-');cnt[k]=(cnt[k]||0)+1;if(!org[k])org[k]=p;});
   const sal=new Set(parSalidos(prev)),out=[];
   for(const k in cnt){const a=k.split('-')[0],b=k.split('-')[1],pa=pos[a],pb=pos[b];if(pa===undefined||pb===undefined)continue;
     const ha=sal.has(a),hb=sal.has(b),half=(ha&&!hb)?b:(hb&&!ha)?a:'';
     let tier;
-    if(half){const pp=pos[half];if(pp>=20)continue;tier=pp<10?0:1;}
-    else{const ra=pa<10,rb=pb<10;if(!ra&&!rb)continue;tier=(ra&&rb)?0:((ra&&pb<20)||(rb&&pa<20))?1:2;}
+    if(half){const pp=pos[half];if(pp>=120)continue;tier=pp<100?0:1;}
+    else{const ra=pa<100,rb=pb<100;if(!ra&&!rb)continue;tier=(ra&&rb)?0:((ra&&pb<120)||(rb&&pa<120))?1:2;}
     out.push({a,b,k:org[k],n:cnt[k],tier,pa,pb,half,done:(ha?a:'')||(hb?b:'')});}
   out.sort((x,y)=>(y.half?1:0)-(x.half?1:0)||x.tier-y.tier||y.n-x.n||(Math.min(x.pa,x.pb)-Math.min(y.pa,y.pb)));
   return out;}
@@ -786,14 +790,14 @@ function parTrack(){
   const v={n,b,u,det};PT2_C={k:ck,v};return v;}
 function parRender(){try{const l=ROWS[ROWS.length-1],r=genList();if(!l||!r)return;
   const L=parFor(r),sh=L.slice(0,PAR_MAX),nm=PAR_NOM[r.wd]||r.wd,ses=r.n.session==='MID'?'Día':'Noche';
-  const col=i=>i<10?'rojo':i<20?'azul':(r.all[i].kadd?'violeta':'negro');
+  const col=i=>i<100?'en el Top, puesto '+(i+1):'fuera del Top';
   const ln=x=>{let t='<b>'+x.k+'</b>'+(x.n>1?' ×'+x.n:'')+' · ';
-    if(x.half){const pp=x.half===x.a?x.pa:x.pb;t+='✅ ya salió '+x.done+' en el Día, falta <b>'+x.half+'</b> (puesto '+(pp+1)+', '+col(pp)+')';}
-    else t+=x.a+': puesto '+(x.pa+1)+' ('+col(x.pa)+') · '+x.b+': puesto '+(x.pb+1)+' ('+col(x.pb)+')'+(x.tier===0?' ★ los dos en el Top':'');
+    if(x.half){const pp=x.half===x.a?x.pa:x.pb;t+='✅ ya salió '+x.done+' en el Día, falta <b>'+x.half+'</b> ('+col(pp)+')';}
+    else t+=x.a+' ('+col(x.pa)+') · '+x.b+' ('+col(x.pb)+')'+(x.tier===0?' ★ los dos en el Top':'');
     return '<div class="meth">'+t+'</div>';};
   const t=parTrack();
-  $('g-par').innerHTML='<b>Parlés del día</b> · columna del '+nm+' ('+ses+')<div class="meth">Parejas del Excel de ese día que traen un número del Top 10 (rojo). Se juegan tal cual como parlé; no se convierten en fijos.'+(r.n.session==='EVE'?' Para la Noche, si en el Día ya salió un número de la pareja, queda como mitad cumplida.':'')+'</div>'+
-   (sh.length?sh.map(ln).join('')+(L.length>sh.length?'<div class="meth">Se muestran '+sh.length+' de '+L.length+'.</div>':''):'<div class="meth">Ninguna pareja de este día trae números del Top 10.</div>')+
+  $('g-par').innerHTML='<b>Parlés del día</b> · columna del '+nm+' ('+ses+')<div class="meth">Parejas del Excel de ese día que traen un número del Top. Se juegan tal cual como parlé; no se convierten en fijos.'+(r.n.session==='EVE'?' Para la Noche, si en el Día ya salió un número de la pareja, queda como mitad cumplida.':'')+'</div>'+
+   (sh.length?sh.map(ln).join('')+(L.length>sh.length?'<div class="meth">Se muestran '+sh.length+' de '+L.length+'.</div>':''):'<div class="meth">Ninguna pareja de este día trae números del Top.</div>')+
    '<div class="meth">Seguimiento (prueba desde el 23-oct Noche, con las primeras '+PAR_MAX+' parejas): <b>bingo '+t.b+' de '+t.n+'</b> · <b>al menos un número '+t.u+' de '+t.n+'</b>. Cuenta el trasero y los dos corridos del Pick 4 de cada sorteo.</div>'+
    (t.det.length?'<div class="meth">Últimos: '+t.det.slice(-6).map(x=>x.d.slice(5)+(x.s==='MID'?' Día ':' Noche ')+(x.bi.length?'🎯 '+x.bi.join(','):x.un.length?'✔ '+x.un.slice(0,3).join(','):'—')).join(' · ')+'</div>':'');
   }catch(e){showErr(e,'parlés del día');}}
@@ -813,12 +817,12 @@ function finBuild(r){
   return forced.concat(rest).map(x=>({n:x.n,f:x.f+(dd(x)?'D':'')+(tt(x)?'N':'')}));}
 function finGet(r){const key=r.n.date+'|'+r.n.session,z=FROZEN[key],si=shInfo();
   if(z)return{l:z.l,p:z.p,d:z.d!==undefined?String(z.d):String(si.d),t:z.t2!==undefined?String(z.t2):String(si.t),frozen:true};
-  return{l:finBuild(r),p:parFor(r).slice(0,9).map(x=>({k:x.k,tier:x.tier,half:x.half?1:0})),d:String(si.d),t:String(si.t),frozen:false};}
+  return{l:r.top||finBuild(r),p:parFor(r).slice(0,9).map(x=>({k:x.k,tier:x.tier,half:x.half?1:0})),d:String(si.d),t:String(si.t),frozen:false};}
 function finFreeze(r){const key=r.n.date+'|'+r.n.session;if(FROZEN[key])return;const f=finGet(r);FROZEN[key]={l:f.l,p:f.p,d:f.d,t2:f.t,t:new Date().toISOString()};store('fpa_frozen',FROZEN);}
 function finRender(){try{const r=genList();if(!r)return;const f=finGet(r);
-  $('g-fin').innerHTML='<b>Pronóstico para compartir</b> · '+DIAS[r.wd]+' '+(r.n.session==='MID'?'Día':'Noche')+' ('+f.l.length+' números)'+(f.frozen?' 🔒 congelado':'')+
-   '<div class="meth">Primero la cadena, los corridos, los seguidores y los números activados en el Año (violeta, hasta 20); luego, hasta completar 12, por coincidencias entre reglas (Patrón del año y Ensemble pesan un poco más; suman también la decena y el terminal más fuertes; Candidatos no cuenta). Al tocar "Compartir" se congela y el BINGO se canta contra esta lista.</div>'+
-   '<div class="meth">Decena más fuerte: <b>'+f.d+'</b> · Terminal más fuerte: <b>'+f.t+'</b> (van en la imagen y cuentan para el BINGO)</div><div class="chips">'+f.l.map(x=>'<span class="chip '+(/[KHRS]/.test(x.f)?'k':'r')+'">'+x.n+'<i>'+(x.f.replace('C','')||'&nbsp;')+'</i></span>').join('')+'</div>'+
+  $('g-fin').innerHTML='<b>Pronóstico para compartir</b> · '+DIAS[r.wd]+' '+(r.n.session==='MID'?'Día':'Noche')+(f.frozen?' 🔒 congelado':'')+
+   '<div class="meth">Se comparte el TOP de arriba ('+f.l.length+' números). Al tocar "Compartir" se congela y el BINGO se canta contra esa lista.</div>'+
+   '<div class="meth">Decena más fuerte: <b>'+f.d+'</b> · Terminal más fuerte: <b>'+f.t+'</b> (van en la imagen y cuentan para el BINGO)</div>'+
    (f.p.length?'<div class="meth"><b>Parlés:</b> '+f.p.map(x=>x.k).join(' · ')+'</div>':'');
   }catch(e){showErr(e,'pronóstico para compartir');}}
 // ---- Cartel de BINGO: contra el pronóstico compartido (congelado); si no hubo, avisa qué regla acertó ----
