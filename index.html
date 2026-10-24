@@ -22,7 +22,7 @@ textarea{min-height:110px;font:13px monospace}
 .num{display:inline-block;font:700 22px monospace;color:var(--pri);min-width:34px}
 .cand{padding:8px 0;border-top:1px solid var(--bd)}.cand:first-child{border-top:0}.meth{font-size:12px;color:var(--mut)}
 .warn{font-size:13px;color:var(--mut);background:var(--card);border:1px dashed var(--bd);border-radius:10px;padding:10px;margin-bottom:12px}
-.row{display:flex;gap:8px}.row>*{flex:1}.msg{margin:8px 0;font-size:14px}.ok{color:var(--ok)}.bad{color:var(--bad)}
+.bingo{margin:10px 12px;padding:12px 10px 8px;border-radius:16px;background:#fff1f0;border:3px solid #e53935;text-align:center;cursor:pointer}.bingo h2{margin:0 0 4px;color:#e53935;font-size:40px;letter-spacing:2px;font-weight:900;animation:bgp .9s ease-in-out infinite alternate}@keyframes bgp{from{transform:scale(1)}to{transform:scale(1.07)}}.bingo .by{font-size:16px;color:#37474f}.bingo .by2{margin-top:8px;font-size:14px;color:#b71c1c;font-weight:700}.bingo .bh{font-size:15px;color:#263238;margin-top:3px}.bingo .by3{margin-top:8px;font-size:11px;color:#90a4ae}.row{display:flex;gap:8px}.row>*{flex:1}.msg{margin:8px 0;font-size:14px}.ok{color:var(--ok)}.bad{color:var(--bad)}
 table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;border-bottom:1px solid var(--bd);text-align:left}
 .hide{display:none}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}.chip{font:700 18px monospace;padding:4px 8px;border-radius:8px;border:2px solid;background:var(--card);min-width:46px;text-align:center}.chip i{display:block;font:11px system-ui;font-style:normal;opacity:.8}
@@ -40,7 +40,8 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}</style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v0.9.60 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v0.9.62 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="tri">Triángulo</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
 <main>
@@ -181,7 +182,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v0.9.60</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v0.9.62</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -584,7 +585,7 @@ function render(){
   try{const bl=BASE.reduce((a,b)=>!a||ordKey(b)>ordKey(a)?b:a,null);if(l&&bl)$('hdr-data').textContent='Datos hasta: '+l.d+' '+sesName(l.s)+(ordKey(l)>ordKey(bl)?' (base '+bl.d+' '+sesName(bl.s)+' + actualizaciones)':'');}catch(e){}
   $('last').innerHTML=l?`<span class="num">${l.p3}</span> ${l.p4?'· Pick 4 <b>'+l.p4+'</b> ':''}<div class="meth">${l.d} · ${sesName(l.s)} · ${ROWS.length} sorteos en total</div>`:'Sin datos';
   ensurePred();renderCand();genRender();triRender();hangTrack();dwRender();renderHist();renderAcier();renderFoll();renderChain();
-  try{generarPanelPatrones();}catch(e){}try{anioRender();}catch(e){}try{chRender();}catch(e){}try{avisoRender();}catch(e){}try{redTrackRender();}catch(e){}try{corRender();}catch(e){}try{parRender();}catch(e){}
+  try{generarPanelPatrones();}catch(e){}try{anioRender();}catch(e){}try{chRender();}catch(e){}try{avisoRender();}catch(e){}try{redTrackRender();}catch(e){}try{corRender();}catch(e){}try{parRender();}catch(e){}try{bingoRender();}catch(e){}
 }
 let SNAP=load('fpa_snap',{});
 function ensureSnap(){try{const l=ROWS[ROWS.length-1];if(!l)return;const n=nextSlot(l.d,l.s),k=n.date+'|'+n.session;if(SNAP[k])return;const r=genList();if(!r||r.all.length<20)return;
@@ -654,6 +655,7 @@ function ruleGrid(){
   const rt=tr(()=>redTrack());
   if(rt){const a={},b={};rt.det.forEach(x=>{a[x.k]=x.hr;b[x.k]=x.ha;});add('Pronósticos','Lista roja (1 al 10)','desde 22-oct Día',a,0.10);add('Pronósticos','Lista azul (11 al 20)','desde 22-oct Día',b,0.10);}
   add('Pronósticos','Corridos → fijos','desde 22-oct Noche',tr(()=>corDet(R)),tr(()=>{const z={};for(let i=1;i<R.length;i++){if(ordKey(R[i])<COR_START||!R[i-1].p4)continue;z[slotKey(R[i])]=Object.keys(corFijos(R.slice(0,i))).length/100;}return k=>z[k];}));
+  add('Pronósticos','Parlés del día (corrido o bingo)','desde 23-oct Noche',tr(()=>{const m={};parTrack().det.forEach(x=>{m[x.d+'|'+x.s]=x.un.length>0;});return m;}));
   add('Reglas','Ensemble (top 5)','desde 11-oct Noche',tr(()=>{const m={};enRule(R).det.forEach(x=>{m[x.d+'|'+x.s]=x.hit;});return m;}),0.05);
   add('Reglas','Triángulo (página completa)','desde 13-oct Noche',tr(()=>{const st=triKey('2026-10-13','EVE'),m={};for(const r of R){if(triKey(r.d,r.s)<st)continue;m[slotKey(r)]=triDraw(r).hit;}return m;}));
   add('Reglas','Ahorcados','desde 17-oct Día',tr(()=>hangDet()));
@@ -667,7 +669,7 @@ function ruleGrid(){
 function renderAcier(){
   renderMine();
   const R=ROWS,l=R[R.length-1];if(!l)return;
-  const rules=ruleGrid(),cols=R.slice(-AC_N),nc=cols.length+2;
+  const rules=(RG_LAST=ruleGrid()),cols=R.slice(-AC_N),nc=cols.length+2;
   let h='<tr><th class="nm">Regla</th>'+cols.map(r=>'<th>'+(+r.d.slice(8))+'<br><span class="sb">'+(r.s==='MID'?'Día':'Noche')+'</span></th>').join('')+'<th class="tt">Total</th></tr>',g='';
   for(const x of rules){
     if(x.g!==g){g=x.g;h+='<tr class="gp"><td colspan="'+nc+'">'+g+'</td></tr>';}
@@ -798,6 +800,16 @@ function parRender(){try{const l=ROWS[ROWS.length-1],r=genList();if(!l||!r)retur
    '<div class="meth">Seguimiento (prueba desde el 23-oct Noche, con las primeras '+PAR_MAX+' parejas): <b>bingo '+t.b+' de '+t.n+'</b> · <b>al menos un número '+t.u+' de '+t.n+'</b>. Cuenta el trasero y los dos corridos del Pick 4 de cada sorteo.</div>'+
    (t.det.length?'<div class="meth">Últimos: '+t.det.slice(-6).map(x=>x.d.slice(5)+(x.s==='MID'?' Día ':' Noche ')+(x.bi.length?'🎯 '+x.bi.join(','):x.un.length?'✔ '+x.un.slice(0,3).join(','):'—')).join(' · ')+'</div>':'');
   }catch(e){showErr(e,'parlés del día');}}
+// ---- Cartel de BINGO: cuando cualquier regla acierta el último sorteo, se muestra en rojo y qué regla lo proporcionó ----
+var RG_LAST=null,BG_OFF='';
+function bingoRender(){try{const b=$('bingo'),l=ROWS[ROWS.length-1];if(!l){b.classList.add('hide');return;}
+  const rules=RG_LAST||ruleGrid(),key=slotKey(l),hits=rules.filter(x=>x.m&&x.m[key]===true);
+  if(!hits.length||BG_OFF===key){b.classList.add('hide');return;}
+  let pd=null;try{pd=parTrack().det.find(x=>x.d===l.d&&x.s===l.s)||null;}catch(e){}
+  const pp=PRED[key]||{},ex=x=>x.nm==='Decena fuerte'&&pp.D!==undefined?' — decena '+pp.D:x.nm==='Terminal fuerte'&&pp.T!==undefined?' — terminal '+pp.T:(x.nm.indexOf('Parlés')===0&&pd)?' — '+(pd.bi.length?'🎯 bingo '+pd.bi.join(', '):'pareja '+pd.un.slice(0,3).join(', ')):'';
+  b.innerHTML='<h2>🎉 ¡BINGO! 🎉</h2><div class="by"><b>'+l.d.slice(8)+'-'+l.d.slice(5,7)+' '+sesName(l.s)+'</b> · salió <b>'+l.p3.slice(1)+'</b> (Pick 3 '+l.p3+(l.p4?' · Pick 4 '+l.p4:'')+')</div><div class="by2">Lo proporcionó:</div>'+hits.map(x=>'<div class="bh">✅ '+x.nm+ex(x)+'</div>').join('')+'<div class="by3">Toca para cerrar</div>';
+  b.classList.remove('hide');b.onclick=()=>{BG_OFF=key;b.classList.add('hide');};
+  }catch(e){}}
 // ---- Imagen para compartir: los 10 primeros (rojo) de Pronósticos + los fijos de corridos, patrones activos y cadena como números extra ----
 function gcCloud(c,x,y,w,h){const N=14,cx=x+w/2,cy=y+h/2,rx=w/2*0.92,ry=h/2*0.92;c.beginPath();
   for(let i=0;i<N;i++){const a0=i/N*2*Math.PI,a1=(i+1)/N*2*Math.PI,am=(a0+a1)/2,px=cx+rx*Math.cos(a1),py=cy+ry*Math.sin(a1),qx=cx+rx*1.14*Math.cos(am),qy=cy+ry*1.14*Math.sin(am);
@@ -1327,7 +1339,7 @@ $('b-del').onclick=()=>{const l=ROWS[ROWS.length-1];if(!l||!confirm('¿Borrar el
   $('m-del').className='msg ok';$('m-del').textContent='Borrado.';render();setNext();};
 $('b-show').onclick=()=>{$('ta').value=csvText();$('ta').select();};
 $('b-dl').onclick=()=>{try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csvText()],{type:'text/csv'}));a.download='pick3_copia_'+(ROWS[ROWS.length-1]||{d:''}).d+'.csv';document.body.appendChild(a);a.click();a.remove();}catch(e){}$('ta').value=csvText();};
-function fullBackup(){const o={app:'FPA',ver:'0.9.60',fecha:new Date().toISOString(),data:{}};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('fpa_')===0)o.data[k]=localStorage.getItem(k);}return JSON.stringify(o);}
+function fullBackup(){const o={app:'FPA',ver:'0.9.62',fecha:new Date().toISOString(),data:{}};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('fpa_')===0)o.data[k]=localStorage.getItem(k);}return JSON.stringify(o);}
 $('b-full').onclick=()=>{const m=$('m-imp');try{const t=fullBackup(),n=Object.keys(JSON.parse(t).data).length,a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'application/json'}));a.download='fpa_copia_completa_'+((ROWS[ROWS.length-1]||{d:''}).d)+'.json';document.body.appendChild(a);a.click();a.remove();m.className='msg ok';m.textContent='Copia completa descargada ('+n+' bloques de datos: sorteos, pronósticos congelados, patrones, cadenas, triángulo y ajustes). Para restaurar, elige ese archivo .json abajo.';}catch(e){m.className='msg bad';m.textContent='No se pudo hacer la copia: '+e.message;showErr(e,'copia completa');}};
 function doImport(text){
   if(/^\s*\{/.test(text)){const m=$('m-imp');try{const o=JSON.parse(text);if(o.app!=='FPA'||!o.data)throw new Error('no es una copia completa de esta app');Object.keys(o.data).forEach(k=>{if(k.indexOf('fpa_')===0)localStorage.setItem(k,o.data[k]);});m.className='msg ok';m.textContent='Copia completa restaurada. Recargando…';setTimeout(()=>location.reload(),900);}catch(e){m.className='msg bad';m.textContent='No se pudo restaurar: '+e.message;showErr(e,'restaurar');}return;}const r=parseCSV(text),m=$('m-imp');let np=0,nm=0;
