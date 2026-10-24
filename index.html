@@ -40,7 +40,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}</style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 1 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 2 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="tri">Triángulo</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
@@ -177,7 +177,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 1</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 2</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -803,7 +803,7 @@ function parRender(){try{const l=ROWS[ROWS.length-1],r=genList();if(!l||!r)retur
   }catch(e){showErr(e,'parlés del día');}}
 // ---- Pronóstico para compartir: fijos de corridos y cadena primero, luego por coincidencias entre reglas; se congela al compartir ----
 var FROZEN=load('fpa_frozen',{});
-const FC_N=12,FC_MAX=20,FC_W={P:1,T:1,E:1.25,U:1,A:1,Y:1.5},FC_NOM={P:'Pronóstico',C:'Candidatos',T:'Triángulo',E:'Ensemble',U:'Tablas',A:'Ahorcado',Y:'Patrón del año',K:'Corrido → fijo',S:'Seguidor',H:'Cadena',R:'Patrón del calendario',D:'Decena fuerte',N:'Terminal fuerte'};
+const FC_BUILD=2,FC_N=12,FC_MAX=20,FC_W={P:1,T:1,E:1.25,U:1,A:1,Y:1.5},FC_NOM={P:'Pronóstico',C:'Candidatos',T:'Triángulo',E:'Ensemble',U:'Tablas',A:'Ahorcado',Y:'Patrón del año',K:'Corrido → fijo',S:'Seguidor',H:'Cadena',R:'Patrón del calendario',D:'Decena fuerte',N:'Terminal fuerte'};
 function finBuild(r){
   const by=new Map(r.all.map((x,i)=>[x.n,{x,i}])),F=[],seen=new Set(),ix=n=>by.get(n).i;
   const add=n=>{if(by.has(n)&&!seen.has(n)){seen.add(n);F.push(by.get(n).x);}},srt=o=>Object.keys(o||{}).sort((p,q)=>ix(p)-ix(q));
@@ -816,15 +816,17 @@ function finBuild(r){
   const rest=r.all.map((x,i)=>({x,i})).filter(o=>!set.has(o.x.n)).sort((p,q)=>sc(q.x)-sc(p.x)||p.i-q.i).slice(0,Math.max(0,FC_N-forced.length)).map(o=>o.x);
   return forced.concat(rest).map(x=>({n:x.n,f:x.f+(dd(x)?'D':'')+(tt(x)?'N':'')}));}
 function finGet(r){const key=r.n.date+'|'+r.n.session,z=FROZEN[key],si=shInfo();
-  if(z)return{l:z.l,p:z.p,d:z.d!==undefined?String(z.d):String(si.d),t:z.t2!==undefined?String(z.t2):String(si.t),frozen:true};
+  if(z&&z.b===FC_BUILD)return{l:z.l,p:z.p,d:z.d!==undefined?String(z.d):String(si.d),t:z.t2!==undefined?String(z.t2):String(si.t),frozen:true};
   return{l:r.top||finBuild(r),p:parFor(r).slice(0,9).map(x=>({k:x.k,tier:x.tier,half:x.half?1:0})),d:String(si.d),t:String(si.t),frozen:false};}
-function finFreeze(r){const key=r.n.date+'|'+r.n.session;if(FROZEN[key])return;const f=finGet(r);FROZEN[key]={l:f.l,p:f.p,d:f.d,t2:f.t,t:new Date().toISOString()};store('fpa_frozen',FROZEN);}
+function finFreeze(r){const key=r.n.date+'|'+r.n.session;if(FROZEN[key]&&FROZEN[key].b===FC_BUILD)return;const f=finGet(r);FROZEN[key]={l:f.l,p:f.p,d:f.d,t2:f.t,b:FC_BUILD,t:new Date().toISOString()};store('fpa_frozen',FROZEN);}
 function finRender(){try{const r=genList();if(!r)return;const f=finGet(r);
   $('g-fin').innerHTML='<b>Pronóstico para compartir</b> · '+DIAS[r.wd]+' '+(r.n.session==='MID'?'Día':'Noche')+(f.frozen?' 🔒 congelado':'')+
    '<div class="meth">Se comparte el TOP de arriba ('+f.l.length+' números). Al tocar "Compartir" se congela y el BINGO se canta contra esa lista.</div>'+
    '<div class="meth">Decena más fuerte: <b>'+f.d+'</b> · Terminal más fuerte: <b>'+f.t+'</b> (van en la imagen y cuentan para el BINGO)</div>'+
-   (f.p.length?'<div class="meth"><b>Parlés:</b> '+f.p.map(x=>x.k).join(' · ')+'</div>':'');
+   (f.p.length?'<div class="meth"><b>Parlés:</b> '+f.p.map(x=>x.k).join(' · ')+'</div>':'')+
+   (f.frozen?'<div><button class="btn s" data-act="unf" style="padding:6px 12px;font-size:13px">Recalcular (descongelar)</button></div>':'');
   }catch(e){showErr(e,'pronóstico para compartir');}}
+$('g-fin').onclick=e=>{if(e.target&&e.target.dataset&&e.target.dataset.act==='unf'){try{const r=genList();delete FROZEN[r.n.date+'|'+r.n.session];store('fpa_frozen',FROZEN);render();}catch(err){}}};
 // ---- Cartel de BINGO: contra el pronóstico compartido (congelado); si no hubo, avisa qué regla acertó ----
 var RG_LAST=null,BG_OFF='';
 function bingoRender(){try{const b=$('bingo'),l=ROWS[ROWS.length-1];if(!l){b.classList.add('hide');return;}
