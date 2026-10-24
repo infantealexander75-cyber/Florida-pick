@@ -22,7 +22,7 @@ textarea{min-height:110px;font:13px monospace}
 .num{display:inline-block;font:700 22px monospace;color:var(--pri);min-width:34px}
 .cand{padding:8px 0;border-top:1px solid var(--bd)}.cand:first-child{border-top:0}.meth{font-size:12px;color:var(--mut)}
 .warn{font-size:13px;color:var(--mut);background:var(--card);border:1px dashed var(--bd);border-radius:10px;padding:10px;margin-bottom:12px}
-.bingo{margin:10px 12px;padding:12px 10px 8px;border-radius:16px;background:#fff1f0;border:3px solid #e53935;text-align:center;cursor:pointer}.bingo h2{margin:0 0 4px;color:#e53935;font-size:40px;letter-spacing:2px;font-weight:900;animation:bgp .9s ease-in-out infinite alternate}@keyframes bgp{from{transform:scale(1)}to{transform:scale(1.07)}}.bingo .by{font-size:16px;color:#37474f}.bingo .by2{margin-top:8px;font-size:14px;color:#b71c1c;font-weight:700}.bingo .bh{font-size:15px;color:#263238;margin-top:3px}.bingo .by3{margin-top:8px;font-size:11px;color:#90a4ae}.row{display:flex;gap:8px}.row>*{flex:1}.msg{margin:8px 0;font-size:14px}.ok{color:var(--ok)}.bad{color:var(--bad)}
+.bingo{margin:10px 12px;padding:12px 10px 8px;border-radius:16px;background:#fff1f0;border:3px solid #e53935;text-align:center;cursor:pointer}.bingo h2{margin:0 0 4px;color:#e53935;font-size:40px;letter-spacing:2px;font-weight:900;animation:bgp .9s ease-in-out infinite alternate}@keyframes bgp{from{transform:scale(1)}to{transform:scale(1.07)}}.bingo .bsub{font-weight:800;color:#e53935;letter-spacing:1px;margin-bottom:4px}.bingo.alt{background:#fff8e1;border-color:#f57c00}.bingo.alt h2{color:#ef6c00;font-size:26px;animation:none}.bingo.alt .bsub{color:#ef6c00}.bingo .by{font-size:16px;color:#37474f}.bingo .by2{margin-top:8px;font-size:14px;color:#b71c1c;font-weight:700}.bingo .bh{font-size:15px;color:#263238;margin-top:3px}.bingo .by3{margin-top:8px;font-size:11px;color:#90a4ae}.row{display:flex;gap:8px}.row>*{flex:1}.msg{margin:8px 0;font-size:14px}.ok{color:var(--ok)}.bad{color:var(--bad)}
 table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;border-bottom:1px solid var(--bd);text-align:left}
 .hide{display:none}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}.chip{font:700 18px monospace;padding:4px 8px;border-radius:8px;border:2px solid;background:var(--card);min-width:46px;text-align:center}.chip i{display:block;font:11px system-ui;font-style:normal;opacity:.8}
@@ -40,7 +40,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}</style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v0.9.62 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v0.9.64 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="tri">Triángulo</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
@@ -75,6 +75,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <div class="msg" id="g-cor"></div>
   <div class="msg" id="g-par"></div>
   <div class="msg" id="g-seg"></div>
+  <div class="msg" id="g-fin"></div>
   <button class="btn" id="g-share">Compartir pronóstico (imagen)</button><div class="msg" id="g-msg"></div>
   <canvas id="g-cv" style="width:100%;border-radius:10px;display:none"></canvas></div>
 </section>
@@ -182,7 +183,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v0.9.62</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v0.9.64</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -585,7 +586,7 @@ function render(){
   try{const bl=BASE.reduce((a,b)=>!a||ordKey(b)>ordKey(a)?b:a,null);if(l&&bl)$('hdr-data').textContent='Datos hasta: '+l.d+' '+sesName(l.s)+(ordKey(l)>ordKey(bl)?' (base '+bl.d+' '+sesName(bl.s)+' + actualizaciones)':'');}catch(e){}
   $('last').innerHTML=l?`<span class="num">${l.p3}</span> ${l.p4?'· Pick 4 <b>'+l.p4+'</b> ':''}<div class="meth">${l.d} · ${sesName(l.s)} · ${ROWS.length} sorteos en total</div>`:'Sin datos';
   ensurePred();renderCand();genRender();triRender();hangTrack();dwRender();renderHist();renderAcier();renderFoll();renderChain();
-  try{generarPanelPatrones();}catch(e){}try{anioRender();}catch(e){}try{chRender();}catch(e){}try{avisoRender();}catch(e){}try{redTrackRender();}catch(e){}try{corRender();}catch(e){}try{parRender();}catch(e){}try{bingoRender();}catch(e){}
+  try{generarPanelPatrones();}catch(e){}try{anioRender();}catch(e){}try{chRender();}catch(e){}try{avisoRender();}catch(e){}try{redTrackRender();}catch(e){}try{corRender();}catch(e){}try{parRender();}catch(e){}try{finRender();}catch(e){}try{bingoRender();}catch(e){}
 }
 let SNAP=load('fpa_snap',{});
 function ensureSnap(){try{const l=ROWS[ROWS.length-1];if(!l)return;const n=nextSlot(l.d,l.s),k=n.date+'|'+n.session;if(SNAP[k])return;const r=genList();if(!r||r.all.length<20)return;
@@ -656,6 +657,7 @@ function ruleGrid(){
   if(rt){const a={},b={};rt.det.forEach(x=>{a[x.k]=x.hr;b[x.k]=x.ha;});add('Pronósticos','Lista roja (1 al 10)','desde 22-oct Día',a,0.10);add('Pronósticos','Lista azul (11 al 20)','desde 22-oct Día',b,0.10);}
   add('Pronósticos','Corridos → fijos','desde 22-oct Noche',tr(()=>corDet(R)),tr(()=>{const z={};for(let i=1;i<R.length;i++){if(ordKey(R[i])<COR_START||!R[i-1].p4)continue;z[slotKey(R[i])]=Object.keys(corFijos(R.slice(0,i))).length/100;}return k=>z[k];}));
   add('Pronósticos','Parlés del día (corrido o bingo)','desde 23-oct Noche',tr(()=>{const m={};parTrack().det.forEach(x=>{m[x.d+'|'+x.s]=x.un.length>0;});return m;}));
+  add('Pronósticos','Pronóstico compartido','desde que se comparte',(()=>{const m={},by=new Map(R.map(r=>[slotKey(r),r]));for(const k in FROZEN){const r=by.get(k);if(r)m[k]=FROZEN[k].l.some(x=>x.n===r.p3.slice(1));}return Object.keys(m).length?m:null;})());
   add('Reglas','Ensemble (top 5)','desde 11-oct Noche',tr(()=>{const m={};enRule(R).det.forEach(x=>{m[x.d+'|'+x.s]=x.hit;});return m;}),0.05);
   add('Reglas','Triángulo (página completa)','desde 13-oct Noche',tr(()=>{const st=triKey('2026-10-13','EVE'),m={};for(const r of R){if(triKey(r.d,r.s)<st)continue;m[slotKey(r)]=triDraw(r).hit;}return m;}));
   add('Reglas','Ahorcados','desde 17-oct Día',tr(()=>hangDet()));
@@ -800,14 +802,44 @@ function parRender(){try{const l=ROWS[ROWS.length-1],r=genList();if(!l||!r)retur
    '<div class="meth">Seguimiento (prueba desde el 23-oct Noche, con las primeras '+PAR_MAX+' parejas): <b>bingo '+t.b+' de '+t.n+'</b> · <b>al menos un número '+t.u+' de '+t.n+'</b>. Cuenta el trasero y los dos corridos del Pick 4 de cada sorteo.</div>'+
    (t.det.length?'<div class="meth">Últimos: '+t.det.slice(-6).map(x=>x.d.slice(5)+(x.s==='MID'?' Día ':' Noche ')+(x.bi.length?'🎯 '+x.bi.join(','):x.un.length?'✔ '+x.un.slice(0,3).join(','):'—')).join(' · ')+'</div>':'');
   }catch(e){showErr(e,'parlés del día');}}
-// ---- Cartel de BINGO: cuando cualquier regla acierta el último sorteo, se muestra en rojo y qué regla lo proporcionó ----
+// ---- Pronóstico para compartir: fijos de corridos y cadena primero, luego por coincidencias entre reglas; se congela al compartir ----
+var FROZEN=load('fpa_frozen',{});
+const FC_N=12,FC_W={P:1,T:1,E:1.25,U:1,A:1,Y:1.5},FC_NOM={P:'Pronóstico',C:'Candidatos',T:'Triángulo',E:'Ensemble',U:'Tablas',A:'Ahorcado',Y:'Patrón del año',K:'Corrido → fijo',H:'Cadena',R:'Patrón del calendario',D:'Decena fuerte',N:'Terminal fuerte'};
+function finBuild(r){
+  const forced=r.all.filter(x=>/[KH]/.test(x.f)).slice(0,FC_N),set=new Set(forced.map(x=>x.n));
+  const si=shInfo(),dd=x=>String(si.d)===x.n[0],tt=x=>String(si.t)===x.n[1];
+  const sc=x=>{let v=0;for(const c in FC_W)if(x.f.indexOf(c)>=0)v+=FC_W[c];if(dd(x))v+=1;if(tt(x))v+=1;return v;};
+  const rest=r.all.map((x,i)=>({x,i})).filter(o=>!set.has(o.x.n)).sort((a,b)=>sc(b.x)-sc(a.x)||a.i-b.i).slice(0,Math.max(0,FC_N-forced.length)).map(o=>o.x);
+  return forced.concat(rest).map(x=>({n:x.n,f:x.f+(dd(x)?'D':'')+(tt(x)?'N':'')}));}
+function finGet(r){const key=r.n.date+'|'+r.n.session,z=FROZEN[key];
+  if(z)return{l:z.l,p:z.p,frozen:true};
+  return{l:finBuild(r),p:parFor(r).slice(0,9).map(x=>({k:x.k,tier:x.tier,half:x.half?1:0})),frozen:false};}
+function finFreeze(r){const key=r.n.date+'|'+r.n.session;if(FROZEN[key])return;const f=finGet(r);FROZEN[key]={l:f.l,p:f.p,t:new Date().toISOString()};store('fpa_frozen',FROZEN);}
+function finRender(){try{const r=genList();if(!r)return;const f=finGet(r);
+  $('g-fin').innerHTML='<b>Pronóstico para compartir</b> · '+DIAS[r.wd]+' '+(r.n.session==='MID'?'Día':'Noche')+' ('+f.l.length+' números)'+(f.frozen?' 🔒 congelado':'')+
+   '<div class="meth">Primero los fijos de corridos y la cadena (violeta); luego, por coincidencias entre reglas (Patrón del año y Ensemble pesan un poco más; suman también la decena y el terminal más fuertes; Candidatos no cuenta). Al tocar "Compartir" se congela y el BINGO se canta contra esta lista.</div>'+
+   '<div class="chips">'+f.l.map(x=>'<span class="chip '+(/[KH]/.test(x.f)?'k':'r')+'">'+x.n+'<i>'+(x.f.replace('C','')||'&nbsp;')+'</i></span>').join('')+'</div>'+
+   (f.p.length?'<div class="meth"><b>Parlés:</b> '+f.p.map(x=>x.k).join(' · ')+'</div>':'');
+  }catch(e){showErr(e,'pronóstico para compartir');}}
+// ---- Cartel de BINGO: contra el pronóstico compartido (congelado); si no hubo, avisa qué regla acertó ----
 var RG_LAST=null,BG_OFF='';
 function bingoRender(){try{const b=$('bingo'),l=ROWS[ROWS.length-1];if(!l){b.classList.add('hide');return;}
-  const rules=RG_LAST||ruleGrid(),key=slotKey(l),hits=rules.filter(x=>x.m&&x.m[key]===true);
-  if(!hits.length||BG_OFF===key){b.classList.add('hide');return;}
-  let pd=null;try{pd=parTrack().det.find(x=>x.d===l.d&&x.s===l.s)||null;}catch(e){}
-  const pp=PRED[key]||{},ex=x=>x.nm==='Decena fuerte'&&pp.D!==undefined?' — decena '+pp.D:x.nm==='Terminal fuerte'&&pp.T!==undefined?' — terminal '+pp.T:(x.nm.indexOf('Parlés')===0&&pd)?' — '+(pd.bi.length?'🎯 bingo '+pd.bi.join(', '):'pareja '+pd.un.slice(0,3).join(', ')):'';
-  b.innerHTML='<h2>🎉 ¡BINGO! 🎉</h2><div class="by"><b>'+l.d.slice(8)+'-'+l.d.slice(5,7)+' '+sesName(l.s)+'</b> · salió <b>'+l.p3.slice(1)+'</b> (Pick 3 '+l.p3+(l.p4?' · Pick 4 '+l.p4:'')+')</div><div class="by2">Lo proporcionó:</div>'+hits.map(x=>'<div class="bh">✅ '+x.nm+ex(x)+'</div>').join('')+'<div class="by3">Toca para cerrar</div>';
+  const key=slotKey(l),t=l.p3.slice(1),sal=new Set(parSalidos(l)),fr=FROZEN[key];
+  const rules=(RG_LAST||ruleGrid()).filter(x=>x.nm!=='Pronóstico compartido'&&x.nm.indexOf('Parlés')!==0),hits=rules.filter(x=>x.m&&x.m[key]===true);
+  const pp=PRED[key]||{},ex=x=>x.nm==='Decena fuerte'&&pp.D!==undefined?' — decena '+pp.D:x.nm==='Terminal fuerte'&&pp.T!==undefined?' — terminal '+pp.T:'';
+  const hl=hits.map(x=>'<div class="bh">✅ '+x.nm+ex(x)+'</div>').join('');
+  let ti='',su='',cls='bingo',body='';
+  if(fr){
+    const i=fr.l.findIndex(x=>x.n===t),pl=fr.p.map(p=>{const a=p.k.split('-');return{k:p.k,a:sal.has(a[0]),b:sal.has(a[1])};}),pb=pl.filter(x=>x.a&&x.b),pu=pl.filter(x=>(x.a||x.b)&&!(x.a&&x.b));
+    if(i>=0){ti='🎉 ¡BINGO! 🎉';su='DEL PRONÓSTICO';body='<div class="by2">Estaba en tu pronóstico compartido, puesto '+(i+1)+'. Lo proporcionó:</div>'+((fr.l[i].f||'').replace(/(.)(?=.*\1)/g,'').split('').filter(Boolean).map(c=>'<div class="bh">✅ '+(FC_NOM[c]||c)+'</div>').join('')||'<div class="bh">✅ Orden de la lista</div>');}
+    else if(pb.length){ti='🎯 ¡BINGO! 🎯';su='DE PARLÉ';}
+    else if(pu.length){ti='🎉 ¡CORRIDO! 🎉';}
+    if(ti&&(pb.length||pu.length))body+='<div class="by2">Parlés del pronóstico:</div>'+pb.map(x=>'<div class="bh">🎯 bingo '+x.k+'</div>').join('')+pu.slice(0,3).map(x=>'<div class="bh">✅ corrido '+x.k+' (salió '+(x.a?x.k.split('-')[0]:x.k.split('-')[1])+')</div>').join('');
+    if(!ti&&hits.length){ti='✅ Acierto';su='DE OTRA REGLA';cls='bingo alt';body='<div class="by2">No estaba en tu pronóstico compartido. La regla fue:</div>'+hl;}
+  }else if(hits.length){ti='🎉 ¡ACIERTO! 🎉';body='<div class="by2">No compartiste pronóstico para este sorteo. Lo proporcionó:</div>'+hl;}
+  if(!ti||BG_OFF===key){b.classList.add('hide');return;}
+  b.className=cls;
+  b.innerHTML='<h2>'+ti+'</h2>'+(su?'<div class="bsub">'+su+'</div>':'')+'<div class="by"><b>'+l.d.slice(8)+'-'+l.d.slice(5,7)+' '+sesName(l.s)+'</b> · salió <b>'+t+'</b> (Pick 3 '+l.p3+(l.p4?' · Pick 4 '+l.p4:'')+')</div>'+body+'<div class="by3">Toca para cerrar</div>';
   b.classList.remove('hide');b.onclick=()=>{BG_OFF=key;b.classList.add('hide');};
   }catch(e){}}
 // ---- Imagen para compartir: los 10 primeros (rojo) de Pronósticos + los fijos de corridos, patrones activos y cadena como números extra ----
@@ -818,7 +850,7 @@ function gcStar(c,x,y,r,col){c.beginPath();for(let i=0;i<10;i++){const a=-Math.P
 function gcArrow(c,x1,y,x2){c.strokeStyle='#e53935';c.fillStyle='#e53935';c.lineWidth=8;c.lineCap='round';c.beginPath();c.moveTo(x1,y);c.lineTo(x2-12,y);c.stroke();c.beginPath();c.moveTo(x2,y);c.lineTo(x2-22,y-16);c.lineTo(x2-22,y+16);c.closePath();c.fill();}
 function gcFit(c,t,maxW,size,wt){let f=size;do{c.font=wt+' '+f+'px system-ui,Arial,sans-serif';if(c.measureText(t).width<=maxW||f<=14)break;f-=1;}while(true);}
 function genImg(){
-  const r=genList();if(!r)return null;const top=r.all.slice(0,10),ext=r.all.slice(10).filter(x=>/[KRH]/.test(x.f)),PL=parFor(r).slice(0,9),list=top.concat(ext),N=list.length,ttl=ext.length?'PRONÓSTICO':'PRONÓSTICO · TOP 10',cv=$('g-cv'),W=1080,H=400+Math.ceil(N/5)*340+(PL.length?Math.ceil(PL.length/3)*100+20:0),c=cv.getContext('2d');
+  const r=genList();if(!r)return null;const FN=finGet(r),PL=FN.p,list=FN.l,N=list.length,ttl='PRONÓSTICO',cv=$('g-cv'),W=1080,H=400+Math.ceil(N/5)*340+(PL.length?Math.ceil(PL.length/3)*100+20:0),c=cv.getContext('2d');
   cv.width=W;cv.height=H;
   c.fillStyle='#fffdf5';c.fillRect(0,0,W,H);c.lineWidth=14;c.strokeStyle='#42a5f5';c.strokeRect(10,10,W-20,H-20);
   gcStar(c,70,70,38,'#ffd54f');gcStar(c,W-70,70,38,'#ffd54f');gcStar(c,70,H-70,38,'#ffd54f');gcStar(c,W-70,H-70,38,'#ffd54f');
@@ -826,7 +858,7 @@ function genImg(){
   c.fillStyle='#ffee58';c.strokeStyle='#1a237e';c.lineWidth=8;c.beginPath();c.roundRect?c.roundRect(150,50,780,110,40):c.rect(150,50,780,110);c.fill();c.stroke();
   c.fillStyle='#1a237e';c.textAlign='center';c.textBaseline='middle';gcFit(c,ttl,720,62,'800');c.fillText(ttl,W/2,105);
   c.fillStyle='#37474f';gcFit(c,'Florida Pick 3 · '+DIAS[r.wd]+' '+(r.n.session==='MID'?'Día':'Noche')+' · '+r.n.date,900,34,'700');c.fillText('Florida Pick 3 · '+DIAS[r.wd]+' '+(r.n.session==='MID'?'Día':'Noche')+' · '+r.n.date,W/2,195);
-  {const si=shInfo(),tx=si.dia+' · Decena más fuerte '+si.d+' · Terminal más fuerte '+si.t+' · '+N+' números'+(ext.length?' (10 + '+ext.length+')':'');c.fillStyle='#455a64';gcFit(c,tx,W-60,28,'700');c.fillText(tx,W/2,228);}
+  {const si=shInfo(),tx=si.dia+' · Decena más fuerte '+si.d+' · Terminal más fuerte '+si.t+' · '+N+' números';c.fillStyle='#455a64';gcFit(c,tx,W-60,28,'700');c.fillText(tx,W/2,228);}
   const cols=['#f8bbd0','#fff59d','#c8e6c9','#bbdefb','#e1bee7'],bd=['#d81b60','#f9a825','#2e7d32','#1565c0','#6a1b9a'],bw=170,bh=250,gap=(W-120-5*bw)/4;
   for(let i=0;i<N;i++){
     const row=Math.floor(i/5),col=i%5,x=60+col*(bw+gap),y=250+row*(bh+90),k=list[i].n,nm=pnNm(k)||'';
@@ -846,9 +878,9 @@ function genImg(){
   return cv;
 }
 $('g-share').onclick=async()=>{const m=$('g-msg');try{
-  const cv=genImg();if(!cv){m.textContent='Todavía no hay datos.';return;}cv.style.display='block';
+  try{const _r0=genList();if(_r0)finFreeze(_r0);}catch(e){}const cv=genImg();if(!cv){m.textContent='Todavía no hay datos.';return;}cv.style.display='block';
   const blob=await new Promise(res=>cv.toBlob(res,'image/png')),f=new File([blob],'pronostico-top10.png',{type:'image/png'});
-  if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Pronóstico Top 10',text:(function(){const _r=genList(),_s=shInfo();return _s.dia+' · Decena más fuerte '+_s.d+' · Terminal más fuerte '+_s.t+'\n'+'Pronóstico ('+(10+_r.all.slice(10).filter(x=>/[KRH]/.test(x.f)).length)+' números): '+_r.all.slice(0,10).concat(_r.all.slice(10).filter(x=>/[KRH]/.test(x.f))).map(x=>x.n).join(' ')+(function(){const _p=parFor(_r).slice(0,9);return _p.length?'\nParlés del '+(PAR_NOM[_r.wd]||'día')+': '+_p.map(x=>x.k).join(' · '):'';})();})()});m.className='msg ok';m.textContent='Listo.';}
+  if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Pronóstico Top 10',text:(function(){const _r=genList(),_s=shInfo(),_f=finGet(_r);return _s.dia+' · Decena más fuerte '+_s.d+' · Terminal más fuerte '+_s.t+'\n'+'Pronóstico ('+_f.l.length+' números): '+_f.l.map(x=>x.n).join(' ')+(_f.p.length?'\nParlés del '+(PAR_NOM[_r.wd]||'día')+': '+_f.p.map(x=>x.k).join(' · '):'');})()});m.className='msg ok';m.textContent='Listo.';}
   else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pronostico-top10.png';a.click();m.className='msg ok';m.textContent='Se descargó la imagen. Si no, mantén pulsada la de abajo para guardarla.';}
 }catch(e){if(e&&e.name==='AbortError')return;m.className='msg bad';m.textContent='No se pudo compartir. Mantén pulsada la imagen de abajo para guardarla.';}};
 
@@ -1339,7 +1371,7 @@ $('b-del').onclick=()=>{const l=ROWS[ROWS.length-1];if(!l||!confirm('¿Borrar el
   $('m-del').className='msg ok';$('m-del').textContent='Borrado.';render();setNext();};
 $('b-show').onclick=()=>{$('ta').value=csvText();$('ta').select();};
 $('b-dl').onclick=()=>{try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csvText()],{type:'text/csv'}));a.download='pick3_copia_'+(ROWS[ROWS.length-1]||{d:''}).d+'.csv';document.body.appendChild(a);a.click();a.remove();}catch(e){}$('ta').value=csvText();};
-function fullBackup(){const o={app:'FPA',ver:'0.9.62',fecha:new Date().toISOString(),data:{}};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('fpa_')===0)o.data[k]=localStorage.getItem(k);}return JSON.stringify(o);}
+function fullBackup(){const o={app:'FPA',ver:'0.9.64',fecha:new Date().toISOString(),data:{}};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('fpa_')===0)o.data[k]=localStorage.getItem(k);}return JSON.stringify(o);}
 $('b-full').onclick=()=>{const m=$('m-imp');try{const t=fullBackup(),n=Object.keys(JSON.parse(t).data).length,a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'application/json'}));a.download='fpa_copia_completa_'+((ROWS[ROWS.length-1]||{d:''}).d)+'.json';document.body.appendChild(a);a.click();a.remove();m.className='msg ok';m.textContent='Copia completa descargada ('+n+' bloques de datos: sorteos, pronósticos congelados, patrones, cadenas, triángulo y ajustes). Para restaurar, elige ese archivo .json abajo.';}catch(e){m.className='msg bad';m.textContent='No se pudo hacer la copia: '+e.message;showErr(e,'copia completa');}};
 function doImport(text){
   if(/^\s*\{/.test(text)){const m=$('m-imp');try{const o=JSON.parse(text);if(o.app!=='FPA'||!o.data)throw new Error('no es una copia completa de esta app');Object.keys(o.data).forEach(k=>{if(k.indexOf('fpa_')===0)localStorage.setItem(k,o.data[k]);});m.className='msg ok';m.textContent='Copia completa restaurada. Recargando…';setTimeout(()=>location.reload(),900);}catch(e){m.className='msg bad';m.textContent='No se pudo restaurar: '+e.message;showErr(e,'restaurar');}return;}const r=parseCSV(text),m=$('m-imp');let np=0,nm=0;
@@ -1397,7 +1429,7 @@ function ofInit(){try{const l=ROWS[ROWS.length-1],dt=l?parseDate(nextSlot(l.d,l.
   [1,2,3,4,5,6,0].forEach(i=>a+='<option value="'+i+'">'+DN[i]+'</option>');['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'].forEach((x,i)=>b+='<option value="'+(i+1)+'">'+x+'</option>');
   $('of-w').innerHTML=a;$('of-m').innerHTML=b;$('of-w').value=dt.getUTCDay();$('of-m').value=dt.getUTCMonth()+1;$('of-t').value=l?(nextSlot(l.d,l.s).session==='EVE'?1:0):2;$('of-w').onchange=$('of-m').onchange=$('of-t').onchange=ofRender;ofRender();}catch(e){showErr(e,'consulta histórica');}}
 ofInit();try{renderChain();}catch(e){}try{avisoRender();}catch(e){}
-function selfCheck(){const T=[['lista de 100',()=>{const r=genList();if(!r||new Set(r.all.map(x=>x.n)).size!==100)throw new Error('la lista no tiene 100 números distintos');}],['tabla de reglas',()=>{ruleGrid().forEach(x=>{if(x.h>x.n)throw new Error(x.nm+': aciertos > sorteos');});}],['corridos',()=>{corRender();}],['parlés del día',()=>{parRender();}],['pestaña Año',()=>{anioRender();}],['consulta histórica',()=>{const S=ofStats();if(S.W[2].reduce((a,g)=>a+g.n,0)!==OFI.s.length/3)throw new Error('faltan sorteos');shInfo();}]];
+function selfCheck(){const T=[['lista de 100',()=>{const r=genList();if(!r||new Set(r.all.map(x=>x.n)).size!==100)throw new Error('la lista no tiene 100 números distintos');}],['tabla de reglas',()=>{ruleGrid().forEach(x=>{if(x.h>x.n)throw new Error(x.nm+': aciertos > sorteos');});}],['corridos',()=>{corRender();}],['parlés del día',()=>{parRender();}],['pronóstico para compartir',()=>{finRender();}],['pestaña Año',()=>{anioRender();}],['consulta histórica',()=>{const S=ofStats();if(S.W[2].reduce((a,g)=>a+g.n,0)!==OFI.s.length/3)throw new Error('faltan sorteos');shInfo();}]];
   T.forEach(([n,f])=>{try{f();}catch(e){showErr(e,'Autoprueba «'+n+'»');}});}
 setTimeout(selfCheck,900);
 setTimeout(()=>doUpdate(true),400);
