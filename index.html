@@ -40,7 +40,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}</style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v0.9.57 · funciona sin Internet</small><br><small>Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v0.9.58 · funciona sin Internet</small><br><small>Datos base hasta: 2026-10-22 Día</small></header>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="tri">Triángulo</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
 <main>
@@ -180,7 +180,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v0.9.57</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v0.9.58</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -485,8 +485,8 @@ function folStats(rows){
 const CHAIN_START='2026-10-08|MID';
 function consec(r1,r2){const n=nextSlot(r1.d,r1.s);return n.date===r2.d&&n.session===r2.s;}
 let OF_R=null;
-function chRowsAll(){try{if(!OF_R){const A=[],t0=Date.UTC(2010,0,1),n=OFI.s.length/3;for(let i=0;i<n;i++)A.push({d:new Date(t0+Math.floor(i/2)*864e5).toISOString().slice(0,10),s:i%2?'EVE':'MID',p3:OFI.s.substr(i*3,3),p4:''});OF_R=A;}
-  const lk=ordKey(OF_R[OF_R.length-1]);return OF_R.concat(ROWS.filter(r=>ordKey(r)>lk));}catch(e){return ROWS;}}
+function chRowsAll(R){R=R||ROWS;try{if(!OF_R){const A=[],t0=Date.UTC(2010,0,1),n=OFI.s.length/3;for(let i=0;i<n;i++)A.push({d:new Date(t0+Math.floor(i/2)*864e5).toISOString().slice(0,10),s:i%2?'EVE':'MID',p3:OFI.s.substr(i*3,3),p4:''});OF_R=A;}
+  const lk=ordKey(OF_R[OF_R.length-1]),l=R[R.length-1];if(!l)return R;const k=ordKey(l);return(k<lk?OF_R.filter(r=>ordKey(r)<=k):OF_R).concat(R.filter(r=>ordKey(r)>lk));}catch(e){return R;}}
 function chainFind(rows,a,b,limit){
   limit=limit===undefined?rows.length:limit;const out=[];
   for(let i=0;i<limit-2;i++){
@@ -496,7 +496,7 @@ function chainFind(rows,a,b,limit){
 }
 function chainNow(rows){
   const L=rows.length;if(L<2||!consec(rows[L-2],rows[L-1]))return null;
-  const a=rows[L-2].p3.slice(1),b=rows[L-1].p3.slice(1);return{a,b,list:chainFind(chRowsAll(),a,b)};
+  const a=rows[L-2].p3.slice(1),b=rows[L-1].p3.slice(1);return{a,b,list:chainFind(chRowsAll(rows),a,b)};
 }
 function chainStats(rows){
   const st=CHAIN_START.split('|'),start=st[0]+(st[1]==='MID'?'0':'1'),acc={retro:{h:0,e:0,n:0},fwd:{h:0,e:0,n:0}},prf=[];
@@ -705,7 +705,8 @@ function genList(){
   for(let i=0;i<100;i++){const k=p2(i),P=pr.B.includes(k)?1:0,x=cm.get(k),Cn=x?x.nm/mx:0,T=tri.all.has(k)?1:0,E=ens.has(k)?1:0,U=um.has(k)?um.get(k)/mu:(ahs.has(k)?1/mu:0),Y=yhas(x)?1:0;
     all.push({n:k,sc:5*P+4*Cn+3*T+2*E+U+2.5*Y,f:[P?'P':'',x?'C':'',T?'T':'',E?'E':'',um.has(k)?'U':'',ahs.has(k)?'A':'',Y?'Y':''].join(''),cn:x?x.nm:0,cs:x?x.score:0});}
   all.sort((a,b)=>b.sc-a.sc||b.cn-a.cn||b.cs-a.cs||(a.n<b.n?-1:1));
-  const cor=corFijos(ROWS),isx=x=>cor[x.n]||pat[x.n],mk=x=>{if(cor[x.n])x.f+='K';if(pat[x.n])x.f+='R';};all.slice(0,20).forEach(mk);const kx=all.slice(20).filter(isx);kx.forEach(x=>{mk(x);x.kadd=true;});const all2=all.slice(0,20).concat(kx,all.slice(20).filter(x=>!isx(x)));const yp=c.filter(x=>yhas(x)).map(x=>x.n);return{n,wd,base,pr,c,tri,en,un,ah,all:all2,yp,cor,pat,kx:kx.length};
+  const cad={};try{const cc=chainNow(ROWS);if(cc&&cc.list)cc.list.forEach(x=>{(cad[x.n]=cad[x.n]||[]).push(cc.a+'→'+cc.b+' ('+x.d+')');});}catch(e){showErr(e,'cadena en el pronóstico');}
+  const cor=corFijos(ROWS),isx=x=>cor[x.n]||pat[x.n]||cad[x.n],mk=x=>{if(cor[x.n])x.f+='K';if(pat[x.n])x.f+='R';if(cad[x.n])x.f+='H';};all.slice(0,20).forEach(mk);const kx=all.slice(20).filter(isx);kx.forEach(x=>{mk(x);x.kadd=true;});const all2=all.slice(0,20).concat(kx,all.slice(20).filter(x=>!isx(x)));const yp=c.filter(x=>yhas(x)).map(x=>x.n);return{n,wd,base,pr,c,tri,en,un,ah,all:all2,yp,cor,pat,cad,kx:kx.length};
 }
 function genRender(){try{
   const r=genList();if(!r)return;
@@ -714,8 +715,8 @@ function genRender(){try{
   const tab=Object.keys(grp).map(Number).sort((a,b)=>b-a).map(L=>'<div class="meth">×'+L+': <b>'+grp[L].join(' ')+'</b></div>').join('');
   const cs=r.c.slice().sort((a,b)=>b.nm-a.nm||b.score-a.score).slice(0,12).map(x=>x.n+'('+x.nm+')').join(' ');
   $('gen-out').innerHTML=
-   '<div class="msg">Para el sorteo: <b>'+r.n.date+' ('+DIAS[r.wd]+') · '+sesName(r.n.session)+'</b><div class="meth">Último trasero '+r.base+'. Prioridad: 1 Pronóstico · 2 Candidatos · 3 Triángulo · 4 Ensemble · 5 Patrones del año · 6 Tablas. Las letras de cada número dicen qué fuentes lo traen: P Pronóstico, C Candidatos, T Triángulo, E Ensemble, U Tablas, A Ahorcado, Y Patrón del año, K Corrido, R Patrón activo del calendario (número que sale en un patrón activado): si no estaba en el rojo ni en el azul, se agrega en violeta.</div></div>'+
-   '<div class="pg r">Rojo · del 1 al 10</div>'+g(r.all.slice(0,10),'r')+'<div class="pg a">Azul · del 11 al 20</div>'+g(r.all.slice(10,20),'a')+(r.kx?'<div class="pg k">Violeta · fijos de corridos y números de patrones activos ('+r.kx+')</div>'+g(r.all.slice(20,20+r.kx),'k'):'')+'<div class="pg">Negro · el resto</div>'+g(r.all.slice(20+(r.kx||0)),'n')+
+   '<div class="msg">Para el sorteo: <b>'+r.n.date+' ('+DIAS[r.wd]+') · '+sesName(r.n.session)+'</b><div class="meth">Último trasero '+r.base+'. Prioridad: 1 Pronóstico · 2 Candidatos · 3 Triángulo · 4 Ensemble · 5 Patrones del año · 6 Tablas. Las letras de cada número dicen qué fuentes lo traen: P Pronóstico, C Candidatos, T Triángulo, E Ensemble, U Tablas, A Ahorcado, Y Patrón del año, K Corrido, H Cadena (número que salió después de esta misma cadena), R Patrón activo del calendario (número que sale en un patrón activado): si no estaba en el rojo ni en el azul, se agrega en violeta.</div></div>'+
+   '<div class="pg r">Rojo · del 1 al 10</div>'+g(r.all.slice(0,10),'r')+'<div class="pg a">Azul · del 11 al 20</div>'+g(r.all.slice(10,20),'a')+(r.kx?'<div class="pg k">Violeta · fijos de corridos, patrones activos y cadena ('+r.kx+')</div>'+g(r.all.slice(20,20+r.kx),'k'):'')+'<div class="pg">Negro · el resto</div>'+g(r.all.slice(20+(r.kx||0)),'n')+
    '<div class="msg"><b>Por fuente</b></div>'+
    '<div class="meth"><b>1 · Pronóstico:</b> '+(r.pr.B.join(' · ')||'—')+(r.pr.D!==undefined&&r.pr.D!==''?' · decena '+r.pr.D+' · terminal '+r.pr.T:'')+'</div>'+
    '<div class="meth"><b>2 · Candidatos</b> (los que traen más reglas): '+(cs||'—')+'</div>'+
@@ -750,13 +751,13 @@ function corTrack(){const R=ROWS,ord=r=>r.d+(r.s==='MID'?'0':'1');let n=0,h=0;
 function corRender(){try{const l=ROWS[ROWS.length-1],r=genList();if(!l||!r)return;
   const cs=l.p4&&l.p4.length>=4?[l.p4.slice(0,2),l.p4.slice(2,4)]:[],t=corTrack();
   const col=i=>i<10?'rojo':i<20?'azul':(r.all[i].kadd?'violeta':'negro');
-  const it=r.all.map((x,i)=>({x,i})).filter(o=>(r.cor&&r.cor[o.x.n])||(r.pat&&r.pat[o.x.n]));
-  const li=it.map(o=>{const n=o.x.n,a=[];if(r.cor[n])a.push(r.cor[n].join(', '));if(r.pat[n])a.push('patrón: '+[...new Set(r.pat[n])].join(', '));return '<b>'+n+'</b> · puesto '+(o.i+1)+' ('+col(o.i)+') · '+a.join(' + ')+((r.cor[n]&&r.pat[n])?' ★':'');});
+  const it=r.all.map((x,i)=>({x,i})).filter(o=>(r.cor&&r.cor[o.x.n])||(r.pat&&r.pat[o.x.n])||(r.cad&&r.cad[o.x.n]));
+  const li=it.map(o=>{const n=o.x.n,a=[];if(r.cor[n])a.push(r.cor[n].join(', '));if(r.pat[n])a.push('patrón: '+[...new Set(r.pat[n])].join(', '));if(r.cad[n])a.push('cadena '+r.cad[n][0].split(' ')[0]);return '<b>'+n+'</b> · puesto '+(o.i+1)+' ('+col(o.i)+') · '+a.join(' + ')+((r.cor[n]&&r.pat[n])?' ★':'');});
   $('g-cor').innerHTML='<b>Corridos</b> del último sorteo ('+(l.p4||'sin Pick 4')+'): '+(cs.length?cs.map(c=>'<b>'+c+'C</b>').join(' · '):'—')+
    '<div class="meth"><b>Dónde están en el pronóstico</b> (fijos de corridos y números de patrones del año, juntos):</div>'+
    (li.length?'<div class="meth">'+li.join('<br>')+'</div><div class="meth">★ = coinciden corrido y patrón del año.</div>':'<div class="meth">Estos corridos no tienen fijos en la tabla ni hay patrones activos.</div>')+
    '<div class="meth">Seguimiento (regla fija desde el 22-oct Noche): el trasero salió entre los fijos de los corridos del sorteo anterior <b>'+t.h+' de '+t.n+'</b>.</div>';}catch(e){showErr(e,'corridos');}}
-// ---- Imagen para compartir: los 10 primeros (rojo) de Pronósticos + los fijos de corridos y números de patrones activos como números extra ----
+// ---- Imagen para compartir: los 10 primeros (rojo) de Pronósticos + los fijos de corridos, patrones activos y cadena como números extra ----
 function gcCloud(c,x,y,w,h){const N=14,cx=x+w/2,cy=y+h/2,rx=w/2*0.92,ry=h/2*0.92;c.beginPath();
   for(let i=0;i<N;i++){const a0=i/N*2*Math.PI,a1=(i+1)/N*2*Math.PI,am=(a0+a1)/2,px=cx+rx*Math.cos(a1),py=cy+ry*Math.sin(a1),qx=cx+rx*1.14*Math.cos(am),qy=cy+ry*1.14*Math.sin(am);
     if(i===0)c.moveTo(cx+rx*Math.cos(a0),cy+ry*Math.sin(a0));c.quadraticCurveTo(qx,qy,px,py);}c.closePath();}
@@ -764,7 +765,7 @@ function gcStar(c,x,y,r,col){c.beginPath();for(let i=0;i<10;i++){const a=-Math.P
 function gcArrow(c,x1,y,x2){c.strokeStyle='#e53935';c.fillStyle='#e53935';c.lineWidth=8;c.lineCap='round';c.beginPath();c.moveTo(x1,y);c.lineTo(x2-12,y);c.stroke();c.beginPath();c.moveTo(x2,y);c.lineTo(x2-22,y-16);c.lineTo(x2-22,y+16);c.closePath();c.fill();}
 function gcFit(c,t,maxW,size,wt){let f=size;do{c.font=wt+' '+f+'px system-ui,Arial,sans-serif';if(c.measureText(t).width<=maxW||f<=14)break;f-=1;}while(true);}
 function genImg(){
-  const r=genList();if(!r)return null;const top=r.all.slice(0,10),ext=r.all.slice(10).filter(x=>/[KR]/.test(x.f)),list=top.concat(ext),N=list.length,ttl=ext.length?'PRONÓSTICO':'PRONÓSTICO · TOP 10',cv=$('g-cv'),W=1080,H=400+Math.ceil(N/5)*340,c=cv.getContext('2d');
+  const r=genList();if(!r)return null;const top=r.all.slice(0,10),ext=r.all.slice(10).filter(x=>/[KRH]/.test(x.f)),list=top.concat(ext),N=list.length,ttl=ext.length?'PRONÓSTICO':'PRONÓSTICO · TOP 10',cv=$('g-cv'),W=1080,H=400+Math.ceil(N/5)*340,c=cv.getContext('2d');
   cv.width=W;cv.height=H;
   c.fillStyle='#fffdf5';c.fillRect(0,0,W,H);c.lineWidth=14;c.strokeStyle='#42a5f5';c.strokeRect(10,10,W-20,H-20);
   gcStar(c,70,70,38,'#ffd54f');gcStar(c,W-70,70,38,'#ffd54f');gcStar(c,70,H-70,38,'#ffd54f');gcStar(c,W-70,H-70,38,'#ffd54f');
@@ -789,7 +790,7 @@ function genImg(){
 $('g-share').onclick=async()=>{const m=$('g-msg');try{
   const cv=genImg();if(!cv){m.textContent='Todavía no hay datos.';return;}cv.style.display='block';
   const blob=await new Promise(res=>cv.toBlob(res,'image/png')),f=new File([blob],'pronostico-top10.png',{type:'image/png'});
-  if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Pronóstico Top 10',text:(function(){const _r=genList(),_s=shInfo();return _s.dia+' · Decena más fuerte '+_s.d+' · Terminal más fuerte '+_s.t+'\n'+'Pronóstico ('+(10+_r.all.slice(10).filter(x=>/[KR]/.test(x.f)).length)+' números): '+_r.all.slice(0,10).concat(_r.all.slice(10).filter(x=>/[KR]/.test(x.f))).map(x=>x.n).join(' ');})()});m.className='msg ok';m.textContent='Listo.';}
+  if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Pronóstico Top 10',text:(function(){const _r=genList(),_s=shInfo();return _s.dia+' · Decena más fuerte '+_s.d+' · Terminal más fuerte '+_s.t+'\n'+'Pronóstico ('+(10+_r.all.slice(10).filter(x=>/[KRH]/.test(x.f)).length)+' números): '+_r.all.slice(0,10).concat(_r.all.slice(10).filter(x=>/[KRH]/.test(x.f))).map(x=>x.n).join(' ');})()});m.className='msg ok';m.textContent='Listo.';}
   else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pronostico-top10.png';a.click();m.className='msg ok';m.textContent='Se descargó la imagen. Si no, mantén pulsada la de abajo para guardarla.';}
 }catch(e){if(e&&e.name==='AbortError')return;m.className='msg bad';m.textContent='No se pudo compartir. Mantén pulsada la imagen de abajo para guardarla.';}};
 
@@ -1280,7 +1281,7 @@ $('b-del').onclick=()=>{const l=ROWS[ROWS.length-1];if(!l||!confirm('¿Borrar el
   $('m-del').className='msg ok';$('m-del').textContent='Borrado.';render();setNext();};
 $('b-show').onclick=()=>{$('ta').value=csvText();$('ta').select();};
 $('b-dl').onclick=()=>{try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csvText()],{type:'text/csv'}));a.download='pick3_copia_'+(ROWS[ROWS.length-1]||{d:''}).d+'.csv';document.body.appendChild(a);a.click();a.remove();}catch(e){}$('ta').value=csvText();};
-function fullBackup(){const o={app:'FPA',ver:'0.9.57',fecha:new Date().toISOString(),data:{}};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('fpa_')===0)o.data[k]=localStorage.getItem(k);}return JSON.stringify(o);}
+function fullBackup(){const o={app:'FPA',ver:'0.9.58',fecha:new Date().toISOString(),data:{}};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('fpa_')===0)o.data[k]=localStorage.getItem(k);}return JSON.stringify(o);}
 $('b-full').onclick=()=>{const m=$('m-imp');try{const t=fullBackup(),n=Object.keys(JSON.parse(t).data).length,a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'application/json'}));a.download='fpa_copia_completa_'+((ROWS[ROWS.length-1]||{d:''}).d)+'.json';document.body.appendChild(a);a.click();a.remove();m.className='msg ok';m.textContent='Copia completa descargada ('+n+' bloques de datos: sorteos, pronósticos congelados, patrones, cadenas, triángulo y ajustes). Para restaurar, elige ese archivo .json abajo.';}catch(e){m.className='msg bad';m.textContent='No se pudo hacer la copia: '+e.message;showErr(e,'copia completa');}};
 function doImport(text){
   if(/^\s*\{/.test(text)){const m=$('m-imp');try{const o=JSON.parse(text);if(o.app!=='FPA'||!o.data)throw new Error('no es una copia completa de esta app');Object.keys(o.data).forEach(k=>{if(k.indexOf('fpa_')===0)localStorage.setItem(k,o.data[k]);});m.className='msg ok';m.textContent='Copia completa restaurada. Recargando…';setTimeout(()=>location.reload(),900);}catch(e){m.className='msg bad';m.textContent='No se pudo restaurar: '+e.message;showErr(e,'restaurar');}return;}const r=parseCSV(text),m=$('m-imp');let np=0,nm=0;
