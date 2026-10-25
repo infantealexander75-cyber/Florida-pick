@@ -40,10 +40,10 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}</style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 4 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 5 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
-<nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="tri">Triángulo</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
+<nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="tri">Triángulo</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="ang">Anguila</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
 <main>
 <div class="warn">Herramienta de entretenimiento. Las "coincidencias" no son probabilidades de ganar. Juega solo lo que estés dispuesto a perder.</div>
 
@@ -126,6 +126,9 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
  <button class="btn d" id="b-del">Borrar el último sorteo</button><div class="msg" id="m-del"></div></div></section>
 
 
+<section id="t-ang" class="hide"><div class="card"><b>Anguila</b><div class="meth" id="an-ses"></div>
+<label>Pega el sorteo (ej.: ANGUILA 4PM 22 21 06)</label><input id="an-txt" placeholder="ANGUILA 4PM 22 21 06"><label>Fecha del sorteo de Anguila</label><input type="date" id="an-d">
+<button class="btn" id="an-add">Agregar</button><div class="msg" id="an-msg"></div><div id="an-list"></div></div></section>
 <section id="t-consulta" class="hide">
  <div class="card"><b>Consulta de número</b><p class="meth">Escribe un número de 2 cifras y mira qué da cada tabla.</p>
   <input id="q-n" inputmode="numeric" maxlength="2" placeholder="38"><div id="q-out"></div></div>
@@ -177,7 +180,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 4</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 5</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -583,6 +586,17 @@ function render(){
   try{generarPanelPatrones();}catch(e){}try{anioRender();}catch(e){}try{chRender();}catch(e){}try{avisoRender();}catch(e){}try{redTrackRender();}catch(e){}try{corRender();}catch(e){}try{parRender();}catch(e){}try{finRender();}catch(e){}try{bingoRender();}catch(e){}
 }
 let SNAP=load('fpa_snap',{});
+let ANG=load('fpa_ang',[]);
+function angSess(R){R=R||ROWS;const l=R[R.length-1];if(!l)return{d:'',mor:true,e:[]};const n=nextSlot(l.d,l.s),mor=n.session==='MID';return{d:n.date,mor,e:ANG.filter(a=>a.d===n.date&&(mor?a.h<=13:a.h>=14))};}
+function angMap(R){const m=new Map();angSess(R).e.slice().sort((a,b)=>b.h-a.h).forEach(a=>a.n.forEach(x=>{if(!m.has(x))m.set(x,[]);m.get(x).push((a.h%12||12)+(a.h<12?'AM':'PM'));}));return m;}
+function angDet(rows,mor){const m={};for(const r of rows){if((r.s==='MID')!==mor)continue;const E=ANG.filter(a=>a.d===r.d&&(mor?a.h<=13:a.h>=14));if(E.length)m[slotKey(r)]=E.some(a=>a.n.includes(r.p3.slice(1)));}return m;}
+function angParse(t,d){t=String(t).toUpperCase();const m=t.match(/(\d{1,2})\s*(AM|PM)/);if(!m)return'Falta la hora (ej.: 4PM).';const h=(+m[1]%12)+(m[2]==='PM'?12:0),nn=(t.replace(m[0],' ').replace(/ANGUIL+A/,' ').match(/\d{1,2}/g)||[]);if(nn.length<3)return'Faltan números: son 3.';
+  const n=nn.slice(0,3).map(x=>x.padStart(2,'0')),dd=d||angSess().d;ANG=ANG.filter(a=>!(a.d===dd&&a.h===h));ANG.push({d:dd,h,n,t:new Date().toISOString()});ANG.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:a.h-b.h);store('fpa_ang',ANG);return'';}
+function angDel(i){ANG.splice(i,1);store('fpa_ang',ANG);angRender();try{genRender();}catch(e){}}
+function angRender(){try{const s=angSess(),m=angMap();$('an-ses').innerHTML='Sesión actual: <b>'+(s.mor?'mañana (hasta la 1:30) → Día de Florida':'tarde (hasta las 9:50) → Noche de Florida')+'</b> del '+s.d+'. Números de Anguila: <b>'+m.size+'</b>; entran al top <b>'+(()=>{try{return genList().top.filter(x=>/G/.test(x.f)).length}catch(e){return 0}})()+'</b> (tope de 30 en total, primero los más recientes).';
+  if(!$('an-d').value)$('an-d').value=s.d;
+  $('an-list').innerHTML=ANG.map((a,i)=>({a,i})).filter(o=>o.a.d>=s.d.slice(0,8)+'01'||o.a.d===s.d).slice(-24).reverse().map(o=>'<div class="meth">'+o.a.d+' · '+(o.a.h%12||12)+(o.a.h<12?' AM':' PM')+' · <b>'+o.a.n.join(' · ')+'</b> <button class="btn s" onclick="angDel('+o.i+')">Borrar</button></div>').join('')||'<div class="meth">Todavía no hay sorteos de Anguila anotados.</div>';}catch(e){showErr(e,'Anguila');}}
+function angInit(){try{document.querySelector('#nav button[data-t="ang"]').addEventListener('click',()=>{$('an-d').value='';angRender();});}catch(e){}$('an-add').onclick=()=>{const m=$('an-msg'),e=angParse($('an-txt').value,$('an-d').value);m.className='msg '+(e?'bad':'ok');m.textContent=e||'Anotado.';if(!e){$('an-txt').value='';angRender();try{genRender();}catch(x){showErr(x,'pronóstico');}}};angRender();}
 function ensureSnap(){try{const l=ROWS[ROWS.length-1];if(!l)return;const n=nextSlot(l.d,l.s),k=n.date+'|'+n.session;if(SNAP[k])return;const r=genList();if(!r||r.all.length<20)return;
   SNAP[k]={r:r.top.slice(0,10).map(x=>x.n),a:r.top.slice(10,20).map(x=>x.n),t:new Date().toISOString()};store('fpa_snap',SNAP);}catch(e){showErr(e,'foto de la lista');}}
 function ensurePred(){try{ensureSnap();}catch(e){}const p=makePred(ROWS);if(!p)return;if(!PRED[p.key]){PRED[p.key]={B:p.B,F:p.F,D:p.D,T:p.T,t:new Date().toISOString()};store('fpa_pred',PRED);}else if(PRED[p.key].D===undefined){PRED[p.key].D=p.D;PRED[p.key].T=p.T;store('fpa_pred',PRED);}}
@@ -653,6 +667,7 @@ function ruleGrid(){
   const rt=tr(()=>redTrack());
   if(rt){const a={},b={};rt.det.forEach(x=>{a[x.k]=x.hr;b[x.k]=x.ha;});add('Pronósticos','Lista roja (1 al 10)','desde 22-oct Día',a,0.10);add('Pronósticos','Lista azul (11 al 20)','desde 22-oct Día',b,0.10);}
   add('Pronósticos','Corridos → fijos','desde 22-oct Noche',tr(()=>corDet(R)),tr(()=>{const z={};for(let i=1;i<R.length;i++){if(ordKey(R[i])<COR_START||!R[i-1].p4)continue;z[slotKey(R[i])]=Object.keys(corFijos(R.slice(0,i))).length/100;}return k=>z[k];}));
+  add('Anguila','Anguila mañana → Día','desde que anotes',angDet(ROWS,true));add('Anguila','Anguila tarde → Noche','desde que anotes',angDet(ROWS,false));
   add('Pronósticos','Parlés del día (corrido o bingo)','desde 23-oct Noche',tr(()=>{const m={};parTrack().det.forEach(x=>{m[x.d+'|'+x.s]=x.un.length>0;});return m;}));
   add('Pronósticos','Pronóstico compartido','desde que se comparte',(()=>{const m={},by=new Map(R.map(r=>[slotKey(r),r]));for(const k in FROZEN){const r=by.get(k);if(r)m[k]=FROZEN[k].l.some(x=>x.n===r.p3.slice(1));}return Object.keys(m).length?m:null;})());
   add('Reglas','Ensemble (top 5)','desde 11-oct Noche',tr(()=>{const m={};enRule(R).det.forEach(x=>{m[x.d+'|'+x.s]=x.hit;});return m;}),0.05);
@@ -710,7 +725,7 @@ function genList(){
   all.sort((a,b)=>b.sc-a.sc||b.cn-a.cn||b.cs-a.cs||(a.n<b.n?-1:1));
   const cad={};try{const cc=chainNow(ROWS);if(cc&&cc.list)cc.list.forEach(x=>{(cad[x.n]=cad[x.n]||[]).push(cc.a+'→'+cc.b+' ('+x.d+')');});}catch(e){showErr(e,'cadena en el pronóstico');}
   const fol={};try{folSummary(followersTable(ROWS)[base]||[]).forEach(e=>{fol[e[0]]=e[1];});}catch(e){showErr(e,'seguidores en el pronóstico');}
-  const cor=corFijos(ROWS),isx=x=>cor[x.n]||pat[x.n]||cad[x.n]||fol[x.n],mk=x=>{if(cor[x.n])x.f+='K';if(pat[x.n])x.f+='R';if(cad[x.n])x.f+='H';if(fol[x.n])x.f+='S';};all.slice(0,20).forEach(mk);const kx=all.slice(20).filter(isx);kx.forEach(x=>{mk(x);x.kadd=true;});const all2=all.slice(0,20).concat(kx,all.slice(20).filter(x=>!isx(x)));const yp=c.filter(x=>yhas(x)).map(x=>x.n);const R0={n,wd,base,pr,c,tri,en,un,ah,all:all2,yp,cor,pat,cad,fol,kx:kx.length};R0.top=finBuild(R0);return R0;
+  const ang=angMap(ROWS),cor=corFijos(ROWS),isx=x=>cor[x.n]||pat[x.n]||cad[x.n]||fol[x.n]||ang.has(x.n),mk=x=>{if(ang.has(x.n))x.f+='G';if(cor[x.n])x.f+='K';if(pat[x.n])x.f+='R';if(cad[x.n])x.f+='H';if(fol[x.n])x.f+='S';};all.slice(0,20).forEach(mk);const kx=all.slice(20).filter(isx);kx.forEach(x=>{mk(x);x.kadd=true;});const all2=all.slice(0,20).concat(kx,all.slice(20).filter(x=>!isx(x)));const yp=c.filter(x=>yhas(x)).map(x=>x.n);const R0={n,wd,base,pr,c,tri,en,un,ah,all:all2,yp,cor,pat,cad,fol,ang,kx:kx.length};R0.top=finBuild(R0);R0.top.forEach(x=>{if(ang.has(x.n)&&x.f.indexOf('G')<0)x.f+='G';});const hv=new Set(R0.top.map(x=>x.n));ang.forEach((v,k)=>{if(!hv.has(k)&&R0.top.length<30)R0.top.push({n:k,f:'G'});});return R0;
 }
 function genRender(){try{
   const r=genList();if(!r)return;
@@ -720,7 +735,7 @@ function genRender(){try{
   const cs=r.c.slice().sort((a,b)=>b.nm-a.nm||b.score-a.score).slice(0,12).map(x=>x.n+'('+x.nm+')').join(' ');
   const TP=finGet(r).l,TPS=new Set(TP.map(x=>x.n)),RS=r.all.filter(x=>!TPS.has(x.n)),RV=RS.filter(x=>/[KRHS]/.test(x.f)),RN=RS.filter(x=>!/[KRHS]/.test(x.f));
   $('gen-out').innerHTML=
-   '<div class="msg">Para el sorteo: <b>'+r.n.date+' ('+DIAS[r.wd]+') · '+sesName(r.n.session)+'</b><div class="meth">Último trasero '+r.base+'. El TOP lleva 20 números: primero los de la cadena, los corridos, los seguidores y los activados en el Año (sin repetir), y se completa hasta 20 con lo que más coinciden las demás fuentes (Pronóstico, Candidatos, Triángulo, Ensemble, Patrones del año, Tablas, decena y terminal más fuertes). Las letras de cada número dicen qué fuentes lo traen: P Pronóstico, C Candidatos, T Triángulo, E Ensemble, U Tablas, A Ahorcado, Y Patrón del año, D Decena fuerte, N Terminal fuerte, K Corrido, S Seguidor (número que salió después de este último trasero), H Cadena (número que salió después de esta misma cadena), R Patrón activo del calendario (número que sale en un patrón activado). Los de K, S, H y R entran siempre al Top, hasta el tope de 20.</div></div>'+
+   '<div class="msg">Para el sorteo: <b>'+r.n.date+' ('+DIAS[r.wd]+') · '+sesName(r.n.session)+'</b><div class="meth">Último trasero '+r.base+'. El TOP lleva 20 números: primero los de la cadena, los corridos, los seguidores y los activados en el Año (sin repetir), y se completa hasta 20 con lo que más coinciden las demás fuentes (Pronóstico, Candidatos, Triángulo, Ensemble, Patrones del año, Tablas, decena y terminal más fuertes). Las letras de cada número dicen qué fuentes lo traen: P Pronóstico, C Candidatos, T Triángulo, E Ensemble, U Tablas, A Ahorcado, Y Patrón del año, D Decena fuerte, N Terminal fuerte, K Corrido, S Seguidor (número que salió después de este último trasero), G Anguila (salió en Anguila en esta sesión), H Cadena (número que salió después de esta misma cadena), R Patrón activo del calendario (número que sale en un patrón activado). Los de K, S, H y R entran siempre al Top, hasta el tope de 20.</div></div>'+
    '<div class="pg r">TOP · Rojo · del 1 al 10</div>'+g(TP.slice(0,10),'r')+(TP.length>10?'<div class="pg a">TOP · Azul · del 11 al '+TP.length+'</div>'+g(TP.slice(10),'a'):'')+(RV.length?'<div class="pg k">Violeta · fijos, seguidores, patrones o cadena que no caben en el tope de 20 ('+RV.length+')</div>'+g(RV,'k'):'')+'<div class="pg">Negro · el resto</div>'+g(RN,'n')+
    '<div class="msg"><b>Por fuente</b></div>'+
    '<div class="meth"><b>1 · Pronóstico:</b> '+(r.pr.B.join(' · ')||'—')+(r.pr.D!==undefined&&r.pr.D!==''?' · decena '+r.pr.D+' · terminal '+r.pr.T:'')+'</div>'+
@@ -1166,7 +1181,7 @@ function csvText(){
   return t;}
 function addRows(list){for(const r of list){EXTRA=EXTRA.filter(e=>slotKey(e)!==slotKey(r));EXTRA.push(r);DEL=DEL.filter(k=>k!==slotKey(r));}const a=store('fpa_extra',EXTRA),b=store('fpa_del',DEL);return a&&b;}
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('on',x===b));
-  for(const t of ['nuevo','gen','cand','tri','hist','consulta','dias','anio','ens','patron','copia'])$('t-'+t).classList.toggle('hide',t!==b.dataset.t);});
+  for(const t of ['nuevo','gen','cand','tri','hist','consulta','dias','anio','ens','patron','copia','ang'])$('t-'+t).classList.toggle('hide',t!==b.dataset.t);});
 $('b-save').onclick=()=>{
   const d=$('f-d').value,s=$('f-s').value,p3=$('f-p3').value.trim(),p4=$('f-p4').value.trim(),m=$('m-save');
   if(!/^\d{4}-\d{2}-\d{2}$/.test(d)){m.className='msg bad';m.textContent='Falta la fecha.';return;}
@@ -1440,13 +1455,13 @@ function ofRender(){try{const S=ofStats(),z=+$('of-t').value,tz=z<2?' · '+(z?'N
 function ofInit(){try{const l=ROWS[ROWS.length-1],dt=l?parseDate(nextSlot(l.d,l.s).date):new Date();let a='',b='';
   [1,2,3,4,5,6,0].forEach(i=>a+='<option value="'+i+'">'+DN[i]+'</option>');['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'].forEach((x,i)=>b+='<option value="'+(i+1)+'">'+x+'</option>');
   $('of-w').innerHTML=a;$('of-m').innerHTML=b;$('of-w').value=dt.getUTCDay();$('of-m').value=dt.getUTCMonth()+1;$('of-t').value=l?(nextSlot(l.d,l.s).session==='EVE'?1:0):2;$('of-w').onchange=$('of-m').onchange=$('of-t').onchange=ofRender;ofRender();}catch(e){showErr(e,'consulta histórica');}}
-ofInit();try{renderChain();}catch(e){}try{avisoRender();}catch(e){}
+angInit();ofInit();try{renderChain();}catch(e){}try{avisoRender();}catch(e){}
 function selfCheck(){const T=[['lista de 100',()=>{const r=genList();if(!r||new Set(r.all.map(x=>x.n)).size!==100)throw new Error('la lista no tiene 100 números distintos');}],['tabla de reglas',()=>{ruleGrid().forEach(x=>{if(x.h>x.n)throw new Error(x.nm+': aciertos > sorteos');});}],['corridos',()=>{corRender();}],['parlés del día',()=>{parRender();}],['pronóstico para compartir',()=>{finRender();}],['pestaña Año',()=>{anioRender();}],['consulta histórica',()=>{const S=ofStats();if(S.W[2].reduce((a,g)=>a+g.n,0)!==OFI.s.length/3)throw new Error('faltan sorteos');shInfo();}]];
   T.forEach(([n,f])=>{try{f();}catch(e){showErr(e,'Autoprueba «'+n+'»');}});}
 setTimeout(selfCheck,900);
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=4;var UPD_SHOWN=false;
+const APP_BUILD=5;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
