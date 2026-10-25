@@ -40,7 +40,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}</style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 5 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 6 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="tri">Triángulo</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="ang">Anguila</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
@@ -65,13 +65,14 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 </section>
 
 <section id="t-gen" class="hide">
- <div class="card"><b style="color:#d32f2f">Pronósticos (todas las fuentes en una lista)</b><div id="gen-out"></div>
+ <div class="card"><b style="color:#d32f2f">Pronósticos (todas las fuentes en una lista)</b>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><button class="btn" id="g-share">Compartir imagen</button><button class="btn" id="g-sharet">Compartir números</button></div><div class="msg" id="g-msg"></div>
+  <canvas id="g-cv" style="width:100%;border-radius:10px;display:none;margin-bottom:8px"></canvas><div id="gen-out"></div>
   <div class="msg" id="g-cor"></div>
   <div class="msg" id="g-par"></div>
   <div class="msg" id="g-seg"></div>
   <div class="msg" id="g-fin"></div>
-  <button class="btn" id="g-share">Compartir pronóstico (imagen)</button><div class="msg" id="g-msg"></div>
-  <canvas id="g-cv" style="width:100%;border-radius:10px;display:none"></canvas></div>
+</div>
 </section>
 <section id="t-anio" class="hide">
  <div class="card"><b>Calendario del año (Día y Noche por mes)</b>
@@ -180,7 +181,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 5</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 6</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -914,8 +915,14 @@ $('g-share').onclick=async()=>{const m=$('g-msg');try{
   try{const _r0=genList();if(_r0)finFreeze(_r0);}catch(e){}const cv=genImg();if(!cv){m.textContent='Todavía no hay datos.';return;}cv.style.display='block';
   const blob=await new Promise(res=>cv.toBlob(res,'image/png')),f=new File([blob],'pronostico-top10.png',{type:'image/png'});
   if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Pronóstico'});m.className='msg ok';m.textContent='Listo.';}
-  else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pronostico-top10.png';a.click();m.className='msg ok';m.textContent='Se descargó la imagen. Si no, mantén pulsada la de abajo para guardarla.';}
-}catch(e){if(e&&e.name==='AbortError')return;m.className='msg bad';m.textContent='No se pudo compartir. Mantén pulsada la imagen de abajo para guardarla.';}};
+  else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pronostico-top10.png';a.click();m.className='msg ok';m.textContent='Se descargó la imagen. Si no, mantén pulsada la imagen para guardarla.';}
+}catch(e){if(e&&e.name==='AbortError')return;m.className='msg bad';m.textContent='No se pudo compartir. Mantén pulsada la imagen para guardarla.';}};
+function finText(){const r=genList();if(!r)return'';finFreeze(r);const f=finGet(r),si=shInfo(),d=r.n.date;
+  return 'PRONÓSTICO · '+(r.n.session==='MID'?'Día':'Noche')+' · '+si.dia+' '+d.slice(8)+'/'+d.slice(5,7)+'\nDecena más fuerte '+f.d+' · Terminal más fuerte '+f.t+'\nNúmeros ('+f.l.length+'): '+f.l.map(x=>x.n).join(' ')+(f.p.length?'\nParlés: '+f.p.map(x=>x.k).join(' · '):'');}
+$('g-sharet').onclick=async()=>{const m=$('g-msg');try{const tx=finText();if(!tx){m.className='msg bad';m.textContent='Todavía no hay datos.';return;}
+  if(navigator.share){await navigator.share({text:tx});m.className='msg ok';m.textContent='Listo.';}
+  else{await navigator.clipboard.writeText(tx);m.className='msg ok';m.textContent='Números copiados. Pégalos donde quieras.';}
+}catch(e){if(e&&e.name==='AbortError')return;m.className='msg bad';m.textContent='No se pudo compartir.';try{m.textContent+=' '+finText();}catch(x){}}};
 
 // ---- Calendario del año: Día/Noche por mes y patrones ----
 var AN_SEL='',AN_ST=null;
@@ -1469,7 +1476,7 @@ function selfCheck(){const T=[['lista de 100',()=>{const r=genList();if(!r||new 
 setTimeout(selfCheck,900);
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=5;var UPD_SHOWN=false;
+const APP_BUILD=6;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
