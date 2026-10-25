@@ -127,7 +127,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 
 
 <section id="t-ang" class="hide"><div class="card"><b>Anguila</b><div class="meth" id="an-ses"></div>
-<label>Pega el sorteo (ej.: ANGUILA 4PM 22 21 06)</label><input id="an-txt" placeholder="ANGUILA 4PM 22 21 06"><label>Fecha del sorteo de Anguila</label><input type="date" id="an-d">
+<label>Pega uno o varios sorteos, uno por línea (sirve el chat tal cual: [24/10, 4:23 p. m.] ANGUILA 4PM 22 21 06)</label><textarea id="an-txt" rows="7" placeholder="ANGUILA 4PM 22 21 06"></textarea><label>Fecha del sorteo de Anguila</label><input type="date" id="an-d">
 <button class="btn" id="an-add">Agregar</button><div class="msg" id="an-msg"></div><div id="an-list"></div></div></section>
 <section id="t-consulta" class="hide">
  <div class="card"><b>Consulta de número</b><p class="meth">Escribe un número de 2 cifras y mira qué da cada tabla.</p>
@@ -590,13 +590,21 @@ let ANG=load('fpa_ang',[]);
 function angSess(R){R=R||ROWS;const l=R[R.length-1];if(!l)return{d:'',mor:true,e:[]};const n=nextSlot(l.d,l.s),mor=n.session==='MID';return{d:n.date,mor,e:ANG.filter(a=>a.d===n.date&&(mor?a.h<=13:a.h>=14))};}
 function angMap(R){const m=new Map();angSess(R).e.slice().sort((a,b)=>b.h-a.h).forEach(a=>a.n.forEach(x=>{if(!m.has(x))m.set(x,[]);m.get(x).push((a.h%12||12)+(a.h<12?'AM':'PM'));}));return m;}
 function angDet(rows,mor){const m={};for(const r of rows){if((r.s==='MID')!==mor)continue;const E=ANG.filter(a=>a.d===r.d&&(mor?a.h<=13:a.h>=14));if(E.length)m[slotKey(r)]=E.some(a=>a.n.includes(r.p3.slice(1)));}return m;}
-function angParse(t,d){t=String(t).toUpperCase();const m=t.match(/(\d{1,2})\s*(AM|PM)/);if(!m)return'Falta la hora (ej.: 4PM).';const h=(+m[1]%12)+(m[2]==='PM'?12:0),nn=(t.replace(m[0],' ').replace(/ANGUIL+A/,' ').match(/\d{1,2}/g)||[]);if(nn.length<3)return'Faltan números: son 3.';
-  const n=nn.slice(0,3).map(x=>x.padStart(2,'0')),dd=d||angSess().d;ANG=ANG.filter(a=>!(a.d===dd&&a.h===h));ANG.push({d:dd,h,n,t:new Date().toISOString()});ANG.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:a.h-b.h);store('fpa_ang',ANG);return'';}
+function angLine(t,dd){t=String(t).toUpperCase().replace(/[*_~]/g,' ');let d=dd,hh=null;
+  const p=t.match(/\[(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?,?\s*(\d{1,2}):(\d{2})\s*([AP])\.?\s*M\.?\]/);
+  if(p){const y=p[3]?(p[3].length===2?'20'+p[3]:p[3]):String(dd||angSess().d||'2026').slice(0,4);d=y+'-'+p[2].padStart(2,'0')+'-'+p[1].padStart(2,'0');hh=(+p[4]%12)+(p[6]==='P'?12:0);t=t.replace(p[0],' ');}
+  const k=t.search(/ANGUI/);if(k>=0)t=t.slice(k);
+  const m=t.match(/(\d{1,2})\s*(AM|PM)\b/);let h;if(m){h=(+m[1]%12)+(m[2]==='PM'?12:0);t=t.replace(m[0],' ');}else if(hh!==null)h=hh;else return'no encontré la hora (ej.: 4PM)';
+  const nn=t.replace(/ANGUI+L+A/,' ').match(/\d{1,2}/g)||[];if(nn.length<3)return'faltan números (son 3)';
+  return{d:d||angSess().d,h,n:nn.slice(0,3).map(x=>x.padStart(2,'0'))};}
+function angParse(txt,dd){const ok=[],bad=[];String(txt).split(/\n+/).map(x=>x.trim()).filter(Boolean).forEach(l=>{const r=angLine(l,dd);if(typeof r==='string'){bad.push(l.slice(0,28)+' → '+r);return;}
+    ANG=ANG.filter(a=>!(a.d===r.d&&a.h===r.h));ANG.push({d:r.d,h:r.h,n:r.n,t:new Date().toISOString()});ok.push(r);});
+  ANG.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:a.h-b.h);store('fpa_ang',ANG);return{ok,bad};}
 function angDel(i){ANG.splice(i,1);store('fpa_ang',ANG);angRender();try{genRender();}catch(e){}}
 function angRender(){try{const s=angSess(),m=angMap();$('an-ses').innerHTML='Sesión actual: <b>'+(s.mor?'mañana (hasta la 1:30) → Día de Florida':'tarde (hasta las 9:50) → Noche de Florida')+'</b> del '+s.d+'. Números de Anguila: <b>'+m.size+'</b>; entran al top <b>'+(()=>{try{return genList().top.filter(x=>/G/.test(x.f)).length}catch(e){return 0}})()+'</b> (tope de 30 en total, primero los más recientes).';
   if(!$('an-d').value)$('an-d').value=s.d;
   $('an-list').innerHTML=ANG.map((a,i)=>({a,i})).filter(o=>o.a.d>=s.d.slice(0,8)+'01'||o.a.d===s.d).slice(-24).reverse().map(o=>'<div class="meth">'+o.a.d+' · '+(o.a.h%12||12)+(o.a.h<12?' AM':' PM')+' · <b>'+o.a.n.join(' · ')+'</b> <button class="btn s" onclick="angDel('+o.i+')">Borrar</button></div>').join('')||'<div class="meth">Todavía no hay sorteos de Anguila anotados.</div>';}catch(e){showErr(e,'Anguila');}}
-function angInit(){try{document.querySelector('#nav button[data-t="ang"]').addEventListener('click',()=>{$('an-d').value='';angRender();});}catch(e){}$('an-add').onclick=()=>{const m=$('an-msg'),e=angParse($('an-txt').value,$('an-d').value);m.className='msg '+(e?'bad':'ok');m.textContent=e||'Anotado.';if(!e){$('an-txt').value='';angRender();try{genRender();}catch(x){showErr(x,'pronóstico');}}};angRender();}
+function angInit(){try{document.querySelector('#nav button[data-t="ang"]').addEventListener('click',()=>{$('an-d').value='';angRender();});}catch(e){}$('an-add').onclick=()=>{const m=$('an-msg'),r=angParse($('an-txt').value,$('an-d').value);m.className='msg '+(r.ok.length?'ok':'bad');m.textContent=(r.ok.length?'Anotados '+r.ok.length+': '+r.ok.map(x=>x.d.slice(5)+' '+(x.h%12||12)+(x.h<12?'AM':'PM')).join(', ')+'. ':'')+(r.bad.length?'No entendí: '+r.bad.join(' | '):'')||'No hay nada que anotar.';if(r.ok.length){$('an-txt').value='';angRender();try{genRender();}catch(x){showErr(x,'pronóstico');}}};angRender();}
 function ensureSnap(){try{const l=ROWS[ROWS.length-1];if(!l)return;const n=nextSlot(l.d,l.s),k=n.date+'|'+n.session;if(SNAP[k])return;const r=genList();if(!r||r.all.length<20)return;
   SNAP[k]={r:r.top.slice(0,10).map(x=>x.n),a:r.top.slice(10,20).map(x=>x.n),t:new Date().toISOString()};store('fpa_snap',SNAP);}catch(e){showErr(e,'foto de la lista');}}
 function ensurePred(){try{ensureSnap();}catch(e){}const p=makePred(ROWS);if(!p)return;if(!PRED[p.key]){PRED[p.key]={B:p.B,F:p.F,D:p.D,T:p.T,t:new Date().toISOString()};store('fpa_pred',PRED);}else if(PRED[p.key].D===undefined){PRED[p.key].D=p.D;PRED[p.key].T=p.T;store('fpa_pred',PRED);}}
