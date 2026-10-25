@@ -40,7 +40,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}</style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 9 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 10 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="tri">Triángulo</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="ang">Anguila</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
@@ -69,11 +69,11 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 <section id="t-gen" class="hide">
  <div class="card"><b style="color:#d32f2f">Pronósticos (todas las fuentes en una lista)</b>
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><button class="btn" id="g-share">Compartir imagen</button><button class="btn" id="g-sharet">Compartir números</button></div><div class="msg" id="g-msg"></div>
+  <div class="msg" id="g-fin"></div>
   <canvas id="g-cv" style="width:100%;border-radius:10px;display:none;margin-bottom:8px"></canvas><div id="gen-out"></div>
   <div class="msg" id="g-cor"></div>
   <div class="msg" id="g-par"></div>
   <div class="msg" id="g-seg"></div>
-  <div class="msg" id="g-fin"></div>
 </div>
 </section>
 <section id="t-anio" class="hide">
@@ -183,7 +183,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 9</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 10</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -849,11 +849,12 @@ function finGet(r){const key=r.n.date+'|'+r.n.session,z=FROZEN[key],si=shInfo();
   if(z&&z.b===FC_BUILD)return{l:z.l,p:z.p,d:z.d!==undefined?String(z.d):String(si.d),t:z.t2!==undefined?String(z.t2):String(si.t),frozen:true};
   return{l:r.top||finBuild(r),p:parFor(r).slice(0,9).map(x=>({k:x.k,tier:x.tier,half:x.half?1:0})),d:String(si.d),t:String(si.t),frozen:false};}
 function finFreeze(r){const key=r.n.date+'|'+r.n.session;if(FROZEN[key]&&FROZEN[key].b===FC_BUILD)return;const f=finGet(r);FROZEN[key]={l:f.l,p:f.p,d:f.d,t2:f.t,b:FC_BUILD,t:new Date().toISOString()};store('fpa_frozen',FROZEN);}
-function finRender(){try{const r=genList();if(!r)return;const f=finGet(r);
-  $('g-fin').innerHTML='<b>Pronóstico para compartir</b> · '+DIAS[r.wd]+' '+(r.n.session==='MID'?'Día':'Noche')+(f.frozen?' 🔒 congelado':'')+
-   '<div class="meth">Se comparte el TOP de arriba ('+f.l.length+' números). Al tocar "Compartir" se congela y el BINGO se canta contra esa lista.</div>'+
+function finRender(){try{const r=genList();if(!r)return;const f=finGet(r),L=f.l,g=(a,cl)=>'<div class="chips">'+a.map(x=>'<span class="chip '+cl+'">'+x.n+'<i>'+(x.f||'&nbsp;')+'</i></span>').join('')+'</div>';
+  $('g-fin').innerHTML='<b>Esto es lo que vas a compartir</b> · '+DIAS[r.wd]+' '+(r.n.session==='MID'?'Día':'Noche')+(f.frozen?' 🔒 congelado':' · 🔓 aún no congelado')+
+   '<div class="meth">'+(f.frozen?'Ya está congelado: el BINGO se canta contra esta lista.':'Todavía puede cambiar si anotas más sorteos. Se congela al tocar "Compartir" y el BINGO se canta contra esa lista.')+' Total: <b>'+L.length+'</b> números.</div>'+
+   '<div class="pg r">Rojo · del 1 al 10</div>'+g(L.slice(0,10),'r')+(L.length>10?'<div class="pg a">Azul · del 11 al '+L.length+'</div>'+g(L.slice(10),'a'):'')+
    '<div class="meth">Decena más fuerte: <b>'+f.d+'</b> · Terminal más fuerte: <b>'+f.t+'</b> (van en la imagen y cuentan para el BINGO)</div>'+
-   (f.p.length?'<div class="meth"><b>Parlés:</b> '+f.p.map(x=>x.k).join(' · ')+'</div>':'')+
+   '<div class="meth"><b>Parlés:</b> '+(f.p.length?f.p.map(x=>x.k).join(' · '):'ninguno')+'</div>'+
    (f.frozen?'<div><button class="btn s" data-act="unf" style="padding:6px 12px;font-size:13px">Recalcular (descongelar)</button></div>':'');
   }catch(e){showErr(e,'pronóstico para compartir');}}
 $('g-fin').onclick=e=>{if(e.target&&e.target.dataset&&e.target.dataset.act==='unf'){try{const r=genList();delete FROZEN[r.n.date+'|'+r.n.session];store('fpa_frozen',FROZEN);render();}catch(err){}}};
@@ -918,12 +919,12 @@ function genImg(){
   return cv;
 }
 $('g-share').onclick=async()=>{const m=$('g-msg');try{
-  try{const _r0=genList();if(_r0)finFreeze(_r0);}catch(e){}const cv=genImg();if(!cv){m.textContent='Todavía no hay datos.';return;}cv.style.display='block';
+  try{const _r0=genList();if(_r0){finFreeze(_r0);finRender();}}catch(e){}const cv=genImg();if(!cv){m.textContent='Todavía no hay datos.';return;}cv.style.display='block';
   const blob=await new Promise(res=>cv.toBlob(res,'image/png')),f=new File([blob],'pronostico-top10.png',{type:'image/png'});
   if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Pronóstico'});m.className='msg ok';m.textContent='Listo.';}
   else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pronostico-top10.png';a.click();m.className='msg ok';m.textContent='Se descargó la imagen. Si no, mantén pulsada la imagen para guardarla.';}
 }catch(e){if(e&&e.name==='AbortError')return;m.className='msg bad';m.textContent='No se pudo compartir. Mantén pulsada la imagen para guardarla.';}};
-function finText(){const r=genList();if(!r)return'';finFreeze(r);const f=finGet(r),si=shInfo(),d=r.n.date;
+function finText(){const r=genList();if(!r)return'';finFreeze(r);try{finRender();}catch(e){}const f=finGet(r),si=shInfo(),d=r.n.date;
   return 'PRONÓSTICO · '+(r.n.session==='MID'?'Día':'Noche')+' · '+si.dia+' '+d.slice(8)+'/'+d.slice(5,7)+'\nDecena más fuerte '+f.d+' · Terminal más fuerte '+f.t+'\nNúmeros ('+f.l.length+'): '+f.l.map(x=>x.n).join(' ')+(f.p.length?'\nParlés: '+f.p.map(x=>x.k).join(' · '):'');}
 $('g-sharet').onclick=async()=>{const m=$('g-msg');try{const tx=finText();if(!tx){m.className='msg bad';m.textContent='Todavía no hay datos.';return;}
   if(navigator.share){await navigator.share({text:tx});m.className='msg ok';m.textContent='Listo.';}
@@ -1503,7 +1504,7 @@ function selfCheck(){const T=[['lista de 100',()=>{const r=genList();if(!r||new 
 setTimeout(selfCheck,900);
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=9;var UPD_SHOWN=false;
+const APP_BUILD=10;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
