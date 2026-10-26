@@ -40,10 +40,10 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}</style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 18 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 21 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
-<nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="tri">Triángulo</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="ang">Anguila</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
+<nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="ang">Anguila</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
 <main>
 <div class="warn">Herramienta de entretenimiento. Las "coincidencias" no son probabilidades de ganar. Juega solo lo que estés dispuesto a perder.</div>
 
@@ -101,30 +101,6 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <div id="dw-out"></div></div>
 </section>
 
-<section id="t-tri" class="hide">
- <div class="card"><b>Triángulo del día</b>
-  <p class="meth">Cálculo por fecha: la primera cifra baja 2 y las dos últimas bajan 19 cada día (comprobado del 10 al 16-oct). Sirve para anotarlo y seguirlo.</p>
-  <div class="row"><button class="btn" id="tri-prev">◀</button><input type="date" id="tri-date"><button class="btn" id="tri-next">▶</button></div>
-  <button class="btn" id="tri-hoy">Hoy</button>
-  <div id="tri-out"></div>
-  <label>Número que publicó la página ese día (opcional)</label>
-  <div class="row"><input id="tri-real" inputmode="numeric" maxlength="3" placeholder="575"><button class="btn" id="tri-save">Guardar</button></div>
-  <div class="msg" id="tri-chk"></div></div>
- <div class="card"><b>Otros números de la página de este día</b>
-  <p class="meth">Los de adentro, los de abajo y las fórmulas C (si dice V, escribe también el viraje). Yo no los puedo calcular: los escribes tú.</p>
-  <input id="tri-extra" placeholder="84 48 15 51 17">
-  <button class="btn" id="tri-xsave">Guardar</button><div class="msg" id="tri-xmsg"></div></div>
- <div class="card"><b>Listas de la semana</b>
-  <select id="tri-wsel"></select>
-  <input id="tri-wk" placeholder="84 48 15 51 17 71">
-  <div class="row"><div><label>Desde</label><input type="date" id="tri-wd"><select id="tri-ws"><option value="MID">Día</option><option value="EVE">Noche</option></select></div><div><label>Hasta</label><input type="date" id="tri-wh"><select id="tri-wt"><option value="MID">Día</option><option value="EVE">Noche</option></select></div></div>
-  <button class="btn" id="tri-wsave">Guardar</button> <button class="btn" id="tri-wnew">Nueva lista</button> <button class="btn" id="tri-wdel">Borrar esta</button><div class="msg" id="tri-wmsg"></div></div>
- <div class="card"><b>Mis posibles pronósticos</b>
-  <div id="tri-mine"></div>
-  <button class="btn" id="tri-clear">Borrar los de este día</button></div>
- <div class="card"><b>Seguimiento (lo que salió y la página)</b><div id="tri-seg"></div></div>
-</section>
-
 <section id="t-hist" class="hide"><div class="card"><b>Consulta histórica 2010-2026</b><div class="row"><div><label>Día de la semana</label><select id="of-w"></select></div><div><label>Mes</label><select id="of-m"></select></div><div><label>Turno</label><select id="of-t"><option value="0">Día</option><option value="1">Noche</option><option value="2">Ambos</option></select></div></div><div id="of-out"></div></div><div class="card"><div class="row"><div><label>Turno</label><select id="h-s"><option value="">Todos</option><option value="MID">Día</option><option value="EVE">Noche</option></select></div><div><label>Buscar (fecha o número)</label><input id="h-q" placeholder="2026-10 o 38"></div></div><div id="hist-info"></div><table id="hist-tab"></table>
  <button class="btn d" id="b-del">Borrar el último sorteo</button><div class="msg" id="m-del"></div></div></section>
 
@@ -137,7 +113,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
  <div class="card"><b>Consulta de número</b><p class="meth">Escribe un número de 2 cifras y mira qué da cada tabla.</p>
   <input id="q-n" inputmode="numeric" maxlength="2" placeholder="38"><div id="q-out"></div></div>
  <div class="card"><b>Tabla unificada</b><p class="meth">Escribe un número y mira todos los que le dan las tablas, sin repetir. ×4 = coinciden en 4 tablas. Arriba van los que coinciden en más. Es coincidencia entre reglas, no probabilidad.</p>
-  <input id="un-n" inputmode="numeric" maxlength="2" placeholder="38"><div id="un-out"></div><div id="un-hang"></div>
+  <input id="un-n" inputmode="numeric" maxlength="2" placeholder="38"><div id="un-out"></div>
   <details><summary class="meth">Ver la tabla completa (00 a 99)</summary><table id="un-all"></table></details></div>
  <div class="card"><b>Seguidores: qué salió después</b><p class="meth">Escribe un número y mira qué salió en el sorteo siguiente cada vez que salió, desde el 1 de enero. Vacío = el último sorteo.</p>
   <input id="fo-n" inputmode="numeric" maxlength="2" placeholder="38"><div id="fo-out"></div>
@@ -184,7 +160,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 18</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 21</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -586,7 +562,7 @@ function render(){
   RT_C=null;ROWS=allRows();const l=ROWS[ROWS.length-1];
   try{const bl=BASE.reduce((a,b)=>!a||ordKey(b)>ordKey(a)?b:a,null);if(l&&bl)$('hdr-data').textContent='Datos hasta: '+l.d+' '+sesName(l.s)+(ordKey(l)>ordKey(bl)?' (base '+bl.d+' '+sesName(bl.s)+' + actualizaciones)':'');}catch(e){}
   $('last').innerHTML=l?`<span class="num">${l.p3}</span> ${l.p4?'· Pick 4 <b>'+l.p4+'</b> ':''}<div class="meth">${l.d} · ${sesName(l.s)} · ${ROWS.length} sorteos en total</div>`:'Sin datos';
-  ensurePred();renderCand();genRender();triRender();hangTrack();dwRender();renderHist();renderAcier();renderFoll();renderChain();
+  ensurePred();renderCand();genRender();dwRender();renderHist();renderAcier();renderFoll();renderChain();
   try{generarPanelPatrones();}catch(e){}try{anioRender();}catch(e){}try{chRender();}catch(e){}try{avisoRender();}catch(e){}try{redTrackRender();}catch(e){}try{corRender();}catch(e){}try{parRender();}catch(e){}try{finRender();}catch(e){}try{bingoRender();}catch(e){}
 }
 let SNAP=load('fpa_snap',{});
@@ -714,6 +690,11 @@ function dwLog(){const o={m:{},ex:{},dg:{}},ph=[];let hh=0;
     if(hit){const x=e.a.find(y=>y.v===t);o.dg[k]='paso semanal '+t+' — cada '+x.k+(x.k===1?' semana':' semanas')+' ('+x.dates.map(d=>d.slice(5)).join(', ')+')';}}
   return o;}
 function dwLift(){const o=dwLog();let h=0,e=0;for(const k in o.m){if(o.m[k])h++;e+=o.ex[k];}const lift=e>0?h/e:0;return{h,e,w:e>=5?Math.min(1.5,Math.max(0,lift-1)*3):0};}
+// Cadenas semánticas: ¿el siguiente eslabón que avisó la cadena salió en el sorteo siguiente? (con tus cadenas y tu ventana actuales)
+function chSemDet(){const seq=ROWS.map(r=>r.p3.slice(1)),cs=chParse(CH_TXT),o={m:{},ex:{},dg:{}};
+  for(let i=1;i<seq.length-1;i++){const nx=new Set(),why={};for(const c of cs){const b=chMatch(seq,i,c.n,CH_W);if(!b)continue;const x=c.n[b.j+1];if(!x)continue;nx.add(x);(why[x]=why[x]||[]).push(c.t+': '+b.pos.map(q=>seq[q]).join(' → ')+' ⇒ '+x);}
+    if(!nx.size)continue;const k=slotKey(ROWS[i+1]),hit=nx.has(seq[i+1]);o.m[k]=hit;o.ex[k]=nx.size/100;if(hit)o.dg[k]='cadena '+why[seq[i+1]][0];}
+  return o;}
 function ruleGrid(){
   const R=ROWS,out=[],tr=f=>{try{return f();}catch(e){return null;}};
   const add=(g,nm,sub,m,pe)=>{if(!m)return;let h=0,n=0,ex;if(pe!==undefined)ex=0;for(const k in m){if(m[k]===null||m[k]===undefined)continue;n++;if(m[k])h++;if(pe!==undefined)ex+=typeof pe==='function'?(pe(k)||0):pe;}out.push({g,nm,sub,m,h,n,ex});};
@@ -726,10 +707,10 @@ function ruleGrid(){
   add('Anguila','Anguila mañana → Día','desde que anotes',angDet(ROWS,true),0.165);add('Anguila','Anguila '+angHN(ANG_FUERTE.MID)+' → Día','desde que anotes',angDetH(ROWS,true,ANG_FUERTE.MID),0.03*ANG_FUERTE.MID.length);add('Anguila','Anguila tarde → Noche','desde que anotes',angDet(ROWS,false),0.214);add('Anguila','Anguila '+angHN(ANG_FUERTE.EVE)+' → Noche','desde que anotes',angDetH(ROWS,false,ANG_FUERTE.EVE),0.03*ANG_FUERTE.EVE.length);
   {const al=tr(()=>anActLog());if(al){add('Año','Terminal activado en el Año','desde 15-ene',al.T.m,k=>al.T.ex[k]);out[out.length-1].dg=al.T.dg;add('Año','Decena activada en el Año','desde 15-ene',al.D.m,k=>al.D.ex[k]);out[out.length-1].dg=al.D.dg;}}
   {const dl=tr(()=>dwLog());if(dl){add('Días de semana','Paso semanal exacto (columna del día)','desde 15-ene',dl.m,k=>dl.ex[k]);out[out.length-1].dg=dl.dg;}}
+  {const cs2=tr(()=>chSemDet());if(cs2){add('Reglas','Cadena semántica (siguiente eslabón)','con tus cadenas y ventana',cs2.m,k=>cs2.ex[k]);out[out.length-1].dg=cs2.dg;}}
   add('Pronósticos','Parlés del día (corrido o bingo)','desde 23-oct Noche',tr(()=>{const m={};parTrack().det.forEach(x=>{m[x.d+'|'+x.s]=x.un.length>0;});return m;}));
   add('Pronósticos','Pronóstico compartido','desde que se comparte',(()=>{const m={},by=new Map(R.map(r=>[slotKey(r),r]));for(const k in FROZEN){const r=by.get(k);if(r)m[k]=FROZEN[k].l.some(x=>x.n===r.p3.slice(1));}return Object.keys(m).length?m:null;})());
   add('Reglas','Ensemble (top 5)','desde 11-oct Noche',tr(()=>{const m={};enRule(R).det.forEach(x=>{m[x.d+'|'+x.s]=x.hit;});return m;}),0.05);
-  add('Reglas','Triángulo (página completa)','desde 13-oct Noche',tr(()=>{const st=triKey('2026-10-13','EVE'),m={};for(const r of R){if(triKey(r.d,r.s)<st)continue;m[slotKey(r)]=triDraw(r).hit;}return m;}));
   add('Reglas','Ahorcados','desde 17-oct Día',tr(()=>hangDet()));
   add('Reglas','Seguidores (qué sale después)','desde 08-oct Día',tr(()=>folDet(R)));
   add('Reglas','Cadenas (anterior → último)','desde 08-oct Día · solo si hay cadena',tr(()=>chainDet(R)));
@@ -784,14 +765,14 @@ function genList(){
   const n=nextSlot(l.d,l.s),wd=weekdayOf(n.date),base=l.p3.slice(1),b4=l.p4?[l.p4.slice(0,2),l.p4.slice(2)]:[];
   const pr=makePred(ROWS)||{B:[],D:'',T:''};
   const c=candidates(base,b4,'B',ROWS,wd),cm=new Map(c.map(x=>[x.n,x])),mx=Math.max(1,...c.map(x=>x.nm));
-  const tri=triSets({d:n.date,s:n.session}),en=ensTop5(ROWS.map(r=>r.p3.slice(1))),ens=new Set(en);
+  const en=ensTop5(ROWS.map(r=>r.p3.slice(1))),ens=new Set(en);
   const un=unifiedData(base),um=new Map(un.map(e=>[e[0],e[1].length])),mu=Math.max(1,...um.values()),ah=uniHang(new Set(um.keys())),ahs=new Set(ah);
   const pat={};try{const _g=anData(),_c=2*(+n.date.slice(5,7)-1)+(n.session==='EVE'?1:0);
     anPred(_g,+n.date.slice(8,10),_c).forEach(p=>{(pat[p.v]=pat[p.v]||[]).push('en línea');});
     anDays(anWK(),n.date,n.session).P.forEach(p=>{(pat[p.v]=pat[p.v]||[]).push('cada '+p.dd+' días');});}catch(e){showErr(e,'patrones del año');}
   const all=[];
   const yhas=x=>x&&x.items.some(q=>String(q[0]).indexOf('Patrón del año')===0);
-  for(let i=0;i<100;i++){const k=p2(i),P=pr.B.includes(k)?1:0,x=cm.get(k),Cn=x?x.nm/mx:0,T=tri.all.has(k)?1:0,E=ens.has(k)?1:0,U=um.has(k)?um.get(k)/mu:(ahs.has(k)?1/mu:0),Y=yhas(x)?1:0;
+  for(let i=0;i<100;i++){const k=p2(i),P=pr.B.includes(k)?1:0,x=cm.get(k),Cn=x?x.nm/mx:0,T=0,E=ens.has(k)?1:0,U=um.has(k)?um.get(k)/mu:(ahs.has(k)?1/mu:0),Y=yhas(x)?1:0;
     all.push({n:k,sc:5*P+4*Cn+3*T+2*E+U+2.5*Y,f:[P?'P':'',x?'C':'',T?'T':'',E?'E':'',um.has(k)?'U':'',ahs.has(k)?'A':'',Y?'Y':''].join(''),cn:x?x.nm:0,cs:x?x.score:0});}
   all.sort((a,b)=>b.sc-a.sc||b.cn-a.cn||b.cs-a.cs||(a.n<b.n?-1:1));
   const cad={};try{const cc=chainNow(ROWS);if(cc&&cc.list)cc.list.forEach(x=>{(cad[x.n]=cad[x.n]||[]).push(cc.a+'→'+cc.b+' ('+x.d+')');});}catch(e){showErr(e,'cadena en el pronóstico');}
@@ -799,7 +780,7 @@ function genList(){
   const ang=angMap(ROWS),angI=angPesos(ROWS),angW=angI.w,angS=angI.s,cor=corFijos(ROWS),isx=x=>cor[x.n]||pat[x.n]||cad[x.n]||fol[x.n]||angW[x.n]>0,mk=x=>{if(ang.has(x.n)&&x.f.indexOf('G')<0)x.f+='G';if(cor[x.n])x.f+='K';if(pat[x.n])x.f+='R';if(cad[x.n])x.f+='H';if(fol[x.n])x.f+='S';};all.forEach(x=>{if(ang.has(x.n)&&x.f.indexOf('G')<0)x.f+='G';});all.slice(0,20).forEach(mk);const kx=all.slice(20).filter(isx);kx.forEach(x=>{mk(x);x.kadd=true;});const all2=all.slice(0,20).concat(kx,all.slice(20).filter(x=>!isx(x)));const yp=c.filter(x=>yhas(x)).map(x=>x.n);let aInfo='';const qI=qCalc(ROWS),qW={},aW={};{try{const dsw=dwLift(),dst=dwStep(anWK(),n.date,n.session);dst.forEach(x=>{if(dsw.w>0)aW[x.v]=(aW[x.v]||0)+dsw.w;});aInfo='<div class="meth"><b>Paso semanal</b> (aciertos / azar): '+dsw.h+'/'+dsw.e.toFixed(1)+' (peso '+dsw.w.toFixed(1)+')'+(dst.length?' · activo ahora: <b>'+[...new Set(dst.map(x=>x.v))].join(', ')+'</b>':'')+'.</div>';}catch(e){}try{const aa=anActive(ROWS,n.date,n.session),lw=anLift();for(let i=0;i<100;i++){const k=p2(i);let v=0;if(aa.T[k[1]])v+=lw.w.T;if(aa.D[k[0]])v+=lw.w.D;if(v>0)aW[k]=v;}aInfo+='<div class="meth"><b>Año</b> (aciertos / azar): terminal '+lw.inf.T.h+'/'+lw.inf.T.e.toFixed(0)+' (peso '+lw.inf.T.w.toFixed(1)+') · decena '+lw.inf.D.h+'/'+lw.inf.D.e.toFixed(0)+' (peso '+lw.inf.D.w.toFixed(1)+'). Se suma a los números cuyo terminal o decena está activado en la pestaña Año.</div>';}catch(e){}}
   {for(const nm in qI.w){if(!(qI.w[nm]>0))continue;for(const z of qI.f[nm](base,wd))if(/^\d\d$/.test(z))qW[z]=(qW[z]||0)+qI.w[nm];}}
   all2.forEach(x=>{if(qW[x.n]>0&&x.f.indexOf('Q')<0)x.f+='Q';});
-  const R0={n,wd,base,pr,c,tri,en,un,ah,all:all2,yp,cor,pat,cad,fol,ang,angW,angS,qW,aW,qInfo:(qI.info||'')+aInfo,kx:kx.length};R0.top=finBuild(R0);R0.top.forEach(x=>{if(ang.has(x.n)&&x.f.indexOf('G')<0)x.f+='G';});const hv=new Set(R0.top.map(x=>x.n));ang.forEach((v,k)=>{if(angW[k]>0&&!hv.has(k)&&R0.top.length<30)R0.top.push({n:k,f:'G'});});return R0;
+  const R0={n,wd,base,pr,c,en,un,ah,all:all2,yp,cor,pat,cad,fol,ang,angW,angS,qW,aW,qInfo:(qI.info||'')+aInfo,kx:kx.length};R0.top=finBuild(R0);R0.top.forEach(x=>{if(ang.has(x.n)&&x.f.indexOf('G')<0)x.f+='G';});const hv=new Set(R0.top.map(x=>x.n));ang.forEach((v,k)=>{if(angW[k]>0&&!hv.has(k)&&R0.top.length<30)R0.top.push({n:k,f:'G'});});return R0;
 }
 function genRender(){try{
   const r=genList();if(!r)return;
@@ -809,12 +790,12 @@ function genRender(){try{
   const cs=r.c.slice().sort((a,b)=>b.nm-a.nm||b.score-a.score).slice(0,12).map(x=>x.n+'('+x.nm+')').join(' ');
   const TP=finGet(r).l,TPS=new Set(TP.map(x=>x.n)),RS=r.all.filter(x=>!TPS.has(x.n)),RV=RS.filter(x=>/[KRHS]/.test(x.f)),RN=RS.filter(x=>!/[KRHS]/.test(x.f));
   $('gen-out').innerHTML=
-   '<div class="msg">Para el sorteo: <b>'+r.n.date+' ('+DIAS[r.wd]+') · '+sesName(r.n.session)+'</b><div class="meth">Último trasero '+r.base+'. El TOP lleva 20 números: primero los de la cadena, los corridos, los seguidores y los activados en el Año (sin repetir), y se completa hasta 20 con lo que más coinciden las demás fuentes (Pronóstico, Candidatos, Triángulo, Ensemble, Patrones del año, Tablas, decena y terminal más fuertes). Las letras de cada número dicen qué fuentes lo traen: P Pronóstico, C Candidatos, T Triángulo, E Ensemble, U Tablas, A Ahorcado, Y Patrón del año, D Decena fuerte, N Terminal fuerte, K Corrido, S Seguidor (número que salió después de este último trasero), G Anguila (salió en Anguila en esta sesión; en la Noche las horas 2, 6 y 8 PM entran primero y las demás pesan poco; en el Día solo marca y la 1 PM ayuda a desempatar), H Cadena (número que salió después de esta misma cadena), R Patrón activo del calendario (número que sale en un patrón activado), Q Tabla de las que más acertaron este año (ver abajo; solo ayuda a completar el Top, no desplaza a los de K, S, H, R y G). Los de K, S, H y R (y en la Noche los de Anguila de las 2, 6 y 8 PM) entran siempre al Top, hasta el tope de 20.</div></div>'+
+   '<div class="msg">Para el sorteo: <b>'+r.n.date+' ('+DIAS[r.wd]+') · '+sesName(r.n.session)+'</b><div class="meth">Último trasero '+r.base+'. El TOP lleva 20 números: primero los de la cadena, los corridos, los seguidores y los activados en el Año (sin repetir), y se completa hasta 20 con lo que más coinciden las demás fuentes (Pronóstico, Candidatos, Ensemble, Patrones del año, Tablas, decena y terminal más fuertes). Las letras de cada número dicen qué fuentes lo traen: P Pronóstico, C Candidatos, E Ensemble, U Tablas, A Ahorcado, Y Patrón del año, D Decena fuerte, N Terminal fuerte, K Corrido, S Seguidor (número que salió después de este último trasero), G Anguila (salió en Anguila en esta sesión; en la Noche las horas 2, 6 y 8 PM entran primero y las demás pesan poco; en el Día solo marca y la 1 PM ayuda a desempatar), H Cadena (número que salió después de esta misma cadena), R Patrón activo del calendario (número que sale en un patrón activado), Q Tabla de las que más acertaron este año (ver abajo; solo ayuda a completar el Top, no desplaza a los de K, S, H, R y G). Los de K, S, H y R (y en la Noche los de Anguila de las 2, 6 y 8 PM) entran siempre al Top, hasta el tope de 20.</div></div>'+
    (r.qInfo||'')+'<div class="pg r">TOP · Rojo · del 1 al 10</div>'+g(TP.slice(0,10),'r')+(TP.length>10?'<div class="pg a">TOP · Azul · del 11 al '+TP.length+'</div>'+g(TP.slice(10),'a'):'')+(RV.length?'<div class="pg k">Violeta · fijos, seguidores, patrones o cadena que no caben en el tope de 20 ('+RV.length+')</div>'+g(RV,'k'):'')+'<div class="pg">Negro · el resto</div>'+g(RN,'n')+
    '<div class="msg"><b>Por fuente</b></div>'+
    '<div class="meth"><b>1 · Pronóstico:</b> '+(r.pr.B.join(' · ')||'—')+(r.pr.D!==undefined&&r.pr.D!==''?' · decena '+r.pr.D+' · terminal '+r.pr.T:'')+'</div>'+
    '<div class="meth"><b>2 · Candidatos</b> (los que traen más reglas): '+(cs||'—')+'</div>'+
-   '<div class="meth"><b>3 · Triángulo:</b> '+([...r.tri.all].sort().join(' ')||'—')+'</div>'+
+   
    '<div class="meth"><b>4 · Ensemble:</b> '+r.en.join(' · ')+'</div>'+
    '<div class="meth"><b>5 · Patrones del año</b> (activos en la próxima casilla del calendario): <b>'+((r.yp||[]).join(' ')||'—')+'</b></div>'+
    '<div class="meth"><b>6 · Tablas</b> (unificada del '+r.base+'):</div>'+tab+'<div class="meth">Ahorcados: <b>'+(r.ah.join(' ')||'—')+'</b></div>'+
@@ -892,7 +873,7 @@ function parRender(){try{const l=ROWS[ROWS.length-1],r=genList();if(!l||!r)retur
   }catch(e){showErr(e,'parlés del día');}}
 // ---- Pronóstico para compartir: fijos de corridos y cadena primero, luego por coincidencias entre reglas; se congela al compartir ----
 var FROZEN=load('fpa_frozen',{});
-const FC_BUILD=3,FC_N=20,FC_MAX=20,FC_W={P:1,T:1,E:1.25,U:1,A:1,Y:1.5},FC_NOM={P:'Pronóstico',C:'Candidatos',T:'Triángulo',E:'Ensemble',U:'Tablas',A:'Ahorcado',Y:'Patrón del año',K:'Corrido → fijo',S:'Seguidor',H:'Cadena',R:'Patrón del calendario',D:'Decena fuerte',N:'Terminal fuerte',Q:'Tablas con más acierto del año'};
+const FC_BUILD=3,FC_N=20,FC_MAX=20,FC_W={P:1,E:1.25,U:1,A:1,Y:1.5},FC_NOM={P:'Pronóstico',C:'Candidatos',E:'Ensemble',U:'Tablas',A:'Ahorcado',Y:'Patrón del año',K:'Corrido → fijo',S:'Seguidor',H:'Cadena',R:'Patrón del calendario',D:'Decena fuerte',N:'Terminal fuerte',Q:'Tablas con más acierto del año'};
 function finBuild(r){
   const by=new Map(r.all.map((x,i)=>[x.n,{x,i}])),F=[],seen=new Set(),ix=n=>by.get(n).i;
   const add=n=>{if(by.has(n)&&!seen.has(n)){seen.add(n);F.push(by.get(n).x);}},srt=o=>Object.keys(o||{}).sort((p,q)=>ix(p)-ix(q));
@@ -1131,7 +1112,9 @@ function chActive(){const seq=ROWS.map(r=>r.p3.slice(1)),i=seq.length-1,out=[];i
 function chRender(){try{
   const cs=chParse(CH_TXT),seq=ROWS.map(r=>r.p3.slice(1)),A=chActive();
   $('an-ch').innerHTML=A.length?A.map(a=>'<div class="cand" style="border-left:6px solid #d32f2f;padding-left:8px"><b>'+a.t+'</b><div class="num" style="font-size:16px">'+a.have.join(' → ')+(a.next?' ⇒ <b>'+a.next+'</b>':'')+'</div><div class="meth">'+(a.next?'Sigue: '+a.rest.map(x=>x+' '+(pnNm(x)||'')).join(' → '):'La cadena ya llegó a su final.')+'</div></div>').join(''):'<div class="meth">Ninguna cadena activa en las últimas '+CH_W+' sorteos.</div>';
-  const H=cs.map(c=>{let act=0,nn=0,hit=0;for(let i=1;i<seq.length;i++){const b=chMatch(seq,i,c.n,CH_W);if(!b)continue;act++;const nx=c.n[b.j+1];if(nx&&i+1<seq.length){nn++;if(seq.slice(i+1,i+1+CH_W).includes(nx))hit++;}}return c.t+': '+act+' activaciones, el siguiente eslabón salió en la ventana '+hit+' de '+nn;});
+  const H=cs.map(c=>{let act=0,nn=0,hit=0;for(let i=1;i<seq.length;i++){const b=chMatch(seq,i,c.n,CH_W);if(!b)continue;act++;const nx=c.n[b.j+1];if(nx&&i+1<seq.length){nn++;if(seq.slice(i+1,i+1+CH_W).includes(nx))hit++;}}return c.t+': '+act+' activaciones, el siguiente eslabón salió en la ventana '+hit+' de '+nn+' (por azar ≈ '+Math.round(nn*(1-Math.pow(0.99,CH_W)))+')';});
+  let gn=0,gh=0;for(const c of cs)for(let i=1;i<seq.length-1;i++){const b=chMatch(seq,i,c.n,CH_W);if(!b)continue;const nx=c.n[b.j+1];if(!nx)continue;gn++;if(seq[i+1]===nx)gh++;}
+  H.push('<b>Lo que más importa — al sorteo siguiente: '+gh+' de '+gn+'</b> (por azar ≈ '+(gn/100).toFixed(1)+'). Si la ventana es muy grande, "salió en la ventana" casi siempre se parece al azar.');
   $('ch-hist').innerHTML='<b>En el historial (desde nov-2025), ventana de '+CH_W+' sorteos:</b><div class="meth">'+H.join('<br>')+'</div>';
   const sel=$('ch-sel');sel.innerHTML='<option value="">Ninguna</option>'+cs.map(c=>'<option value="'+c.t.replace(/"/g,'&quot;')+'">'+c.t+'</option>').join('');sel.value=CH_SEL;
 }catch(e){}}
@@ -1176,85 +1159,8 @@ function dwRender(){try{
    months.map((ym,i)=>'<details'+(i<2?' open':'')+'><summary class="meth"><b>'+DW_M[+ym.slice(5)-1]+' '+ym.slice(0,4)+'</b></summary>'+cal(ym)+'</details>').join('');
   }catch(e){}}
 $('dw-btns').addEventListener('click',e=>{const t=e.target.closest?e.target.closest('button'):null;if(!t)return;if(t.getAttribute('data-solo'))DW_ONLY=!DW_ONLY;else if(t.getAttribute('data-w'))DW_SEL=t.getAttribute('data-w');dwRender();});
-// ---- Triángulo del día: cálculo por fecha + seguimiento ----
-var TRI_SEED={'2026-10-10':'570','2026-10-11':'351','2026-10-12':'132','2026-10-13':'913','2026-10-14':'794','2026-10-15':'575','2026-10-16':'356','2026-10-20':'023'};
-var TRI_EXTRA_SEED={'2026-10-10':['27','52','72'],'2026-10-11':['86','45'],'2026-10-12':['45','50','05','52','25'],'2026-10-13':['04','47','74','49','94','59'],'2026-10-14':['84','48','15','51','17','71','78','87','53','63','36'],'2026-10-15':['22','27','72','25','52'],'2026-10-16':['81','20','83','38','94','49','96','69'],'2026-10-20':['25','77']};
-var TRI_WK_SEED={nums:['84','48','15','51','17','71','78','87','53','35','63','36'],desde:'2026-10-13',sd:'EVE',hasta:'2026-10-18',sh:'EVE'};
-var TRI_WK_SEED2={nums:['02','55','77','37','97','17','82','92','07','09','91','93','72','47'],desde:'2026-10-18',sd:'MID',hasta:'2026-10-25',sh:'EVE'};
-var TRI_USER=load('fpa_tri_real',{}),TRI_REAL=Object.assign({},TRI_SEED,TRI_USER),TRI_MINE=load('fpa_tri_mine',{});
-var TRI_XUSER=load('fpa_tri_extra',{}),TRI_EXTRA=Object.assign({},TRI_EXTRA_SEED,TRI_XUSER);
-var TRI_WKS=load('fpa_tri_wks',null),TRI_WSEL=0;if(!TRI_WKS){const old=load('fpa_tri_week',null);TRI_WKS=[old||TRI_WK_SEED,TRI_WK_SEED2];}
-const triMod=(a,m)=>((a%m)+m)%m;
-const triNums=t=>[...new Set(String(t||'').split(/\D+/).filter(x=>x.length===2))];
-function triN(ds){const q=ds.split('-').map(Number);return Math.round((Date.UTC(q[0],q[1]-1,q[2])-Date.UTC(2026,9,2))/864e5);}
-function triCount(ds){const n=triN(ds);return String(triMod(1-2*n,10))+String(triMod(22-19*n,100)).padStart(2,'0');}
-function triTop(ds){return (TRI_REAL&&TRI_REAL[ds])||triCount(ds);}
-function triKnown(d){return !!(TRI_REAL&&TRI_REAL[d])||d<='2026-10-16';}
-function triBuild(top){const a=+top[0],b=+top[1],c=+top[2],x=(a+b)%10,y=(b+c)%10,z=(x+y)%10,dg=[x,y,z],pairs=new Set(),lst=new Set();
-  for(let i=0;i<3;i++)for(let j=0;j<3;j++)if(i!==j)pairs.add(''+dg[i]+dg[j]);
-  for(const p of pairs){lst.add(p2(+p-1));lst.add(p2(+p+1));}
-  return{x,y,z,dg,pairs:[...pairs].sort(),list:[...lst].sort()};}
-function triToday(){const t=new Date();return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');}
-function triShift(ds,k){const q=ds.split('-').map(Number);return new Date(Date.UTC(q[0],q[1]-1,q[2]+k)).toISOString().slice(0,10);}
-const triKey=(d,s)=>d+(s==='MID'?'0':'1');
-// páginas activas para un sorteo: Día -> páginas D-1, D, D+1; Noche -> D, D+1
-function triSets(r){const pg=r.s==='MID'?[-1,0,1]:[0,1],L=new Set(),X=new Set();
-  for(const k of pg){const d=triShift(r.d,k);if(triKnown(d))triBuild(triTop(d)).list.forEach(v=>L.add(v));(TRI_EXTRA[d]||[]).forEach(v=>X.add(v));}
-  const key=triKey(r.d,r.s),W=new Set();for(const w of TRI_WKS)if(w&&w.nums&&key>=triKey(w.desde,w.sd)&&key<=triKey(w.hasta,w.sh))w.nums.forEach(v=>W.add(v));
-  return{L,X,W,all:new Set([...L,...X,...W])};}
-function triDraw(r){const q=triSets(r),t=r.p3.slice(1);return{t,L:q.L.has(t),X:q.X.has(t),W:q.W.has(t),size:q.all.size,hit:q.all.has(t)};}
-function triRender(){try{
-  const ds=$('tri-date').value||triToday();$('tri-date').value=ds;
-  const top=triTop(ds),t=triBuild(top),mine=TRI_MINE[ds]||[],dn=ROWS.filter(r=>r.d===ds).map(r=>r.p3.slice(1)),real=TRI_REAL[ds];
-  const chip=n=>'<span class="chip '+(mine.includes(n)?'a':'n')+'" data-n="'+n+'">'+n+'<i>'+(dn.includes(n)?'salió':'&nbsp;')+'</i></span>';
-  $('tri-out').innerHTML='<div class="msg">Arriba: <b>'+top+'</b> <span class="meth">('+(real?'publicado':(ds>'2026-10-16'?'estimado':'regla'))+')</span> · Fila 2: <b>'+(''+t.dg[0]+t.dg[1])+'</b> · Fila 3: <b>'+t.dg[2]+'</b></div><div class="meth">Cifras '+t.dg.join(' · ')+' → parejas '+t.pairs.join(', ')+' → cada una ±1 ('+t.list.length+' números). Toca un número para añadirlo a Mis posibles (azul).</div><div class="chips">'+t.list.map(chip).join('')+'</div>';
-  $('tri-real').value=TRI_USER[ds]||'';
-  $('tri-chk').innerHTML=real?(real===triCount(ds)?'<span class="ok">✅ La página publicó '+real+': coincide con la regla.</span>':'<span class="bad">❌ La página publicó '+real+' y la regla da '+triCount(ds)+'. El programa usa el publicado.</span>'):(ds>'2026-10-16'?'Aún sin el número de la página. Este cálculo es solo un estimado: la regla falló el 20-oct, y mientras no escribas el número publicado no cuenta en Pronósticos.':'Aún sin el número de la página para este día.');
-  $('tri-extra').value=(TRI_EXTRA[ds]||[]).join(' ');
-  if(TRI_WSEL>=TRI_WKS.length)TRI_WSEL=Math.max(0,TRI_WKS.length-1);const W0=TRI_WKS[TRI_WSEL]||{nums:[],desde:'',sd:'MID',hasta:'',sh:'MID'};
-  $('tri-wsel').innerHTML=TRI_WKS.map((w,i)=>'<option value="'+i+'"'+(i===TRI_WSEL?' selected':'')+'>'+(i+1)+'. '+(w.desde||'?').slice(8)+'-'+(w.desde||'?').slice(5,7)+' → '+(w.hasta||'?').slice(8)+'-'+(w.hasta||'?').slice(5,7)+' ('+(w.nums||[]).length+' números)</option>').join('');
-  $('tri-wk').value=(W0.nums||[]).join(' ');$('tri-wd').value=W0.desde||'';$('tri-ws').value=W0.sd||'MID';$('tri-wh').value=W0.hasta||'';$('tri-wt').value=W0.sh||'MID';
-  $('tri-mine').innerHTML=mine.length?'<div class="meth">Para '+ds+':</div><div class="chips">'+mine.map(chip).join('')+'</div>':'<div class="meth">Sin números anotados para este día.</div>';
-  let h=0,n=0,e=0;for(const k of Object.keys(TRI_MINE)){const L=TRI_MINE[k]||[];if(!L.length)continue;for(const r of ROWS.filter(r=>r.d===k)){n++;e+=L.length/100;if(L.includes(r.p3.slice(1)))h++;}}
-  $('tri-mine').innerHTML+='<div class="meth">Tus posibles hasta ahora: '+h+' aciertos en '+n+' sorteos.</div>';
-  // seguimiento: página completa (listas ±1 + otros números + lista de la semana) desde el 13-oct Noche
-  const start=triKey('2026-10-13','EVE');let H=0,N=0,E=0,hl=0,lines='';
-  for(const r of ROWS){if(triKey(r.d,r.s)<start)continue;const q=triDraw(r);N++;E+=q.size/100;if(q.hit)H++;
-    const w=[q.L?'lista':'',q.X?'adentro/otros':'',q.W?'semana':''].filter(Boolean).join(', ');
-    lines='<tr><td>'+r.d.slice(8)+'-'+r.d.slice(5,7)+' '+(r.s==='MID'?'Día':'Noche')+'</td><td>'+q.t+'</td><td>'+(q.hit?'✅ '+w:'—')+'</td></tr>'+lines;}
-  $('tri-seg').innerHTML='<div class="msg">Página completa (listas ±1, adentro/otros y semana) desde el 13-oct Noche: <b>'+H+'</b> aciertos en '+N+' sorteos.</div><div class="meth">Cada sorteo se revisa con las páginas activas (Día: de ayer, hoy y mañana; Noche: de hoy y mañana) y con las listas de la semana.</div><table><tr><td></td><td>Salió</td><td>Acertó en</td></tr>'+lines+'</table>';
-  }catch(e){}}
-function triWire(){
-  $('tri-date').onchange=triRender;
-  $('tri-prev').onclick=()=>{$('tri-date').value=triShift($('tri-date').value||triToday(),-1);triRender();};
-  $('tri-next').onclick=()=>{$('tri-date').value=triShift($('tri-date').value||triToday(),1);triRender();};
-  $('tri-hoy').onclick=()=>{$('tri-date').value=triToday();triRender();};
-  $('tri-out').addEventListener('click',e=>{const el=e.target.closest?e.target.closest('[data-n]'):null;if(!el)return;const ds=$('tri-date').value,n=el.getAttribute('data-n'),L=TRI_MINE[ds]||[];TRI_MINE[ds]=L.includes(n)?L.filter(x=>x!==n):L.concat(n).sort();store('fpa_tri_mine',TRI_MINE);triRender();});
-  $('tri-mine').addEventListener('click',e=>{const el=e.target.closest?e.target.closest('[data-n]'):null;if(!el)return;const ds=$('tri-date').value,n=el.getAttribute('data-n');TRI_MINE[ds]=(TRI_MINE[ds]||[]).filter(x=>x!==n);store('fpa_tri_mine',TRI_MINE);triRender();});
-  $('tri-save').onclick=()=>{const ds=$('tri-date').value,v=$('tri-real').value.replace(/\D/g,'');if(v.length===3){TRI_USER[ds]=v;TRI_REAL[ds]=v;store('fpa_tri_real',TRI_USER);}else if(!v){delete TRI_USER[ds];TRI_REAL=Object.assign({},TRI_SEED,TRI_USER);store('fpa_tri_real',TRI_USER);}triRender();};
-  $('tri-clear').onclick=()=>{const ds=$('tri-date').value;TRI_MINE[ds]=[];store('fpa_tri_mine',TRI_MINE);triRender();};
-  $('tri-xsave').onclick=()=>{const ds=$('tri-date').value,L=triNums($('tri-extra').value);TRI_XUSER[ds]=L;TRI_EXTRA[ds]=L;store('fpa_tri_extra',TRI_XUSER);triRender();$('tri-xmsg').textContent='Guardado: '+L.length+' números para '+ds+'.';};
-  $('tri-wsel').onchange=()=>{TRI_WSEL=+$('tri-wsel').value||0;triRender();};
-  $('tri-wsave').onclick=()=>{const L=triNums($('tri-wk').value),d=$('tri-wd').value,h=$('tri-wh').value;if(!d||!h){$('tri-wmsg').textContent='Pon las dos fechas.';return;}TRI_WKS[TRI_WSEL]={nums:L,desde:d,sd:$('tri-ws').value,hasta:h,sh:$('tri-wt').value};store('fpa_tri_wks',TRI_WKS);triRender();$('tri-wmsg').textContent='Guardado: '+L.length+' números.';};
-  $('tri-wnew').onclick=()=>{const t=triToday();TRI_WKS.push({nums:[],desde:t,sd:'MID',hasta:triShift(t,7),sh:'EVE'});TRI_WSEL=TRI_WKS.length-1;store('fpa_tri_wks',TRI_WKS);triRender();$('tri-wmsg').textContent='Lista nueva: escribe los números y guarda.';};
-  $('tri-wdel').onclick=()=>{if(!TRI_WKS.length)return;TRI_WKS.splice(TRI_WSEL,1);TRI_WSEL=0;store('fpa_tri_wks',TRI_WKS);triRender();$('tri-wmsg').textContent='Lista borrada.';};
-}
-triWire();triRender();
 // ---- Ahorcados: número que queda entre dos de la tabla unificada (53 y 55 -> 54) ----
 function uniHang(S){const H=[];for(let n=1;n<99;n++){const k=p2(n);if(S.has(k))continue;if(S.has(p2(n-1))&&S.has(p2(n+1)))H.push(k);}return H;}
-function hangTrack(){try{
-  if(!ROWS.length)return;const keep=ROWS,start='2026-10-17'+'0',key=r=>r.d+(r.s==='MID'?'0':'1');
-  const ahor=base=>uniHang(new Set(unifiedData(base).map(e=>e[0])));
-  const nxt=ahor(keep[keep.length-1].p3.slice(1));
-  let H=0,N=0,E=0,lines='';
-  for(let i=0;i<keep.length-1;i++){if(key(keep[i+1])<start)continue;
-    ROWS=keep.slice(0,i+1);const A=ahor(keep[i].p3.slice(1));ROWS=keep;
-    const t=keep[i+1].p3.slice(1),hit=A.includes(t);N++;E+=A.length/100;if(hit)H++;
-    lines='<tr><td>'+keep[i+1].d.slice(8)+'-'+keep[i+1].d.slice(5,7)+' '+(keep[i+1].s==='MID'?'Día':'Noche')+'</td><td>'+t+'</td><td>'+A.length+'</td><td>'+(hit?'✅':'—')+'</td></tr>'+lines;}
-  ROWS=keep;
-  $('un-hang').innerHTML='<div class="meth" style="margin-top:10px"><b>Ahorcados para el próximo sorteo</b> (tabla del último trasero '+keep[keep.length-1].p3.slice(1)+'): <b>'+(nxt.join(' ')||'—')+'</b></div><div class="msg">Seguimiento desde el 17-oct Día: <b>'+H+'</b> aciertos en '+N+' sorteos.</div>'+(N?'<table><tr><td></td><td>Salió</td><td>Ahorcados</td><td></td></tr>'+lines+'</table>':'');
-  }catch(e){}}
-hangTrack();
 function renderHist(){
   const f=$('h-s').value,q=($('h-q').value||'').trim();
   let L=ROWS.filter(r=>(!f||r.s===f)&&(!q||r.d.indexOf(q)>=0||r.p3.indexOf(q)>=0||r.p3.slice(1)===q||r.p4.indexOf(q)>=0));
@@ -1270,7 +1176,7 @@ function csvText(){
   return t;}
 function addRows(list){for(const r of list){EXTRA=EXTRA.filter(e=>slotKey(e)!==slotKey(r));EXTRA.push(r);DEL=DEL.filter(k=>k!==slotKey(r));}const a=store('fpa_extra',EXTRA),b=store('fpa_del',DEL);return a&&b;}
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('on',x===b));
-  for(const t of ['nuevo','gen','cand','tri','hist','consulta','dias','anio','ens','patron','copia','ang'])$('t-'+t).classList.toggle('hide',t!==b.dataset.t);});
+  for(const t of ['nuevo','gen','cand','hist','consulta','dias','anio','ens','patron','copia','ang'])$('t-'+t).classList.toggle('hide',t!==b.dataset.t);});
 function flLine(t,nx){t=String(t).toUpperCase().replace(/[*_~]/g,' ');let d=nx.date,s=null;
   const p=t.match(/\[(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?,?\s*(\d{1,2}):(\d{2})\s*([AP])\.?\s*M\.?\]/);
   if(p){const y=p[3]?(p[3].length===2?'20'+p[3]:p[3]):nx.date.slice(0,4);d=y+'-'+p[2].padStart(2,'0')+'-'+p[1].padStart(2,'0');s=((+p[4]%12)+(p[6]==='P'?12:0))<17?'MID':'EVE';t=t.replace(p[0],' ');}
@@ -1598,7 +1504,7 @@ function selfCheck(){const T=[['lista de 100',()=>{const r=genList();if(!r||new 
 setTimeout(selfCheck,900);
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=18;var UPD_SHOWN=false;
+const APP_BUILD=21;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
