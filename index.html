@@ -40,7 +40,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}</style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 12 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 13 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="tri">Triángulo</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="ang">Anguila</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
@@ -184,7 +184,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 12</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 13</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -1401,7 +1401,28 @@ function uniOut(){const t=$('un-n').value.replace(/\D/g,'');
   $('un-out').innerHTML=t?'<table>'+unifiedGroups(t).map(g=>'<tr><td>×'+g[0]+'</td><td><b>'+g[1].join(' ')+'</b></td></tr>').join('')+'</table><details><summary class="meth">Qué tablas dan cada número</summary><table>'+unifiedData(t).map(e=>'<tr><td><b>'+e[0]+'</b></td><td class="meth">'+e[1].join(', ')+'</td></tr>').join('')+'</table></details><div class="msg">Ahorcados (entre dos números de la tabla): <b>'+(uniHang(new Set(unifiedData(t).map(e=>e[0]))).join(' ')||'—')+'</b></div>':'';}
 function uniAllRender(){try{let r='';for(let i=0;i<100;i++){const n=String(i).padStart(2,'0');r+='<tr><td><b>'+n+'</b></td><td>'+unifiedGroups(n).map(g=>'×'+g[0]+': '+g[1].join(' ')).join('<br>')+'</td></tr>';}$('un-all').innerHTML=r;uniOut();}catch(e){}}
 $('un-n').oninput=uniOut;uniAllRender();
-$('q-n').oninput=()=>{const t=$('q-n').value.replace(/\D/g,'');$('q-out').innerHTML=t?'<table>'+lookupData(t).map(x=>'<tr><td>'+x[0]+'</td><td><b>'+(x[1].length?x[1].join(' · '):'—')+'</b></td></tr>').join('')+'</table>':'';};
+$('q-n').oninput=()=>{const t=$('q-n').value.replace(/\D/g,'');if(!t){$('q-out').innerHTML='';return;}
+  const n=t.padStart(2,'0'),v=x=>x==null?[]:(typeof x==='string'?[x]:x.filter(y=>y&&y!=='?'&&/^\d\d$/.test(y)));
+  const dk=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date().getDay()],dkn={Mon:'lunes',Tue:'martes',Wed:'miércoles',Thu:'jueves',Fri:'viernes',Sat:'sábado',Sun:'domingo'}[dk];
+  const fam=[];for(const f of T.FAMILIAS)if(f.includes(n))for(const m of f)if(m!==n&&!fam.includes(m))fam.push(m);
+  const rows=[
+   ['1. Números que rodean','g',v(T.RODEAN[n])],
+   ['2. Cuarteta','g',v(T.CUARTETAS[n])],
+   ['3. Vibración ('+dkn+')','g',v(T.VIBRACION[dk])],
+   ['4. M1/M2','o',v(T.M1M2[n])],
+   ['5. Compañeros','o',v(T.COMPANEROS[n])],
+   ['6. Viraje','b',(n[1]+n[0]!==n)?[n[1]+n[0]]:[]],
+   ['7. Regla II','b',regla2(n)],
+   ['8. Tabla fundamental','x',fam],
+   ['Charada','n',v(T.CHARADA[n])],['Maravillosa','n',v(T.MARAVILLOSA[n])],['Mariposas','n',v(T.MARIPOSAS[n])],
+   ['Pleito (siguientes)','n',v(T.PLEITO[n])],['Antonio Gómez','n',v(T.ANTONIO[n])],
+   ['Igualdad','n',v([T.EQUALITY[n]])],['Valor','n',v([T.VALOR[n]])],['Pares','n',v(T.PARES[n])]];
+  const cnt={};[rows[0][2],rows[1][2],rows[2][2]].forEach(a=>a.forEach(x=>cnt[x]=(cnt[x]||0)+1));
+  const combo=Object.keys(cnt).filter(k=>cnt[k]>=2).sort((a,b)=>cnt[b]-cnt[a]);
+  let h='<div class="warn" style="background:#e8f5e9;border-color:#4caf50;margin-bottom:12px;border-left:6px solid #2e7d32;"><b style="color:#2e7d32;font-size:16px;">🏆 COMBO (Rodean + Cuarteta + Vibración):</b><div class="chips" style="margin-top:6px;">'+(combo.length?combo.map(x=>'<span class="chip" style="border-color:#2e7d32;color:#2e7d32;">'+x+'<i>en '+cnt[x]+'</i></span>').join(''):'<span class="meth">Sin coincidencias entre las 3 de arriba este sorteo.</span>')+'</div><div class="meth">Números que coinciden en 2 o más de las 3 primeras tablas.</div></div>';
+  h+='<table>'+rows.map(r=>{const st=r[1]==='g'?'color:#2e7d32;font-weight:bold;font-size:15px;':r[1]==='o'?'color:#f57c00;font-weight:bold;':r[1]==='b'?'color:#1976d2;font-weight:bold;':r[1]==='x'?'color:#9e9e9e;':'';
+   return '<tr><td style="'+st+'">'+r[0]+'</td><td><b>'+(r[2].length?r[2].join(' · '):'—')+'</b></td></tr>';}).join('')+'</table>';
+  $('q-out').innerHTML=h;};
 // ---- Sueños -> números (usa la charada mixta) ----
 var SU_IDX=null;
 const SU_STOP=new Set('el la los las un una unos unas de del al y e o u en con sin por para que se me mi mis tu tus su sus lo le les es era fue ser estar estaba estaban estuve habia hay he ha han como cuando donde mas pero si no ni muy tan ya ese esa eso esos esas este esta esto estos estas alla aqui ahi otro otra otros otras todo toda todos todas algo alguien nada cada hacia desde hasta entre sobre bajo tras ante sone soñe soñando sonando sueno sueño vi veia ver iba ir voy fui tenia tener tengo nos habia habian quien cual cuales'.split(' '));
