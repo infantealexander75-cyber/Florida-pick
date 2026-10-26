@@ -40,7 +40,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}</style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 16 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 17 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="tri">Triángulo</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="ang">Anguila</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
@@ -184,7 +184,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 16</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 17</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -687,13 +687,19 @@ function anActive(rows,date,ses){const g={},WK={};
   for(const p of anWeek(WK,date,ses))put(p.k==='T'?T:D,p.dig,anName(p));
   for(const p of anDays(WK,date,ses).G)put(p.k==='T'?T:D,p.dig,anName(p));
   return{T,D};}
-var ATC={k:'',v:null};
-function anActLog(){const key=ROWS.length+'|'+(ROWS.length?slotKey(ROWS[ROWS.length-1]):'');if(ATC.k===key&&ATC.v)return ATC.v;
-  const o={T:{m:{},ex:{},dg:{}},D:{m:{},ex:{},dg:{}}};
-  for(let i=1;i<ROWS.length;i++){const r=ROWS[i];if(r.d<'2026-01-15')continue;const k=slotKey(r),a=anActive(ROWS.slice(0,i),r.d,r.s),tr=r.p3.slice(1);
+var ATM={};
+function anActLog(){const o={T:{m:{},ex:{},dg:{}},D:{m:{},ex:{},dg:{}}},ph=[];let hh=0;
+  for(let i=0;i<ROWS.length;i++){ph.push(hh);const r=ROWS[i];hh=(hh*131+(+r.p3)*3+(r.s==='MID'?1:2)+(+r.d.slice(5,7))*37+(+r.d.slice(8,10)))%2147483629;}
+  for(let i=1;i<ROWS.length;i++){const r=ROWS[i];if(r.d<'2026-01-15')continue;const k=slotKey(r);let e=ATM[k];if(!e||e.h!==ph[i]){e={h:ph[i],a:anActive(ROWS.slice(0,i),r.d,r.s)};ATM[k]=e;}
+    const a=e.a,tr=r.p3.slice(1);
     for(const q of ['T','D']){const ds=Object.keys(a[q]);if(!ds.length)continue;const dg=q==='T'?tr[1]:tr[0],hit=ds.includes(dg);o[q].m[k]=hit;o[q].ex[k]=ds.length/10;
       if(hit)o[q].dg[k]=(q==='T'?'terminal ':'decena ')+dg+' — '+[...new Set(a[q][dg])].join('; ');}}
-  ATC={k:key,v:o};return o;}
+  return o;}
+// Peso del terminal / decena del Año en el Top: según cuánto acertaron en el año frente al azar (tope 1.5; sin peso si no pasan del azar o hay pocos casos)
+function anLift(){const o=anActLog(),w={T:0,D:0},inf={};
+  for(const q of ['T','D']){let h=0,e=0;for(const k in o[q].m){if(o[q].m[k])h++;e+=o[q].ex[k];}
+    const lift=e>0?h/e:0;w[q]=e>=5?Math.min(1.5,Math.max(0,lift-1)*3):0;inf[q]={h,e,w:w[q]};}
+  return{w,inf};}
 function ruleGrid(){
   const R=ROWS,out=[],tr=f=>{try{return f();}catch(e){return null;}};
   const add=(g,nm,sub,m,pe)=>{if(!m)return;let h=0,n=0,ex;if(pe!==undefined)ex=0;for(const k in m){if(m[k]===null||m[k]===undefined)continue;n++;if(m[k])h++;if(pe!==undefined)ex+=typeof pe==='function'?(pe(k)||0):pe;}out.push({g,nm,sub,m,h,n,ex});};
@@ -775,9 +781,10 @@ function genList(){
   all.sort((a,b)=>b.sc-a.sc||b.cn-a.cn||b.cs-a.cs||(a.n<b.n?-1:1));
   const cad={};try{const cc=chainNow(ROWS);if(cc&&cc.list)cc.list.forEach(x=>{(cad[x.n]=cad[x.n]||[]).push(cc.a+'→'+cc.b+' ('+x.d+')');});}catch(e){showErr(e,'cadena en el pronóstico');}
   const fol={};try{folSummary(followersTable(ROWS)[base]||[]).forEach(e=>{fol[e[0]]=e[1];});}catch(e){showErr(e,'seguidores en el pronóstico');}
-  const ang=angMap(ROWS),angI=angPesos(ROWS),angW=angI.w,angS=angI.s,cor=corFijos(ROWS),isx=x=>cor[x.n]||pat[x.n]||cad[x.n]||fol[x.n]||angW[x.n]>0,mk=x=>{if(ang.has(x.n)&&x.f.indexOf('G')<0)x.f+='G';if(cor[x.n])x.f+='K';if(pat[x.n])x.f+='R';if(cad[x.n])x.f+='H';if(fol[x.n])x.f+='S';};all.forEach(x=>{if(ang.has(x.n)&&x.f.indexOf('G')<0)x.f+='G';});all.slice(0,20).forEach(mk);const kx=all.slice(20).filter(isx);kx.forEach(x=>{mk(x);x.kadd=true;});const all2=all.slice(0,20).concat(kx,all.slice(20).filter(x=>!isx(x)));const yp=c.filter(x=>yhas(x)).map(x=>x.n);const qI=qCalc(ROWS),qW={};{for(const nm in qI.w){if(!(qI.w[nm]>0))continue;for(const z of qI.f[nm](base,wd))if(/^\d\d$/.test(z))qW[z]=(qW[z]||0)+qI.w[nm];}}
+  const ang=angMap(ROWS),angI=angPesos(ROWS),angW=angI.w,angS=angI.s,cor=corFijos(ROWS),isx=x=>cor[x.n]||pat[x.n]||cad[x.n]||fol[x.n]||angW[x.n]>0,mk=x=>{if(ang.has(x.n)&&x.f.indexOf('G')<0)x.f+='G';if(cor[x.n])x.f+='K';if(pat[x.n])x.f+='R';if(cad[x.n])x.f+='H';if(fol[x.n])x.f+='S';};all.forEach(x=>{if(ang.has(x.n)&&x.f.indexOf('G')<0)x.f+='G';});all.slice(0,20).forEach(mk);const kx=all.slice(20).filter(isx);kx.forEach(x=>{mk(x);x.kadd=true;});const all2=all.slice(0,20).concat(kx,all.slice(20).filter(x=>!isx(x)));const yp=c.filter(x=>yhas(x)).map(x=>x.n);let aInfo='';const qI=qCalc(ROWS),qW={},aW={};{try{const aa=anActive(ROWS,n.date,n.session),lw=anLift();for(let i=0;i<100;i++){const k=p2(i);let v=0;if(aa.T[k[1]])v+=lw.w.T;if(aa.D[k[0]])v+=lw.w.D;if(v>0)aW[k]=v;}aInfo='<div class="meth"><b>Año</b> (aciertos / azar): terminal '+lw.inf.T.h+'/'+lw.inf.T.e.toFixed(0)+' (peso '+lw.inf.T.w.toFixed(1)+') · decena '+lw.inf.D.h+'/'+lw.inf.D.e.toFixed(0)+' (peso '+lw.inf.D.w.toFixed(1)+'). Se suma a los números cuyo terminal o decena está activado en la pestaña Año.</div>';}catch(e){}}
+  {for(const nm in qI.w){if(!(qI.w[nm]>0))continue;for(const z of qI.f[nm](base,wd))if(/^\d\d$/.test(z))qW[z]=(qW[z]||0)+qI.w[nm];}}
   all2.forEach(x=>{if(qW[x.n]>0&&x.f.indexOf('Q')<0)x.f+='Q';});
-  const R0={n,wd,base,pr,c,tri,en,un,ah,all:all2,yp,cor,pat,cad,fol,ang,angW,angS,qW,qInfo:qI.info,kx:kx.length};R0.top=finBuild(R0);R0.top.forEach(x=>{if(ang.has(x.n)&&x.f.indexOf('G')<0)x.f+='G';});const hv=new Set(R0.top.map(x=>x.n));ang.forEach((v,k)=>{if(angW[k]>0&&!hv.has(k)&&R0.top.length<30)R0.top.push({n:k,f:'G'});});return R0;
+  const R0={n,wd,base,pr,c,tri,en,un,ah,all:all2,yp,cor,pat,cad,fol,ang,angW,angS,qW,aW,qInfo:(qI.info||'')+aInfo,kx:kx.length};R0.top=finBuild(R0);R0.top.forEach(x=>{if(ang.has(x.n)&&x.f.indexOf('G')<0)x.f+='G';});const hv=new Set(R0.top.map(x=>x.n));ang.forEach((v,k)=>{if(angW[k]>0&&!hv.has(k)&&R0.top.length<30)R0.top.push({n:k,f:'G'});});return R0;
 }
 function genRender(){try{
   const r=genList();if(!r)return;
@@ -879,7 +886,7 @@ function finBuild(r){
   srt(r.pat).forEach(add);srt(r.angS).forEach(add);
   const forced=F.slice(0,FC_MAX),set=new Set(forced.map(x=>x.n));
   const si=shInfo(),dd=x=>String(si.d)===x.n[0],tt=x=>String(si.t)===x.n[1];
-  const sc=x=>{let v=0;for(const c in FC_W)if(x.f.indexOf(c)>=0)v+=FC_W[c];v+=(r.angW&&r.angW[x.n])||0;v+=(r.qW&&r.qW[x.n])||0;if(dd(x))v+=1;if(tt(x))v+=1;return v;};
+  const sc=x=>{let v=0;for(const c in FC_W)if(x.f.indexOf(c)>=0)v+=FC_W[c];v+=(r.angW&&r.angW[x.n])||0;v+=(r.qW&&r.qW[x.n])||0;v+=(r.aW&&r.aW[x.n])||0;if(dd(x))v+=1;if(tt(x))v+=1;return v;};
   const rest=r.all.map((x,i)=>({x,i})).filter(o=>!set.has(o.x.n)).sort((p,q)=>sc(q.x)-sc(p.x)||p.i-q.i).slice(0,Math.max(0,FC_N-forced.length)).map(o=>o.x);
   return forced.concat(rest).map(x=>({n:x.n,f:x.f+(dd(x)?'D':'')+(tt(x)?'N':'')}));}
 function finGet(r){const key=r.n.date+'|'+r.n.session,z=FROZEN[key],si=shInfo();
@@ -1568,7 +1575,7 @@ function selfCheck(){const T=[['lista de 100',()=>{const r=genList();if(!r||new 
 setTimeout(selfCheck,900);
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=16;var UPD_SHOWN=false;
+const APP_BUILD=17;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
