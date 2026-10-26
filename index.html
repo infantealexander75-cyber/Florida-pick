@@ -40,7 +40,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}</style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 17 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 18 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="tri">Triángulo</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="ang">Anguila</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
@@ -184,7 +184,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 17</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 18</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -700,6 +700,20 @@ function anLift(){const o=anActLog(),w={T:0,D:0},inf={};
   for(const q of ['T','D']){let h=0,e=0;for(const k in o[q].m){if(o[q].m[k])h++;e+=o[q].ex[k];}
     const lift=e>0?h/e:0;w[q]=e>=5?Math.min(1.5,Math.max(0,lift-1)*3):0;inf[q]={h,e,w:w[q]};}
   return{w,inf};}
+// ---- Días de semana: paso exacto en la columna semanal (mismo día y turno, cada k semanas, 3 casillas con el mismo salto) ----
+function dwStep(WK,date,ses){const out=[];
+  for(let k=1;k<=4;k++){const ds=[3,2,1].map(i=>anAdd(date,-7*k*i)),c=ds.map(d=>WK[d+'|'+ses]);if(c.some(x=>!x))continue;
+    const sp=anStep(c[0],c[1],c[2]);if(sp)out.push({v:((+c[2][0]+sp[0])%10)+''+((+c[2][1]+sp[1])%10),k,src:c,dates:ds,st:sp});}
+  return out;}
+var DWM={};
+function dwLog(){const o={m:{},ex:{},dg:{}},ph=[];let hh=0;
+  for(let i=0;i<ROWS.length;i++){ph.push(hh);const r=ROWS[i];hh=(hh*131+(+r.p3)*3+(r.s==='MID'?1:2)+(+r.d.slice(5,7))*37+(+r.d.slice(8,10)))%2147483629;}
+  for(let i=1;i<ROWS.length;i++){const r=ROWS[i];if(r.d<'2026-01-15')continue;const k=slotKey(r);let e=DWM[k];
+    if(!e||e.h!==ph[i]){const W={};for(let j=0;j<i;j++)W[ROWS[j].d+'|'+ROWS[j].s]=ROWS[j].p3.slice(1);e={h:ph[i],a:dwStep(W,r.d,r.s)};DWM[k]=e;}
+    if(!e.a.length)continue;const t=r.p3.slice(1),vs=[...new Set(e.a.map(x=>x.v))],hit=vs.includes(t);o.m[k]=hit;o.ex[k]=vs.length/100;
+    if(hit){const x=e.a.find(y=>y.v===t);o.dg[k]='paso semanal '+t+' — cada '+x.k+(x.k===1?' semana':' semanas')+' ('+x.dates.map(d=>d.slice(5)).join(', ')+')';}}
+  return o;}
+function dwLift(){const o=dwLog();let h=0,e=0;for(const k in o.m){if(o.m[k])h++;e+=o.ex[k];}const lift=e>0?h/e:0;return{h,e,w:e>=5?Math.min(1.5,Math.max(0,lift-1)*3):0};}
 function ruleGrid(){
   const R=ROWS,out=[],tr=f=>{try{return f();}catch(e){return null;}};
   const add=(g,nm,sub,m,pe)=>{if(!m)return;let h=0,n=0,ex;if(pe!==undefined)ex=0;for(const k in m){if(m[k]===null||m[k]===undefined)continue;n++;if(m[k])h++;if(pe!==undefined)ex+=typeof pe==='function'?(pe(k)||0):pe;}out.push({g,nm,sub,m,h,n,ex});};
@@ -711,6 +725,7 @@ function ruleGrid(){
   add('Pronósticos','Corridos → fijos','desde 22-oct Noche',tr(()=>corDet(R)),tr(()=>{const z={};for(let i=1;i<R.length;i++){if(ordKey(R[i])<COR_START||!R[i-1].p4)continue;z[slotKey(R[i])]=Object.keys(corFijos(R.slice(0,i))).length/100;}return k=>z[k];}));
   add('Anguila','Anguila mañana → Día','desde que anotes',angDet(ROWS,true),0.165);add('Anguila','Anguila '+angHN(ANG_FUERTE.MID)+' → Día','desde que anotes',angDetH(ROWS,true,ANG_FUERTE.MID),0.03*ANG_FUERTE.MID.length);add('Anguila','Anguila tarde → Noche','desde que anotes',angDet(ROWS,false),0.214);add('Anguila','Anguila '+angHN(ANG_FUERTE.EVE)+' → Noche','desde que anotes',angDetH(ROWS,false,ANG_FUERTE.EVE),0.03*ANG_FUERTE.EVE.length);
   {const al=tr(()=>anActLog());if(al){add('Año','Terminal activado en el Año','desde 15-ene',al.T.m,k=>al.T.ex[k]);out[out.length-1].dg=al.T.dg;add('Año','Decena activada en el Año','desde 15-ene',al.D.m,k=>al.D.ex[k]);out[out.length-1].dg=al.D.dg;}}
+  {const dl=tr(()=>dwLog());if(dl){add('Días de semana','Paso semanal exacto (columna del día)','desde 15-ene',dl.m,k=>dl.ex[k]);out[out.length-1].dg=dl.dg;}}
   add('Pronósticos','Parlés del día (corrido o bingo)','desde 23-oct Noche',tr(()=>{const m={};parTrack().det.forEach(x=>{m[x.d+'|'+x.s]=x.un.length>0;});return m;}));
   add('Pronósticos','Pronóstico compartido','desde que se comparte',(()=>{const m={},by=new Map(R.map(r=>[slotKey(r),r]));for(const k in FROZEN){const r=by.get(k);if(r)m[k]=FROZEN[k].l.some(x=>x.n===r.p3.slice(1));}return Object.keys(m).length?m:null;})());
   add('Reglas','Ensemble (top 5)','desde 11-oct Noche',tr(()=>{const m={};enRule(R).det.forEach(x=>{m[x.d+'|'+x.s]=x.hit;});return m;}),0.05);
@@ -781,7 +796,7 @@ function genList(){
   all.sort((a,b)=>b.sc-a.sc||b.cn-a.cn||b.cs-a.cs||(a.n<b.n?-1:1));
   const cad={};try{const cc=chainNow(ROWS);if(cc&&cc.list)cc.list.forEach(x=>{(cad[x.n]=cad[x.n]||[]).push(cc.a+'→'+cc.b+' ('+x.d+')');});}catch(e){showErr(e,'cadena en el pronóstico');}
   const fol={};try{folSummary(followersTable(ROWS)[base]||[]).forEach(e=>{fol[e[0]]=e[1];});}catch(e){showErr(e,'seguidores en el pronóstico');}
-  const ang=angMap(ROWS),angI=angPesos(ROWS),angW=angI.w,angS=angI.s,cor=corFijos(ROWS),isx=x=>cor[x.n]||pat[x.n]||cad[x.n]||fol[x.n]||angW[x.n]>0,mk=x=>{if(ang.has(x.n)&&x.f.indexOf('G')<0)x.f+='G';if(cor[x.n])x.f+='K';if(pat[x.n])x.f+='R';if(cad[x.n])x.f+='H';if(fol[x.n])x.f+='S';};all.forEach(x=>{if(ang.has(x.n)&&x.f.indexOf('G')<0)x.f+='G';});all.slice(0,20).forEach(mk);const kx=all.slice(20).filter(isx);kx.forEach(x=>{mk(x);x.kadd=true;});const all2=all.slice(0,20).concat(kx,all.slice(20).filter(x=>!isx(x)));const yp=c.filter(x=>yhas(x)).map(x=>x.n);let aInfo='';const qI=qCalc(ROWS),qW={},aW={};{try{const aa=anActive(ROWS,n.date,n.session),lw=anLift();for(let i=0;i<100;i++){const k=p2(i);let v=0;if(aa.T[k[1]])v+=lw.w.T;if(aa.D[k[0]])v+=lw.w.D;if(v>0)aW[k]=v;}aInfo='<div class="meth"><b>Año</b> (aciertos / azar): terminal '+lw.inf.T.h+'/'+lw.inf.T.e.toFixed(0)+' (peso '+lw.inf.T.w.toFixed(1)+') · decena '+lw.inf.D.h+'/'+lw.inf.D.e.toFixed(0)+' (peso '+lw.inf.D.w.toFixed(1)+'). Se suma a los números cuyo terminal o decena está activado en la pestaña Año.</div>';}catch(e){}}
+  const ang=angMap(ROWS),angI=angPesos(ROWS),angW=angI.w,angS=angI.s,cor=corFijos(ROWS),isx=x=>cor[x.n]||pat[x.n]||cad[x.n]||fol[x.n]||angW[x.n]>0,mk=x=>{if(ang.has(x.n)&&x.f.indexOf('G')<0)x.f+='G';if(cor[x.n])x.f+='K';if(pat[x.n])x.f+='R';if(cad[x.n])x.f+='H';if(fol[x.n])x.f+='S';};all.forEach(x=>{if(ang.has(x.n)&&x.f.indexOf('G')<0)x.f+='G';});all.slice(0,20).forEach(mk);const kx=all.slice(20).filter(isx);kx.forEach(x=>{mk(x);x.kadd=true;});const all2=all.slice(0,20).concat(kx,all.slice(20).filter(x=>!isx(x)));const yp=c.filter(x=>yhas(x)).map(x=>x.n);let aInfo='';const qI=qCalc(ROWS),qW={},aW={};{try{const dsw=dwLift(),dst=dwStep(anWK(),n.date,n.session);dst.forEach(x=>{if(dsw.w>0)aW[x.v]=(aW[x.v]||0)+dsw.w;});aInfo='<div class="meth"><b>Paso semanal</b> (aciertos / azar): '+dsw.h+'/'+dsw.e.toFixed(1)+' (peso '+dsw.w.toFixed(1)+')'+(dst.length?' · activo ahora: <b>'+[...new Set(dst.map(x=>x.v))].join(', ')+'</b>':'')+'.</div>';}catch(e){}try{const aa=anActive(ROWS,n.date,n.session),lw=anLift();for(let i=0;i<100;i++){const k=p2(i);let v=0;if(aa.T[k[1]])v+=lw.w.T;if(aa.D[k[0]])v+=lw.w.D;if(v>0)aW[k]=v;}aInfo+='<div class="meth"><b>Año</b> (aciertos / azar): terminal '+lw.inf.T.h+'/'+lw.inf.T.e.toFixed(0)+' (peso '+lw.inf.T.w.toFixed(1)+') · decena '+lw.inf.D.h+'/'+lw.inf.D.e.toFixed(0)+' (peso '+lw.inf.D.w.toFixed(1)+'). Se suma a los números cuyo terminal o decena está activado en la pestaña Año.</div>';}catch(e){}}
   {for(const nm in qI.w){if(!(qI.w[nm]>0))continue;for(const z of qI.f[nm](base,wd))if(/^\d\d$/.test(z))qW[z]=(qW[z]||0)+qI.w[nm];}}
   all2.forEach(x=>{if(qW[x.n]>0&&x.f.indexOf('Q')<0)x.f+='Q';});
   const R0={n,wd,base,pr,c,tri,en,un,ah,all:all2,yp,cor,pat,cad,fol,ang,angW,angS,qW,aW,qInfo:(qI.info||'')+aInfo,kx:kx.length};R0.top=finBuild(R0);R0.top.forEach(x=>{if(ang.has(x.n)&&x.f.indexOf('G')<0)x.f+='G';});const hv=new Set(R0.top.map(x=>x.n));ang.forEach((v,k)=>{if(angW[k]>0&&!hv.has(k)&&R0.top.length<30)R0.top.push({n:k,f:'G'});});return R0;
@@ -1077,6 +1092,7 @@ function avisoRender(){try{
     [[S.G1,S.l1],[S.G2,S.l2]].forEach(a=>{const G=a[0]||[];if(G.length)it.push({l:1,t:'Dígito en línea para <b>'+a[1]+'</b>: '+[...new Set(G.map(x=>(x.k==='T'?'terminal ':'decena ')+x.dig+(x.t==='W'?(x.dd?' (cada '+x.dd+' días)':' (columna semanal)'):'')))].join(', ')});});
     if(S.LD&&S.LD.length)it.push({l:1,t:'El último sorteo completó '+S.LD.length+(S.LD.length===1?' línea':' líneas')+' con el mismo paso'});
   }
+  try{const l1=ROWS[ROWS.length-1];if(l1){const WKs=anWK(),n1=nextSlot(l1.d,l1.s),n2=nextSlot(n1.date,n1.session);[n1,n2].forEach(ns=>{const st=dwStep(WKs,ns.date,ns.session);if(st.length)it.push({l:1,t:'Paso semanal para <b>'+DIAS[weekdayOf(ns.date)]+' '+(ns.session==='MID'?'Día':'Noche')+'</b> (pestaña Días de semana): '+[...new Set(st.map(x=>'<b>'+x.v+'</b> (cada '+x.k+(x.k===1?' semana':' semanas')+')'))].join(', ')});});}}catch(e){}
   try{const l0=ROWS[ROWS.length-1],bs=l0?l0.p3.slice(1):'',ft=bs?(followersTable(ROWS)[bs]||[]):[];if(ft.length){const sm=folSummary(ft);it.push({l:sm[0][1]>=2?2:1,q:sm[0][1]<2,t:'Seguidor <b>'+bs+'</b> (salió '+ft.length+(ft.length===1?' vez':' veces')+' desde el 1 de enero). Después salió: '+sm.map(e=>'<b>'+e[0]+'</b>'+(e[1]>1?' ×'+e[1]:'')).join(', ')});}}catch(e){}
   chActive().forEach(a=>it.push({l:2,t:'Cadena <b>'+a.t+'</b>: salieron '+a.nums.join(' → ')+(a.next?'; sigue <b>'+a.next+'</b>'+(pnNm(a.next)?' ('+pnNm(a.next)+')':''):'; la cadena llegó a su final')}));
   const sig=JSON.stringify(it.map(x=>x.t)),al=$('alerta'),bt=document.querySelector('#nav button[data-t="anio"]');
@@ -1127,6 +1143,13 @@ $('ch-save').onclick=()=>{const v=$('ch-txt').value,p=chParse(v),m=$('ch-msg');i
 // ---- Números por día de la semana ----
 var DW_SEL=null,DW_ONLY=false;const DW_N={Mon:'Lunes',Tue:'Martes',Wed:'Miércoles',Thu:'Jueves',Fri:'Viernes',Sat:'Sábado',Sun:'Domingo'},DW_IDX={Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6,Sun:0};
 const DW_H=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'],DW_M=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+function dwPat(){try{const l=ROWS[ROWS.length-1],ns=nextSlot(l.d,l.s),WK=anWK();let d=ns.date,g=0;while(weekdayOf(d)!==DW_SEL&&g++<8)d=anAdd(d,1);
+  const rows=[];for(const ses of ['MID','EVE']){if(d===ns.date&&ns.session==='EVE'&&ses==='MID')continue;
+    const a=anWeek(WK,d,ses),T=[...new Set(a.filter(p=>p.k==='T').map(p=>p.dig))],D=[...new Set(a.filter(p=>p.k==='D').map(p=>p.dig))],st=dwStep(WK,d,ses);
+    const parts=[];if(T.length)parts.push('terminal <b>'+T.join(', ')+'</b> (se repite en la columna)');if(D.length)parts.push('decena <b>'+D.join(', ')+'</b> (se repite en la columna)');
+    if(st.length)parts.push('paso exacto → <b>'+[...new Set(st.map(x=>x.v))].join(', ')+'</b>');
+    rows.push('<div class="meth">'+(ses==='MID'?'Día':'Noche')+': '+(parts.length?parts.join(' · '):'ningún patrón activo')+'</div>');}
+  return '<div class="msg"><b>Patrones de la columna '+DW_N[DW_SEL]+'</b> · '+d+'</div>'+rows.join('');}catch(e){return '';}}
 function dwRender(){try{
   if(!ROWS.length)return;const l=ROWS[ROWS.length-1];if(!DW_SEL)DW_SEL=weekdayOf(nextSlot(l.d,l.s).date);
   const si=DW_IDX[DW_SEL];
@@ -1149,7 +1172,7 @@ function dwRender(){try{
   $('dw-out').innerHTML='<div class="msg"><b>'+DW_N[DW_SEL]+'</b>: '+rs.length+' sorteos</div>'+
    '<div class="meth"><b>Los que más han salido ese día (trasero):</b> '+(rep.length?rep.map(e=>e[0]+' ×'+e[1]).join(' · '):'ninguno repetido todavía')+'</div>'+
    '<div class="meth">Decena que más salió: <b>'+top(dd)+'</b> · terminal que más salió: <b>'+top(tt)+'</b></div>'+
-   '<div class="meth">Rojo = Día · Azul = Noche. En negrita, el trasero.</div>'+
+   dwPat()+'<div class="meth">Rojo = Día · Azul = Noche. En negrita, el trasero.</div>'+
    months.map((ym,i)=>'<details'+(i<2?' open':'')+'><summary class="meth"><b>'+DW_M[+ym.slice(5)-1]+' '+ym.slice(0,4)+'</b></summary>'+cal(ym)+'</details>').join('');
   }catch(e){}}
 $('dw-btns').addEventListener('click',e=>{const t=e.target.closest?e.target.closest('button'):null;if(!t)return;if(t.getAttribute('data-solo'))DW_ONLY=!DW_ONLY;else if(t.getAttribute('data-w'))DW_SEL=t.getAttribute('data-w');dwRender();});
@@ -1575,7 +1598,7 @@ function selfCheck(){const T=[['lista de 100',()=>{const r=genList();if(!r||new 
 setTimeout(selfCheck,900);
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=17;var UPD_SHOWN=false;
+const APP_BUILD=18;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
