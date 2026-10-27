@@ -40,7 +40,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}</style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 24 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 25 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="sep">Mismo turno</button><button data-t="cand">Candidatos</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="ang">Anguila</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
@@ -63,6 +63,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 <section id="t-sep" class="hide">
  <div class="card"><b>Análisis día a día y noche a noche</b>
   <p class="meth">Cada turno con su propia serie y su propio pronóstico, usando las mismas reglas y tablas.</p><div id="sep-out"></div></div>
+ <div class="msg" id="sep-msg"></div><canvas id="sep-cv" style="width:100%;border-radius:10px;display:none;margin-bottom:8px"></canvas>
 </section>
 
 <section id="t-cand" class="hide">
@@ -165,7 +166,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 24</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 25</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -883,6 +884,7 @@ const FC_BUILD=3,FC_N=20,FC_MAX=20,FC_W={P:1,E:1.25,U:1,A:1,Y:1.5},FC_NOM={P:'Pr
 function finBuild(r){
   const by=new Map(r.all.map((x,i)=>[x.n,{x,i}])),F=[],seen=new Set(),ix=n=>by.get(n).i;
   const add=n=>{if(by.has(n)&&!seen.has(n)){seen.add(n);F.push(by.get(n).x);}},srt=o=>Object.keys(o||{}).sort((p,q)=>ix(p)-ix(q));
+  {const eq=r.base&&T.EQUALITY&&T.EQUALITY[r.base];if(eq&&by.has(eq))add(eq);}
   srt(r.cad).forEach(add);srt(r.cor).forEach(add);
   Object.keys(r.fol||{}).sort((p,q)=>r.fol[q]-r.fol[p]||ix(p)-ix(q)).forEach(add);
   srt(r.pat).forEach(add);srt(r.angS).forEach(add);
@@ -890,7 +892,7 @@ function finBuild(r){
   const si=shInfo(),dd=x=>String(si.d)===x.n[0],tt=x=>String(si.t)===x.n[1];
   const sc=x=>{let v=0;for(const c in FC_W)if(x.f.indexOf(c)>=0)v+=FC_W[c];v+=(r.angW&&r.angW[x.n])||0;v+=(r.qW&&r.qW[x.n])||0;v+=(r.aW&&r.aW[x.n])||0;if(dd(x))v+=1;if(tt(x))v+=1;return v;};
   const rest=r.all.map((x,i)=>({x,i})).filter(o=>!set.has(o.x.n)).sort((p,q)=>sc(q.x)-sc(p.x)||p.i-q.i).slice(0,Math.max(0,FC_N-forced.length)).map(o=>o.x);
-  return forced.concat(rest).map(x=>({n:x.n,f:x.f+(dd(x)?'D':'')+(tt(x)?'N':'')}));}
+  const eqn=(r.base&&T.EQUALITY&&T.EQUALITY[r.base])||'';return forced.concat(rest).map(x=>({n:x.n,f:x.f+(x.n===eqn?'I':'')+(dd(x)?'D':'')+(tt(x)?'N':'')}));}
 function finGet(r){const key=r.n.date+'|'+r.n.session,z=FROZEN[key],si=shInfo();
   if(z&&z.b===FC_BUILD)return{l:z.l,p:z.p,d:z.d!==undefined?String(z.d):String(si.d),t:z.t2!==undefined?String(z.t2):String(si.t),frozen:true};
   return{l:r.top||finBuild(r),p:parFor(r).slice(0,9).map(x=>({k:x.k,tier:x.tier,half:x.half?1:0})),d:String(si.d),t:String(si.t),frozen:false};}
@@ -934,8 +936,8 @@ function gcCloud(c,x,y,w,h){const N=14,cx=x+w/2,cy=y+h/2,rx=w/2*0.92,ry=h/2*0.92
 function gcStar(c,x,y,r,col){c.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2?r*0.45:r;c.lineTo(x+rr*Math.cos(a),y+rr*Math.sin(a));}c.closePath();c.fillStyle=col;c.fill();c.lineWidth=3;c.strokeStyle='#b45309';c.stroke();}
 function gcArrow(c,x1,y,x2){c.strokeStyle='#e53935';c.fillStyle='#e53935';c.lineWidth=8;c.lineCap='round';c.beginPath();c.moveTo(x1,y);c.lineTo(x2-12,y);c.stroke();c.beginPath();c.moveTo(x2,y);c.lineTo(x2-22,y-16);c.lineTo(x2-22,y+16);c.closePath();c.fill();}
 function gcFit(c,t,maxW,size,wt){let f=size;do{c.font=wt+' '+f+'px system-ui,Arial,sans-serif';if(c.measureText(t).width<=maxW||f<=14)break;f-=1;}while(true);}
-function genImg(){
-  const r=genList();if(!r)return null;const FN=finGet(r),PL=FN.p,list=FN.l,N=list.length,ttl='PRONÓSTICO',cv=$('g-cv'),W=1080,H=400+Math.ceil(N/5)*340+110+(PL.length?Math.ceil(PL.length/3)*100+20:0),c=cv.getContext('2d');
+function genImg(X){
+  const r=X?X.r:genList();if(!r)return null;const FN=X?X.FN:finGet(r),PL=FN.p,list=FN.l,N=list.length,ttl=X?X.ttl:'PRONÓSTICO',cv=(X&&X.cv)||$('g-cv'),W=1080,H=400+Math.ceil(N/5)*340+110+(PL.length?Math.ceil(PL.length/3)*100+20:0),c=cv.getContext('2d');
   cv.width=W;cv.height=H;
   c.fillStyle='#fffdf5';c.fillRect(0,0,W,H);c.lineWidth=14;c.strokeStyle='#42a5f5';c.strokeRect(10,10,W-20,H-20);
   gcStar(c,70,70,38,'#ffd54f');gcStar(c,W-70,70,38,'#ffd54f');gcStar(c,70,H-70,38,'#ffd54f');gcStar(c,W-70,H-70,38,'#ffd54f');
@@ -943,7 +945,7 @@ function genImg(){
   c.fillStyle='#ffee58';c.strokeStyle='#1a237e';c.lineWidth=8;c.beginPath();c.roundRect?c.roundRect(150,50,780,110,40):c.rect(150,50,780,110);c.fill();c.stroke();
   c.fillStyle='#1a237e';c.textAlign='center';c.textBaseline='middle';gcFit(c,ttl,720,62,'800');c.fillText(ttl,W/2,105);
   c.fillStyle='#37474f';gcFit(c,'Florida Pick 3 · '+DIAS[r.wd]+' '+(r.n.session==='MID'?'Día':'Noche')+' · '+r.n.date,900,34,'700');c.fillText('Florida Pick 3 · '+DIAS[r.wd]+' '+(r.n.session==='MID'?'Día':'Noche')+' · '+r.n.date,W/2,195);
-  {const si=shInfo(),tx=si.dia+' · '+N+' números';c.fillStyle='#455a64';gcFit(c,tx,W-60,28,'700');c.fillText(tx,W/2,228);}
+  {const si=X?{dia:DN[parseDate(r.n.date).getUTCDay()]}:shInfo(),tx=si.dia+' · '+N+' números';c.fillStyle='#455a64';gcFit(c,tx,W-60,28,'700');c.fillText(tx,W/2,228);}
   const cols=['#f8bbd0','#fff59d','#c8e6c9','#bbdefb','#e1bee7'],bd=['#d81b60','#f9a825','#2e7d32','#1565c0','#6a1b9a'],bw=170,bh=250,gap=(W-120-5*bw)/4;
   for(let i=0;i<N;i++){
     const row=Math.floor(i/5),col=i%5,x=60+col*(bw+gap),y=250+row*(bh+90),k=list[i].n,nm=pnNm(k)||'';
@@ -1509,11 +1511,11 @@ function selfCheck(){const T=[['lista de 100',()=>{const r=genList();if(!r||new 
   T.forEach(([n,f])=>{try{f();}catch(e){showErr(e,'Autoprueba «'+n+'»');}});}
 setTimeout(selfCheck,900);
 // ---- Mismo turno: Día→Día y Noche→Noche, cada uno con su propio pronóstico (reglas y tablas del pronóstico principal) ----
-var SEP=load('fpa_sep',{});
+var SEP=load('fpa_sep',{}),SEPR={};
 function sepCalc(S){
   const all=ROWS,sub=all.filter(r=>r.s===S);if(sub.length<40)return null;
   const ns0=nextSlot;let r=null;
-  try{ROWS=sub;nextSlot=(d,s)=>{const x=parseDate(d);x.setUTCDate(x.getUTCDate()+1);return{date:fmtDate(x),session:s};};r=genList();}
+  try{ROWS=sub;nextSlot=(d,s)=>{const x=parseDate(d);x.setUTCDate(x.getUTCDate()+1);return{date:fmtDate(x),session:s};};r=genList();if(r)r.si=shInfo();}
   catch(e){showErr(e,'mismo turno');}
   finally{ROWS=all;nextSlot=ns0;}
   return r;}
@@ -1532,14 +1534,15 @@ function sepRender(){try{
   for(const S of['MID','EVE']){
     const nm=S==='MID'?'Día → Día':'Noche → Noche',r=sepCalc(S);
     if(!r){h+='<div class="msg"><b>'+nm+'</b>: faltan sorteos para calcular.</div>';continue;}
-    const T=r.top,st=sepStats(S),t=sepTrack(S);
+    SEPR[S]=r;const T=r.top,st=sepStats(S),t=sepTrack(S);
     const cs=r.c.slice().sort((a,b)=>b.nm-a.nm||b.score-a.score).slice(0,12).map(x=>x.n+'('+x.nm+')').join(' ');
     const grp={};for(const e of r.un){const L=e[1].length;(grp[L]=grp[L]||[]).push(e[0]);}
     const tab=Object.keys(grp).map(Number).sort((a,b)=>b-a).map(L=>'<div class="meth">×'+L+': <b>'+grp[L].join(' ')+'</b></div>').join('');
     h+='<div class="card" style="margin:8px 0"><b style="color:#d32f2f">'+nm+'</b> · para el <b>'+r.n.date+' ('+DIAS[r.wd]+')</b>'+
-     '<div class="meth">Se parte del último '+sesName(S)+' ('+r.base+') y de la serie de solo '+sesName(S)+'s.</div>'+
+     '<div class="meth">Se parte del último '+sesName(S)+' ('+r.base+') y de la serie de solo '+sesName(S)+'s. La letra I es la Igualdad, que va de primera.</div>'+
      '<div class="pg r">Rojo · del 1 al 10</div>'+g(T.slice(0,10),'r')+(T.length>10?'<div class="pg a">Azul · del 11 al '+T.length+'</div>'+g(T.slice(10),'a'):'')+
      '<div class="meth">Entre '+sesName(S)+' y '+sesName(S)+' seguidos ('+st.all.n+' pares): mismo número <b>'+st.all.ig+'</b> · mismo terminal <b>'+st.all.te+'</b> · misma decena <b>'+st.all.de+'</b>. Últimos '+st.rec.n+': <b>'+st.rec.ig+'</b> · <b>'+st.rec.te+'</b> · <b>'+st.rec.de+'</b>.</div>'+
+     '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><button class="btn" onclick="sepShare(\''+S+'\',1)">Compartir imagen</button><button class="btn" onclick="sepShare(\''+S+'\',0)">Compartir números</button></div>'+
      '<div class="meth"><b>Seguimiento</b> (lista guardada antes del sorteo, sin mirar el futuro): rojo <b>'+t.hr+' de '+t.n+'</b> · azul <b>'+t.ha+' de '+t.n+'</b>.</div>'+
      '<details style="margin-top:6px"><summary class="meth">Ver por fuente</summary>'+
      '<div class="meth"><b>1 · Pronóstico:</b> '+(r.pr.B.join(' · ')||'—')+(r.pr.D!==undefined&&r.pr.D!==''?' · decena '+r.pr.D+' · terminal '+r.pr.T:'')+'</div>'+
@@ -1550,12 +1553,23 @@ function sepRender(){try{
   }
   $('sep-out').innerHTML=h+'<div class="msg meth">Es coincidencia entre reglas, no probabilidad de ganar. El Día se compara solo con el Día anterior y la Noche solo con la Noche anterior; el pronóstico principal sigue igual.</div>';
   }catch(e){showErr(e,'mismo turno');}}
+async function sepShare(S,img){const m=$('sep-msg');try{
+  const r=SEPR[S]||sepCalc(S);if(!r){m.className='msg bad';m.textContent='Todavía no hay datos.';return;}
+  const nm=S==='MID'?'Día a día':'Noche a noche',d=r.n.date,dia=DN[parseDate(d).getUTCDay()];
+  if(!img){const tx='PRONÓSTICO · '+nm+' · '+dia+' '+d.slice(8)+'/'+d.slice(5,7)+'\nDecena más fuerte '+r.si.d+' · Terminal más fuerte '+r.si.t+'\nNúmeros ('+r.top.length+'): '+r.top.map(x=>x.n).join(' ');
+    if(navigator.share){await navigator.share({text:tx});m.className='msg ok';m.textContent='Listo.';}
+    else{await navigator.clipboard.writeText(tx);m.className='msg ok';m.textContent='Números copiados. Pégalos donde quieras.';}return;}
+  const cv=$('sep-cv');genImg({r,FN:{l:r.top,p:[],d:String(r.si.d),t:String(r.si.t)},ttl:S==='MID'?'DÍA A DÍA':'NOCHE A NOCHE',cv});cv.style.display='block';
+  const blob=await new Promise(res=>cv.toBlob(res,'image/png')),f=new File([blob],'pronostico-'+(S==='MID'?'dia':'noche')+'.png',{type:'image/png'});
+  if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Pronóstico'});m.className='msg ok';m.textContent='Listo.';}
+  else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=f.name;a.click();m.className='msg ok';m.textContent='Se descargó la imagen. Si no, mantén pulsada la imagen para guardarla.';}
+}catch(e){if(e&&e.name==='AbortError')return;m.className='msg bad';m.textContent='No se pudo compartir. Mantén pulsada la imagen para guardarla.';}}
 document.querySelector('#nav button[data-t="sep"]').addEventListener('click',sepRender);
 setTimeout(()=>{try{sepEnsure();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=24;var UPD_SHOWN=false;
+const APP_BUILD=25;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
