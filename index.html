@@ -40,7 +40,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}</style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 22 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 23 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="ang">Anguila</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
@@ -160,7 +160,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 22</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 23</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -1142,7 +1142,7 @@ function dwRender(){try{
   const rep=Object.entries(cnt).filter(e=>e[1]>=2).sort((a,b)=>b[1]-a[1]||(a[0]<b[0]?-1:1));
   const dd={},tt={};rs.forEach(r=>{const x=r.p3.slice(1);dd[x[0]]=(dd[x[0]]||0)+1;tt[x[1]]=(tt[x[1]]||0)+1;});
   const top=o=>Object.keys(o).sort((a,b)=>o[b]-o[a]||a-b)[0];
-  const months=[...new Set(ROWS.map(r=>r.d.slice(0,7)))].sort().reverse(),num=p=>p?p[0]+'<b>'+p.slice(1)+'</b>':'&nbsp;',cols=DW_ONLY?[si]:[0,1,2,3,4,5,6];
+  const months=[...new Set(ROWS.map(r=>r.d.slice(0,7)))].sort(),num=p=>p?p[0]+'<b>'+p.slice(1)+'</b>':'&nbsp;',cols=DW_ONLY?[si]:[0,1,2,3,4,5,6];
   const cal=ym=>{const y=+ym.slice(0,4),m=+ym.slice(5)-1,first=new Date(Date.UTC(y,m,1)).getUTCDay(),nd=new Date(Date.UTC(y,m+1,0)).getUTCDate();
     let h='<table class="cal"><tr>'+cols.map(c=>'<th'+(c===si?' class="sel"':'')+'>'+DW_H[c]+'</th>').join('')+'</tr>';
     for(let w=0;w<6;w++){let row='',any=false;
@@ -1156,7 +1156,7 @@ function dwRender(){try{
    '<div class="meth"><b>Los que más han salido ese día (trasero):</b> '+(rep.length?rep.map(e=>e[0]+' ×'+e[1]).join(' · '):'ninguno repetido todavía')+'</div>'+
    '<div class="meth">Decena que más salió: <b>'+top(dd)+'</b> · terminal que más salió: <b>'+top(tt)+'</b></div>'+
    dwPat()+'<div class="meth">Rojo = Día · Azul = Noche. En negrita, el trasero.</div>'+
-   months.map((ym,i)=>'<details'+(i<2?' open':'')+'><summary class="meth"><b>'+DW_M[+ym.slice(5)-1]+' '+ym.slice(0,4)+'</b></summary>'+cal(ym)+'</details>').join('');
+   months.map((ym,i)=>'<details'+(i>=months.length-2?' open':'')+'><summary class="meth"><b>'+DW_M[+ym.slice(5)-1]+' '+ym.slice(0,4)+'</b></summary>'+cal(ym)+'</details>').join('');
   }catch(e){}}
 $('dw-btns').addEventListener('click',e=>{const t=e.target.closest?e.target.closest('button'):null;if(!t)return;if(t.getAttribute('data-solo'))DW_ONLY=!DW_ONLY;else if(t.getAttribute('data-w'))DW_SEL=t.getAttribute('data-w');dwRender();});
 // ---- Ahorcados: número que queda entre dos de la tabla unificada (53 y 55 -> 54) ----
@@ -1504,7 +1504,7 @@ function selfCheck(){const T=[['lista de 100',()=>{const r=genList();if(!r||new 
 setTimeout(selfCheck,900);
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=22;var UPD_SHOWN=false;
+const APP_BUILD=23;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
