@@ -40,10 +40,10 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}</style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 23 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 24 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
-<nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="ang">Anguila</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
+<nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="sep">Mismo turno</button><button data-t="cand">Candidatos</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="ang">Anguila</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
 <main>
 <div class="warn">Herramienta de entretenimiento. Las "coincidencias" no son probabilidades de ganar. Juega solo lo que estés dispuesto a perder.</div>
 
@@ -58,6 +58,11 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <div class="row"><div><label>Pick 3 (3 cifras)</label><input id="f-p3" inputmode="numeric" maxlength="3" placeholder="124"></div><div><label>Pick 4 (opcional)</label><input id="f-p4" inputmode="numeric" maxlength="4" placeholder="7811"></div></div>
   <button class="btn" id="b-save">Guardar</button><div class="msg" id="m-save"></div></div>
  <div class="card"><b>Último sorteo guardado</b><div id="last"></div></div>
+</section>
+
+<section id="t-sep" class="hide">
+ <div class="card"><b>Análisis día a día y noche a noche</b>
+  <p class="meth">Cada turno con su propia serie y su propio pronóstico, usando las mismas reglas y tablas.</p><div id="sep-out"></div></div>
 </section>
 
 <section id="t-cand" class="hide">
@@ -160,7 +165,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 23</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 24</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -564,6 +569,7 @@ function render(){
   $('last').innerHTML=l?`<span class="num">${l.p3}</span> ${l.p4?'· Pick 4 <b>'+l.p4+'</b> ':''}<div class="meth">${l.d} · ${sesName(l.s)} · ${ROWS.length} sorteos en total</div>`:'Sin datos';
   ensurePred();renderCand();genRender();dwRender();renderHist();renderAcier();renderFoll();renderChain();
   try{generarPanelPatrones();}catch(e){}try{anioRender();}catch(e){}try{chRender();}catch(e){}try{avisoRender();}catch(e){}try{redTrackRender();}catch(e){}try{corRender();}catch(e){}try{parRender();}catch(e){}try{finRender();}catch(e){}try{bingoRender();}catch(e){}
+  try{sepEnsure();}catch(e){}try{if(!$('t-sep').classList.contains('hide'))sepRender();}catch(e){}
 }
 let SNAP=load('fpa_snap',{});
 let ANG=load('fpa_ang',[]);
@@ -1176,7 +1182,7 @@ function csvText(){
   return t;}
 function addRows(list){for(const r of list){EXTRA=EXTRA.filter(e=>slotKey(e)!==slotKey(r));EXTRA.push(r);DEL=DEL.filter(k=>k!==slotKey(r));}const a=store('fpa_extra',EXTRA),b=store('fpa_del',DEL);return a&&b;}
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('on',x===b));
-  for(const t of ['nuevo','gen','cand','hist','consulta','dias','anio','ens','patron','copia','ang'])$('t-'+t).classList.toggle('hide',t!==b.dataset.t);});
+  for(const t of ['nuevo','gen','sep','cand','hist','consulta','dias','anio','ens','patron','copia','ang'])$('t-'+t).classList.toggle('hide',t!==b.dataset.t);});
 function flLine(t,nx){t=String(t).toUpperCase().replace(/[*_~]/g,' ');let d=nx.date,s=null;
   const p=t.match(/\[(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?,?\s*(\d{1,2}):(\d{2})\s*([AP])\.?\s*M\.?\]/);
   if(p){const y=p[3]?(p[3].length===2?'20'+p[3]:p[3]):nx.date.slice(0,4);d=y+'-'+p[2].padStart(2,'0')+'-'+p[1].padStart(2,'0');s=((+p[4]%12)+(p[6]==='P'?12:0))<17?'MID':'EVE';t=t.replace(p[0],' ');}
@@ -1502,9 +1508,54 @@ angInit();ofInit();try{renderChain();}catch(e){}try{avisoRender();}catch(e){}
 function selfCheck(){const T=[['lista de 100',()=>{const r=genList();if(!r||new Set(r.all.map(x=>x.n)).size!==100)throw new Error('la lista no tiene 100 números distintos');}],['tabla de reglas',()=>{ruleGrid().forEach(x=>{if(x.h>x.n)throw new Error(x.nm+': aciertos > sorteos');});}],['corridos',()=>{corRender();}],['parlés del día',()=>{parRender();}],['pronóstico para compartir',()=>{finRender();}],['pestaña Año',()=>{anioRender();}],['consulta histórica',()=>{const S=ofStats();if(S.W[2].reduce((a,g)=>a+g.n,0)!==OFI.s.length/3)throw new Error('faltan sorteos');shInfo();}]];
   T.forEach(([n,f])=>{try{f();}catch(e){showErr(e,'Autoprueba «'+n+'»');}});}
 setTimeout(selfCheck,900);
+// ---- Mismo turno: Día→Día y Noche→Noche, cada uno con su propio pronóstico (reglas y tablas del pronóstico principal) ----
+var SEP=load('fpa_sep',{});
+function sepCalc(S){
+  const all=ROWS,sub=all.filter(r=>r.s===S);if(sub.length<40)return null;
+  const ns0=nextSlot;let r=null;
+  try{ROWS=sub;nextSlot=(d,s)=>{const x=parseDate(d);x.setUTCDate(x.getUTCDate()+1);return{date:fmtDate(x),session:s};};r=genList();}
+  catch(e){showErr(e,'mismo turno');}
+  finally{ROWS=all;nextSlot=ns0;}
+  return r;}
+function sepEnsure(){try{if(typeof SEP==='undefined'||!SEP||!ROWS.length)return;
+  for(const S of['MID','EVE']){const sub=ROWS.filter(r=>r.s===S),l=sub[sub.length-1];if(!l)continue;const k=S+'|'+l.d;if(SEP[k])continue;
+    const r=sepCalc(S);if(!r||!r.top||r.all.length<20)continue;
+    SEP[k]={t:r.n.date,r:r.top.slice(0,10).map(x=>x.n),a:r.top.slice(10,20).map(x=>x.n),at:new Date().toISOString()};store('fpa_sep',SEP);}
+  }catch(e){showErr(e,'foto mismo turno');}}
+function sepTrack(S){let n=0,hr=0,ha=0;for(const k in SEP){if(k.indexOf(S+'|')!==0)continue;const e=SEP[k],x=ROWS.find(r=>r.d===e.t&&r.s===S);if(!x)continue;
+  const v=x.p3.slice(1);n++;if(e.r.includes(v))hr++;else if(e.a.includes(v))ha++;}return{n,hr,ha};}
+function sepStats(S){const v=ROWS.filter(r=>r.s===S).map(r=>r.p3.slice(1)),f=a=>{let ig=0,te=0,de=0;for(let i=1;i<a.length;i++){if(a[i]===a[i-1])ig++;if(a[i][1]===a[i-1][1])te++;if(a[i][0]===a[i-1][0])de++;}return{n:Math.max(0,a.length-1),ig,te,de};};
+  return{all:f(v),rec:f(v.slice(-31))};}
+function sepRender(){try{
+  const g=(a,cl)=>'<div class="chips">'+a.map(x=>'<span class="chip '+cl+'">'+x.n+'<i>'+(x.f||'&nbsp;')+'</i></span>').join('')+'</div>';
+  let h='';
+  for(const S of['MID','EVE']){
+    const nm=S==='MID'?'Día → Día':'Noche → Noche',r=sepCalc(S);
+    if(!r){h+='<div class="msg"><b>'+nm+'</b>: faltan sorteos para calcular.</div>';continue;}
+    const T=r.top,st=sepStats(S),t=sepTrack(S);
+    const cs=r.c.slice().sort((a,b)=>b.nm-a.nm||b.score-a.score).slice(0,12).map(x=>x.n+'('+x.nm+')').join(' ');
+    const grp={};for(const e of r.un){const L=e[1].length;(grp[L]=grp[L]||[]).push(e[0]);}
+    const tab=Object.keys(grp).map(Number).sort((a,b)=>b-a).map(L=>'<div class="meth">×'+L+': <b>'+grp[L].join(' ')+'</b></div>').join('');
+    h+='<div class="card" style="margin:8px 0"><b style="color:#d32f2f">'+nm+'</b> · para el <b>'+r.n.date+' ('+DIAS[r.wd]+')</b>'+
+     '<div class="meth">Se parte del último '+sesName(S)+' ('+r.base+') y de la serie de solo '+sesName(S)+'s.</div>'+
+     '<div class="pg r">Rojo · del 1 al 10</div>'+g(T.slice(0,10),'r')+(T.length>10?'<div class="pg a">Azul · del 11 al '+T.length+'</div>'+g(T.slice(10),'a'):'')+
+     '<div class="meth">Entre '+sesName(S)+' y '+sesName(S)+' seguidos ('+st.all.n+' pares): mismo número <b>'+st.all.ig+'</b> · mismo terminal <b>'+st.all.te+'</b> · misma decena <b>'+st.all.de+'</b>. Últimos '+st.rec.n+': <b>'+st.rec.ig+'</b> · <b>'+st.rec.te+'</b> · <b>'+st.rec.de+'</b>.</div>'+
+     '<div class="meth"><b>Seguimiento</b> (lista guardada antes del sorteo, sin mirar el futuro): rojo <b>'+t.hr+' de '+t.n+'</b> · azul <b>'+t.ha+' de '+t.n+'</b>.</div>'+
+     '<details style="margin-top:6px"><summary class="meth">Ver por fuente</summary>'+
+     '<div class="meth"><b>1 · Pronóstico:</b> '+(r.pr.B.join(' · ')||'—')+(r.pr.D!==undefined&&r.pr.D!==''?' · decena '+r.pr.D+' · terminal '+r.pr.T:'')+'</div>'+
+     '<div class="meth"><b>2 · Candidatos</b> (más reglas): '+(cs||'—')+'</div>'+
+     '<div class="meth"><b>3 · Ensemble:</b> '+r.en.join(' · ')+'</div>'+
+     '<div class="meth"><b>4 · Patrones del año:</b> '+((r.yp||[]).join(' ')||'—')+'</div>'+
+     '<div class="meth"><b>5 · Tablas</b> (unificada del '+r.base+'):</div>'+tab+'<div class="meth">Ahorcados: <b>'+(r.ah.join(' ')||'—')+'</b></div></details></div>';
+  }
+  $('sep-out').innerHTML=h+'<div class="msg meth">Es coincidencia entre reglas, no probabilidad de ganar. El Día se compara solo con el Día anterior y la Noche solo con la Noche anterior; el pronóstico principal sigue igual.</div>';
+  }catch(e){showErr(e,'mismo turno');}}
+document.querySelector('#nav button[data-t="sep"]').addEventListener('click',sepRender);
+setTimeout(()=>{try{sepEnsure();}catch(e){}},700);
+
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=23;var UPD_SHOWN=false;
+const APP_BUILD=24;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
