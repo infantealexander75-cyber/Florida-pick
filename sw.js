@@ -1,4 +1,4 @@
-const C='fpa-v1.0b29';
+const C='fpa-v1.0b30';
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(async c=>{await Promise.allSettled(['./','index.html','sw.js','manifest.webmanifest','icon-192.png','icon-512.png'].map(u=>fetch(new Request(u,{cache:'reload'})).then(r=>{if(r.ok)return c.put(u,r);}).catch(()=>{})));}).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))).then(()=>self.clients.claim()));});
 self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET')return;
