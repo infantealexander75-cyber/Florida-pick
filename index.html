@@ -40,7 +40,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}</style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 32 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 33 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="bingo2" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
@@ -169,7 +169,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 32</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 33</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -789,7 +789,7 @@ function genList(){
   const un=unifiedData(base),um=new Map(un.map(e=>[e[0],e[1].length])),mu=Math.max(1,...um.values()),ah=uniHang(new Set(um.keys())),ahs=new Set(ah);
   const pat={};try{const _g=anData(),_c=2*(+n.date.slice(5,7)-1)+(n.session==='EVE'?1:0);
     anPred(_g,+n.date.slice(8,10),_c).forEach(p=>{(pat[p.v]=pat[p.v]||[]).push('en línea');});
-    anDays(anWK(),n.date,n.session).P.forEach(p=>{(pat[p.v]=pat[p.v]||[]).push('cada '+p.dd+' días');});}catch(e){showErr(e,'patrones del año');}
+    anDays(anWK(),n.date,n.session).P.forEach(p=>{(pat[p.v]=pat[p.v]||[]).push(anDT(p.dd));});}catch(e){showErr(e,'patrones del año');}
   const all=[];
   const yhas=x=>x&&x.items.some(q=>String(q[0]).indexOf('Patrón del año')===0);
   for(let i=0;i<100;i++){const k=p2(i),P=pr.B.includes(k)?1:0,x=cm.get(k),Cn=x?x.nm/mx:0,T=0,E=ens.has(k)?1:0,U=um.has(k)?um.get(k)/mu:(ahs.has(k)?1/mu:0),Y=yhas(x)?1:0;
@@ -1029,7 +1029,8 @@ function anDig(g,r,c){const out=[];
 function anDone(g,r,c){const out=[];
   for(const d of AN_DIRS){const a=anCell(g,r-2*d[0],c-2*d[1]),b=anCell(g,r-d[0],c-d[1]),e=anCell(g,r,c);if(!a||!b||!e)continue;const st=anStep(a,b,e);if(st)out.push({t:anType(d),d,st,src:[a,b,e]});}
   return out;}
-function anName(p){if(p.t==='W'&&p.dd)return 'Cada '+p.dd+' días, mismo turno ('+p.dates.map(x=>x.slice(5)).join(', ')+')'+(p.len===4?' · ★ 4 casillas':'');if(p.t==='W')return 'Misma columna de día de semana, cada '+p.wk+(p.wk===1?' semana':' semanas')+' ('+p.dates.map(x=>x.slice(5)).join(', ')+')'+(p.len===4?' · ★ 4 casillas':'');const d=p.d,t=p.t;return t==='V'?'Vertical, cada '+d[0]+(d[0]===1?' día':' días'):t==='H'?(d[1]===1?'Horizontal, casilla anterior':'Horizontal, mismo turno del mes anterior'):(t==='D'?'Oblicua ↘':'Transversal ↗')+', '+Math.abs(d[0])+(Math.abs(d[0])===1?' día':' días')+(d[1]===2?', mes anterior':', turno anterior');}
+function anDT(n){return n===1?'cada día':'cada '+n+' días';}
+function anName(p){if(p.t==='W'&&p.dd)return (p.dd===1?'Cada día':'Cada '+p.dd+' días')+', mismo turno ('+p.dates.map(x=>x.slice(5)).join(', ')+')'+(p.len===4?' · ★ 4 casillas':'');if(p.t==='W')return 'Misma columna de día de semana, cada '+p.wk+(p.wk===1?' semana':' semanas')+' ('+p.dates.map(x=>x.slice(5)).join(', ')+')'+(p.len===4?' · ★ 4 casillas':'');const d=p.d,t=p.t;return t==='V'?'Vertical, cada '+d[0]+(d[0]===1?' día':' días'):t==='H'?(d[1]===1?'Horizontal, casilla anterior':'Horizontal, mismo turno del mes anterior'):(t==='D'?'Oblicua ↘':'Transversal ↗')+', '+Math.abs(d[0])+(Math.abs(d[0])===1?' día':' días')+(d[1]===2?', mes anterior':', turno anterior');}
 function anSt(st){const f=x=>x>5?x-10:x;return 'decena '+(f(st[0])>0?'+':'')+f(st[0])+', terminal '+(f(st[1])>0?'+':'')+f(st[1]);}
 
 function anAdd(d,n){const x=new Date(d+'T12:00:00Z');x.setUTCDate(x.getUTCDate()+n);return x.toISOString().slice(0,10);}
@@ -1045,12 +1046,27 @@ function colLn(dt,se){const WK=anWK(),v=[];for(let i=8;i>=1;i--){const d=anAdd(d
   return '<div class="meth" style="margin:4px 0">Columna '+DIAS[weekdayOf(dt)]+' '+(se==='MID'?'Día':'Noche')+': '+v.map(a=>ct[a[1][1]]>=3?'<b>'+a[0]+' '+a[1]+'</b>':a[0]+' '+a[1]).join(' · ')+' · (en negrita, terminal que se repite 3 o más veces)</div>';}
 
 function anDays(WK,date,ses){const G=[],P=[];
-  for(let st=2;st<=30;st++){if(st%7===0)continue;const ds=[3,2,1].map(i=>anAdd(date,-st*i)),c=ds.map(d=>WK[d+'|'+ses]);if(c.some(x=>!x))continue;
+  for(let st=1;st<=30;st++){if(st%7===0)continue;const ds=[3,2,1].map(i=>anAdd(date,-st*i));if(st===1&&ds[0].slice(0,7)===date.slice(0,7))continue;const c=ds.map(d=>WK[d+'|'+ses]);if(c.some(x=>!x))continue;
     const f=WK[anAdd(date,-4*st)+'|'+ses],b={t:'W',dd:st,ses,src:c,dates:ds};
     if(c[0][1]===c[1][1]&&c[1][1]===c[2][1])G.push(Object.assign({},b,{k:'T',dig:c[2][1],len:f&&f[1]===c[2][1]?4:3}));
     if(c[0][0]===c[1][0]&&c[1][0]===c[2][0])G.push(Object.assign({},b,{k:'D',dig:c[2][0],len:f&&f[0]===c[2][0]?4:3}));
     const sp=anStep(c[0],c[1],c[2]);if(sp)P.push(Object.assign({},b,{v:((+c[2][0]+sp[0])%10)+''+((+c[2][1]+sp[1])%10),st:sp,len:3}));}
   return{G,P};}
+// ---- Consecutivo: los últimos 3 sorteos en orden real (Día → Noche → Día…): mismo paso en decena y terminal, o mismo dígito repetido. Solo alerta, sin peso en el Top ----
+function anConsec(rows){const E={P:[],G:[]};if(SEP_ON||!rows||rows.length<3)return E;
+  const n=rows.length,L=rows.slice(-3),sq=(a,b)=>{const x=nextSlot(a.d,a.s);return x.date===b.d&&x.session===b.s;};
+  if(!sq(L[0],L[1])||!sq(L[1],L[2]))return E;
+  const c=L.map(r=>r.p3.slice(1)),dt=L.map(r=>r.d.slice(8)+'/'+r.d.slice(5,7)+' '+(r.s==='MID'?'Día':'Noche')),sp=anStep(c[0],c[1],c[2]);
+  if(sp){let big=false;if(n>=4&&sq(rows[n-4],L[0])){const q=anStep(rows[n-4].p3.slice(1),c[0],c[1]);big=!!q&&q[0]===sp[0]&&q[1]===sp[1];}
+    E.P.push({v:((+c[2][0]+sp[0])%10)+''+((+c[2][1]+sp[1])%10),st:sp,src:c,dates:dt,len:big?4:3});}
+  if(c[0][1]===c[1][1]&&c[1][1]===c[2][1])E.G.push({k:'T',dig:c[2][1],src:c,dates:dt});
+  if(c[0][0]===c[1][0]&&c[1][0]===c[2][0])E.G.push({k:'D',dig:c[2][0],src:c,dates:dt});
+  return E;}
+function anConsHTML(C){const L=ROWS.slice(-3).map(r=>r.p3.slice(1)).join(' → ');
+  return '<div class="msg"><b>Consecutivo</b> (sorteos seguidos, Día → Noche → Día…): '+L+'</div>'+((C.P.length||C.G.length)?
+    C.P.map(p=>'<div class="cand"><span class="num" style="font-size:16px">'+p.src.join(' → ')+' ⇒ '+p.v+'</span><div class="meth">Sorteos seguidos ('+p.dates.join(', ')+') · '+anSt(p.st)+(p.len===4?' · ★ 4 sorteos':'')+'</div></div>').join('')+
+    C.G.map(g=>'<div class="cand"><span class="num" style="font-size:16px">'+(g.k==='T'?'Terminal ':'Decena ')+g.dig+'</span><div class="meth">Se repitió en 3 sorteos seguidos ('+g.dates.join(', ')+')</div></div>').join(''):
+    '<div class="meth">Ningún paso ni dígito repetido en los últimos 3 sorteos seguidos.</div>');}
 function anioRender(){try{
   const l=ROWS[ROWS.length-1];if(!l)return;const g=anData(),ns=nextSlot(l.d,l.s),nm=+ns.date.slice(5,7),nd=+ns.date.slice(8,10),mx=Math.min(12,nm);
   const chS=chParse(CH_TXT).find(c=>c.t===CH_SEL),chm={};if(chS)chS.n.forEach((x,i)=>{(chm[x]=chm[x]||[]).push(i+1);});
@@ -1075,7 +1091,7 @@ function anioRender(){try{
       ks.slice(0,6).map(k=>u[k].slice(0,3).map(p=>'<div class="cand"><span class="num" style="font-size:16px">'+p.src.join(' → ')+' ⇒ '+k+'</span><div class="meth">'+anName(p)+' · '+anSt(p.st)+(p.len===4?' · ★ 4 casillas':'')+'</div></div>').join('')).join('');};
   const LD=anDone(g,+l.d.slice(8,10),2*(+l.d.slice(5,7)-1)+(l.s==='EVE'?1:0));
   $('an-pat').innerHTML=lab(P1a,r1,c1,ns.date,ns.session)+labG(G1a)+colLn(ns.date,ns.session)+lab(P2a,r2,c2,N2.date,N2.session)+labG(G2a)+colLn(N2.date,N2.session)+'<div class="msg"><b>Completado por el último sorteo</b> ('+l.d.slice(8,10)+' '+AN_M[+l.d.slice(5,7)-1]+' '+(l.s==='MID'?'Día':'Noche')+' '+l.p3.slice(1)+')</div>'+(LD.length?LD.slice(0,6).map(p=>'<div class="cand"><span class="num" style="font-size:16px">'+p.src.join(' → ')+'</span><div class="meth">'+anName(p)+' · '+anSt(p.st)+'</div></div>').join(''):'<div class="meth">Ninguna línea de 3 casillas con el último número.</div>');
-  AN_ST={P1:P1a,P2:P2a,G1:G1a,G2:G2a,LD,l1:(ns.session==='MID'?'Día ':'Noche ')+r1+' '+AN_M[nm-1],l2:(N2.session==='MID'?'Día ':'Noche ')+r2+' '+AN_M[+N2.date.slice(5,7)-1]};
+  AN_ST={P1:P1a,P2:P2a,G1:G1a,G2:G2a,LD,l1:(ns.session==='MID'?'Día ':'Noche ')+r1+' '+AN_M[nm-1],l2:(N2.session==='MID'?'Día ':'Noche ')+r2+' '+AN_M[+N2.date.slice(5,7)-1],C:anConsec(ROWS)};$('an-pat').innerHTML+=anConsHTML(AN_ST.C);
   // número marcado
   if(AN_SEL){const L=[];for(const m in g)for(const d in g[m])for(const s in g[m][d])if(g[m][d][s].slice(1)===AN_SEL)L.push(d+' '+AN_M[m-1]+(s==='MID'?' Día':' Noche'));
     $('an-sel').innerHTML=pnTag(AN_SEL)+': salió <b>'+L.length+'</b> '+(L.length===1?'vez':'veces')+' desde enero'+(L.length?'<div class="meth">'+L.join(' · ')+'</div>':'');}else $('an-sel').innerHTML='';
@@ -1105,8 +1121,10 @@ function avisoRender(){try{
   if(S){
     [[S.P1,S.l1],[S.P2,S.l2]].forEach(a=>{const P=a[0]||[],A=P.filter(x=>!x.dd),B=P.filter(x=>x.dd);
       if(A.length)it.push({l:2,t:'Patrón en línea para <b>'+a[1]+'</b>: <b>'+[...new Set(A.map(x=>x.v))].join(', ')+'</b>'});
-      if(B.length)it.push({l:1,t:'Patrón cada N días para <b>'+a[1]+'</b>: '+[...new Set(B.map(x=>'<b>'+x.v+'</b> (cada '+x.dd+' días)'))].join(', ')});});
-    [[S.G1,S.l1],[S.G2,S.l2]].forEach(a=>{const G=a[0]||[];if(G.length)it.push({l:1,t:'Dígito en línea para <b>'+a[1]+'</b>: '+[...new Set(G.map(x=>(x.k==='T'?'terminal ':'decena ')+x.dig+(x.t==='W'?(x.dd?' (cada '+x.dd+' días)':' (columna semanal)'):'')))].join(', ')});});
+      if(B.length)it.push({l:1,t:'Patrón cada N días para <b>'+a[1]+'</b>: '+[...new Set(B.map(x=>'<b>'+x.v+'</b> ('+anDT(x.dd)+')'))].join(', ')});});
+    [[S.G1,S.l1],[S.G2,S.l2]].forEach(a=>{const G=a[0]||[];if(G.length)it.push({l:1,t:'Dígito en línea para <b>'+a[1]+'</b>: '+[...new Set(G.map(x=>(x.k==='T'?'terminal ':'decena ')+x.dig+(x.t==='W'?(x.dd?' ('+anDT(x.dd)+')':' (columna semanal)'):'')))].join(', ')});});
+    if(S.C){const C=S.C;if(C.P.length)it.push({l:C.P[0].len===4?2:1,t:'Patrón consecutivo para <b>'+S.l1+'</b>: <b>'+C.P[0].v+'</b> ('+C.P[0].src.join(' → ')+' en sorteos seguidos)'+(C.P[0].len===4?' · ★ 4 sorteos':'')});
+      if(C.G.length)it.push({l:1,t:'Dígito consecutivo para <b>'+S.l1+'</b>: '+C.G.map(x=>(x.k==='T'?'terminal ':'decena ')+x.dig).join(', ')+' (3 sorteos seguidos)'});}
     if(S.LD&&S.LD.length)it.push({l:1,t:'El último sorteo completó '+S.LD.length+(S.LD.length===1?' línea':' líneas')+' con el mismo paso'});
   }
   try{const l1=ROWS[ROWS.length-1];if(l1){const WKs=anWK(),n1=nextSlot(l1.d,l1.s),n2=nextSlot(n1.date,n1.session);[n1,n2].forEach(ns=>{const st=dwStep(WKs,ns.date,ns.session);if(st.length)it.push({l:1,t:'Paso semanal para <b>'+DIAS[weekdayOf(ns.date)]+' '+(ns.session==='MID'?'Día':'Noche')+'</b> (pestaña Días de semana): '+[...new Set(st.map(x=>'<b>'+x.v+'</b> (cada '+x.k+(x.k===1?' semana':' semanas')+')'))].join(', ')});});}}catch(e){}
@@ -1561,8 +1579,8 @@ function sepAlerts(S){return sepWith(S,()=>{
    lb=n=>(n.session==='MID'?'Día ':'Noche ')+(+n.date.slice(8,10))+' '+AN_M[+n.date.slice(5,7)-1];
   [[P1.concat(D1.P),lb(n1)],[P2.concat(D2.P),lb(n2)]].forEach(a=>{const A=a[0].filter(x=>!x.dd),B=a[0].filter(x=>x.dd);
     if(A.length)it.push({l:2,t:'Patrón en línea para <b>'+a[1]+'</b>: <b>'+[...new Set(A.map(x=>x.v))].join(', ')+'</b>'});
-    if(B.length)it.push({l:1,t:'Patrón cada N días para <b>'+a[1]+'</b>: '+[...new Set(B.map(x=>'<b>'+x.v+'</b> (cada '+x.dd+' días)'))].join(', ')});});
-  [[G1.concat(W1,D1.G),lb(n1)],[G2.concat(W2,D2.G),lb(n2)]].forEach(a=>{const G=a[0];if(G.length)it.push({l:1,t:'Dígito en línea para <b>'+a[1]+'</b>: '+[...new Set(G.map(x=>(x.k==='T'?'terminal ':'decena ')+x.dig+(x.t==='W'?(x.dd?' (cada '+x.dd+' días)':' (columna semanal)'):'')))].join(', ')});});
+    if(B.length)it.push({l:1,t:'Patrón cada N días para <b>'+a[1]+'</b>: '+[...new Set(B.map(x=>'<b>'+x.v+'</b> ('+anDT(x.dd)+')'))].join(', ')});});
+  [[G1.concat(W1,D1.G),lb(n1)],[G2.concat(W2,D2.G),lb(n2)]].forEach(a=>{const G=a[0];if(G.length)it.push({l:1,t:'Dígito en línea para <b>'+a[1]+'</b>: '+[...new Set(G.map(x=>(x.k==='T'?'terminal ':'decena ')+x.dig+(x.t==='W'?(x.dd?' ('+anDT(x.dd)+')':' (columna semanal)'):'')))].join(', ')});});
   const LD=anDone(g,+l.d.slice(8,10),ci(l.d,l.s));if(LD.length)it.push({l:1,t:'El último sorteo completó '+LD.length+(LD.length===1?' línea':' líneas')+' con el mismo paso'});
   [n1,n2].forEach(ns=>{const st=dwStep(WK,ns.date,ns.session);if(st.length)it.push({l:1,t:'Paso semanal para <b>'+DIAS[weekdayOf(ns.date)]+' '+(ns.session==='MID'?'Día':'Noche')+'</b>: '+[...new Set(st.map(x=>'<b>'+x.v+'</b> (cada '+x.k+(x.k===1?' semana':' semanas')+')'))].join(', ')});});
   const bs=l.p3.slice(1),ft=followersTable(ROWS)[bs]||[];if(ft.length){const sm=folSummary(ft);it.push({l:sm[0][1]>=2?2:1,q:sm[0][1]<2,t:'Seguidor <b>'+bs+'</b> (salió '+ft.length+(ft.length===1?' vez':' veces')+' desde el 1 de enero). Después salió: '+sm.map(e=>'<b>'+e[0]+'</b>'+(e[1]>1?' ×'+e[1]:'')).join(', ')});}
@@ -1653,7 +1671,7 @@ setTimeout(()=>{try{sepEnsure();}catch(e){}try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=32;var UPD_SHOWN=false;
+const APP_BUILD=33;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
