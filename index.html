@@ -40,7 +40,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}</style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 31 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 32 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="bingo2" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
@@ -169,7 +169,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 31</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 32</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -893,34 +893,34 @@ function parRender(){try{const l=ROWS[ROWS.length-1],r=genList();if(!l||!r)retur
   }catch(e){showErr(e,'parlés del día');}}
 // ---- Pronóstico para compartir: fijos de corridos y cadena primero, luego por coincidencias entre reglas; se congela al compartir ----
 var FROZEN=load('fpa_frozen',{});
-const FC_BUILD=3,FC_N=20,FC_MAX=20,FC_W={P:1,E:1.25,U:1,A:1,Y:1.5},FC_NOM={I:'Igualdad',B:'Tabla Abue',P:'Pronóstico',C:'Candidatos',E:'Ensemble',U:'Tablas',A:'Ahorcado',Y:'Patrón del año',K:'Corrido → fijo',S:'Seguidor',H:'Cadena',R:'Patrón del calendario',D:'Decena fuerte',N:'Terminal fuerte',Q:'Tablas con más acierto del año'};
+const FC_BUILD=3,FC_N=20,FC_MAX=20,FC_W={P:1,E:1.25,U:1,A:1,Y:1.5},FC_NOM={I:'Igualdad',B:'Tabla Abue',P:'Pronóstico',C:'Candidatos',E:'Ensemble',U:'Tablas',A:'Ahorcado',Y:'Patrón del año',K:'Corrido → fijo',S:'Seguidor',H:'Cadena',R:'Patrón del calendario',D:'Decena fuerte',N:'Terminal fuerte',Q:'Tablas con más acierto del año',M:'Único del mes anterior'};
 // ---- Orden lógico del Top: cada regla pesa según lo que acertó en TODO el historial 2010-oct 2026 (con prudencia, k=150), no según un solo año. Pesos fijos de esta versión. ----
-var LOGIC=load('fpa_logic',true),LAST_G=null;
+var LOGIC=true,LAST_G=null;
 const LM_FIX={"C":{"Pleito":0.9916,"M1/M2":0.9926,"Cuarteta":1.0744,"Rodean":0.9589,"Vibración":0.9745,"Compañeros":1.046,"Viraje":1.0079,"Regla II":0.9449,"Maravillosa":1.0125,"Mariposas":0.9243,"Antonio":1.0035,"Igualdad":1.0666,"Valor":0.9419,"Pares":1.0028,"Tabla fundamental":1.0101,"Tabla Abue":1.0763,"1-Up/Down":1.015},"MID":{"Pleito":0.9594,"M1/M2":1.0454,"Cuarteta":0.9923,"Rodean":1.0539,"Vibración":0.9932,"Compañeros":1.0168,"Viraje":0.9912,"Regla II":0.9452,"Maravillosa":1.0321,"Mariposas":0.9973,"Antonio":0.9732,"Igualdad":1.0169,"Valor":0.9791,"Pares":1.0399,"Tabla fundamental":1.0019,"Tabla Abue":1,"1-Up/Down":1.0286},"EVE":{"Pleito":0.9547,"M1/M2":1.0264,"Cuarteta":1.0051,"Rodean":0.9681,"Vibración":0.9655,"Compañeros":0.9993,"Viraje":1.0042,"Regla II":1.0338,"Maravillosa":1.0352,"Mariposas":1.0372,"Antonio":0.9836,"Igualdad":1.0501,"Valor":1.0406,"Pares":1.0193,"Tabla fundamental":0.9881,"Tabla Abue":1,"1-Up/Down":0.9074}};
 function logicMult(){const mu=LM_FIX[SEP_ON||'C']||LM_FIX.C,src=SEP_ON?{P:1.014,E:.992,U:1.006,A:1.012,D:.995,N:1.041}:{P:.98,E:1,U:.995,A:.995,D:1.033,N:.99};return{mu,src};}
+// ---- Únicos del mes anterior como fuente del Lógico: pesan según lo que acertaron desde 06-oct Noche (con prudencia, k=150) ----
+function uniNext(rows,date){const none={set:new Set(),m:1};
+  if(SEP_ON||!rows.length)return none;
+  const by=new Map();for(const r of rows){const mo=r.d.slice(0,7);if(!by.has(mo))by.set(mo,[]);by.get(mo).push(r);}
+  const ms=[...by.keys()].sort(),tm=date.slice(0,7),last=ms[ms.length-1],seen=new Set();let prev;
+  if(tm===last){if(ms.length<2)return none;prev=ms[ms.length-2];for(const r of by.get(last))seen.add(r.p3.slice(1));}
+  else if(tm>last)prev=last;else return none;
+  const cnt=new Map();for(const r of by.get(prev)){const t=r.p3.slice(1);cnt.set(t,(cnt.get(t)||0)+1);}
+  const set=new Set([...cnt].filter(x=>x[1]===1&&!seen.has(x[0])).map(x=>x[0]));
+  let m=1;try{const f=uniStats(rows).fwd;if(f.n>0)m=(f.h+150)/(f.e+150);}catch(e){}
+  return{set,m};}
 function logicScores(r){const M=logicMult(),mu=M.mu,src=M.src,qf=qCalc(ROWS).f,sc={};
   for(let i=0;i<100;i++)sc[p2(i)]=0;
   for(const nm in qf){const m=mu[nm];if(!m||m===1)continue;const ln=Math.log(m);for(const z of qf[nm](r.base,r.wd))if(sc[z]!==undefined)sc[z]+=ln;}
-  const si=shInfo(),pe=new Set(r.pr.B||[]),en=new Set(r.en||[]),um=new Set((r.un||[]).map(e=>e[0])),ah=new Set(r.ah||[]);
-  for(const k in sc){let v=0;if(pe.has(k))v+=Math.log(src.P);if(en.has(k))v+=Math.log(src.E);if(um.has(k))v+=Math.log(src.U);if(ah.has(k))v+=Math.log(src.A);if(String(si.d)===k[0])v+=Math.log(src.D);if(String(si.t)===k[1])v+=Math.log(src.N);sc[k]+=v;}
+  const si=shInfo(),pe=new Set(r.pr.B||[]),en=new Set(r.en||[]),um=new Set((r.un||[]).map(e=>e[0])),ah=new Set(r.ah||[]);const uq=uniNext(ROWS,r.n.date);r.uq=uq.set;
+  for(const k in sc){let v=0;if(pe.has(k))v+=Math.log(src.P);if(en.has(k))v+=Math.log(src.E);if(um.has(k))v+=Math.log(src.U);if(ah.has(k))v+=Math.log(src.A);if(String(si.d)===k[0])v+=Math.log(src.D);if(String(si.t)===k[1])v+=Math.log(src.N);if(uq.set.has(k))v+=Math.log(uq.m);sc[k]+=v;}
   let Z=0;const p={};for(const k in sc)Z+=Math.exp(.5*sc[k]);for(const k in sc)p[k]=Math.exp(.5*sc[k])/Z;return{sc,p};} // probabilidad: se usa la mitad de la evidencia (en la prueba hacia adelante con 10,818 sorteos fue lo más cercano a la realidad)
 function finLogic(r,LS){const ix=new Map(r.all.map((x,i)=>[x.n,i])),eq=(r.base&&T.EQUALITY&&T.EQUALITY[r.base])||'',abn=(!SEP_ON&&r.base&&ABUE[r.base])||[],si=shInfo();
-  return r.all.slice().sort((a,b)=>LS.sc[b.n]-LS.sc[a.n]||ix.get(a.n)-ix.get(b.n)).slice(0,FC_N).map(x=>({n:x.n,f:x.f+(x.n===eq?'I':'')+(abn.indexOf(x.n)>=0?'B':'')+(String(si.d)===x.n[0]?'D':'')+(String(si.t)===x.n[1]?'N':'')}));}
+  return r.all.slice().sort((a,b)=>LS.sc[b.n]-LS.sc[a.n]||ix.get(a.n)-ix.get(b.n)).slice(0,FC_N).map(x=>({n:x.n,f:x.f+(x.n===eq?'I':'')+(abn.indexOf(x.n)>=0?'B':'')+(String(si.d)===x.n[0]?'D':'')+(String(si.t)===x.n[1]?'N':'')+(r.uq&&r.uq.has(x.n)?'M':'')}));}
 function logicLine(r){if(!r||!r.lp||!r.top||!r.top.length)return'';const ps=r.top.map(x=>r.lp[x.n]||.01),mn=Math.min(...ps),mx=Math.max(...ps),sm=ps.reduce((a,b)=>a+b,0),n=r.top.length;
   return 'Probabilidad estimada (prueba hacia adelante): cada número de <b>'+(100*mn).toFixed(2)+'%</b> a <b>'+(100*mx).toFixed(2)+'%</b>; los '+n+' juntos <b>'+(100*sm).toFixed(1)+'%</b>. Sin ninguna regla serían 1% por número y '+n+'% los '+n+'.';}
-function logicShow(r){$('g-prob').innerHTML=logicLine(r);$('g-mode').innerHTML='<button class="btn s" id="g-lg">Orden del Top: '+(LOGIC?'Lógico (por evidencia)':'Clásico (cadenas y corridos primero)')+' · tocar para cambiar</button>';$('g-lg').onclick=()=>{LOGIC=!LOGIC;store('fpa_logic',LOGIC);render();};}
-function finBuild(r){const LS=logicScores(r);r.lp=LS.p;if(LOGIC)return finLogic(r,LS);
-  const by=new Map(r.all.map((x,i)=>[x.n,{x,i}])),F=[],seen=new Set(),ix=n=>by.get(n).i;
-  const add=n=>{if(by.has(n)&&!seen.has(n)){seen.add(n);F.push(by.get(n).x);}},srt=o=>Object.keys(o||{}).sort((p,q)=>ix(p)-ix(q));
-  {const eq=r.base&&T.EQUALITY&&T.EQUALITY[r.base];if(eq&&by.has(eq))add(eq);}
-  srt(r.cad).forEach(add);srt(r.cor).forEach(add);
-  Object.keys(r.fol||{}).sort((p,q)=>r.fol[q]-r.fol[p]||ix(p)-ix(q)).forEach(add);
-  srt(r.pat).forEach(add);srt(r.angS).forEach(add);
-  const forced=F.slice(0,FC_MAX),set=new Set(forced.map(x=>x.n));
-  const si=shInfo(),dd=x=>String(si.d)===x.n[0],tt=x=>String(si.t)===x.n[1];
-  const sc=x=>{let v=0;for(const c in FC_W)if(x.f.indexOf(c)>=0)v+=FC_W[c];v+=(r.angW&&r.angW[x.n])||0;v+=(r.qW&&r.qW[x.n])||0;v+=(r.aW&&r.aW[x.n])||0;if(dd(x))v+=1;if(tt(x))v+=1;return v;};
-  const rest=r.all.map((x,i)=>({x,i})).filter(o=>!set.has(o.x.n)).sort((p,q)=>sc(q.x)-sc(p.x)||p.i-q.i).slice(0,Math.max(0,FC_N-forced.length)).map(o=>o.x);
-  const eqn=(r.base&&T.EQUALITY&&T.EQUALITY[r.base])||'',abn=(!SEP_ON&&r.base&&ABUE[r.base])||[];return forced.concat(rest).map(x=>({n:x.n,f:x.f+(x.n===eqn?'I':'')+(abn.indexOf(x.n)>=0?'B':'')+(dd(x)?'D':'')+(tt(x)?'N':'')}));}
+function logicShow(r){$('g-prob').innerHTML=logicLine(r);$('g-mode').innerHTML='<div class="meth">Orden del Top: Lógico (por evidencia)</div>';}
+function finBuild(r){const LS=logicScores(r);r.lp=LS.p;return finLogic(r,LS);}
 function finGet(r){const key=r.n.date+'|'+r.n.session,z=FROZEN[key],si=shInfo();
   if(z&&z.b===FC_BUILD)return{l:z.l,p:z.p,d:z.d!==undefined?String(z.d):String(si.d),t:z.t2!==undefined?String(z.t2):String(si.t),frozen:true};
   return{l:r.top||finBuild(r),p:parFor(r).slice(0,9).map(x=>({k:x.k,tier:x.tier,half:x.half?1:0})),d:String(si.d),t:String(si.t),frozen:false};}
@@ -1653,7 +1653,7 @@ setTimeout(()=>{try{sepEnsure();}catch(e){}try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=31;var UPD_SHOWN=false;
+const APP_BUILD=32;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
