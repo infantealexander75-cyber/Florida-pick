@@ -40,7 +40,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}</style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 33 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 34 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="bingo2" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
@@ -169,7 +169,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 33</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 34</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -714,6 +714,17 @@ function chSemDet(){const seq=ROWS.map(r=>r.p3.slice(1)),cs=chParse(CH_TXT),o={m
   for(let i=1;i<seq.length-1;i++){const nx=new Set(),why={};for(const c of cs){const b=chMatch(seq,i,c.n,CH_W);if(!b)continue;const x=c.n[b.j+1];if(!x)continue;nx.add(x);(why[x]=why[x]||[]).push(c.t+': '+b.pos.map(q=>seq[q]).join(' → ')+' ⇒ '+x);}
     if(!nx.size)continue;const k=slotKey(ROWS[i+1]),hit=nx.has(seq[i+1]);o.m[k]=hit;o.ex[k]=nx.size/100;if(hit)o.dg[k]='cadena '+why[seq[i+1]][0];}
   return o;}
+// ---- Pirámide y vira (métodos populares de la Bolita): solo se miden contra el azar en Aciertos, sin peso en el Top ----
+const PIR_START='2026-10-29|MID';
+function pirCierre(date,prev3){let row=(date.slice(8,10)+date.slice(5,7)+date.slice(0,4)+prev3).split('').map(Number);
+  while(row.length>2){const o=row;row=o.slice(1).map((v,i)=>(o[i]+v)%10);}return row.join('');}
+function pirPred(kind,date,prev3){return kind==='pir'?pirCierre(date,prev3):prev3.slice(1).split('').reverse().join('');}
+function pirDet(rows,kind){const st=PIR_START.split('|'),start=st[0]+(st[1]==='MID'?'0':'1'),m={},dg={};let rh=0,rn=0;
+  for(let i=1;i<rows.length;i++){const r=rows[i],pv=rows[i-1].p3;if(!pv||pv.length!==3||!r.p3)continue;
+    const pred=pirPred(kind,r.d,pv),hit=pred===r.p3.slice(1);
+    if(ordKey(r)>=start){m[slotKey(r)]=hit;if(hit)dg[slotKey(r)]=(kind==='pir'?'pirámide ':'vira ')+pred;}else{rn++;if(hit)rh++;}}
+  return{m,dg,rh,rn};}
+function pirNext(kind){const l=ROWS[ROWS.length-1],x=nextSlot(l.d,l.s);return pirPred(kind,x.date,l.p3);}
 function ruleGrid(){
   const R=ROWS,out=[],tr=f=>{try{return f();}catch(e){return null;}};
   const add=(g,nm,sub,m,pe)=>{if(!m)return;let h=0,n=0,ex;if(pe!==undefined)ex=0;for(const k in m){if(m[k]===null||m[k]===undefined)continue;n++;if(m[k])h++;if(pe!==undefined)ex+=typeof pe==='function'?(pe(k)||0):pe;}out.push({g,nm,sub,m,h,n,ex});};
@@ -736,6 +747,7 @@ function ruleGrid(){
   add('Reglas','Cadenas (anterior → último)','desde 08-oct Día · solo si hay cadena',tr(()=>chainDet(R)));
   add('Reglas','Únicos del mes anterior','desde 06-oct Noche',tr(()=>uniDet(R)));
   add('Reglas','Frontal = día del mes','desde 05-oct Noche',tr(()=>domDet(R)));
+  for(const [kd,nm] of [['pir','Pirámide (cierre de 2 cifras)'],['vira','Vira (inverso del último número)']]){const pd=tr(()=>pirDet(R,kd));if(pd){add('Reglas',nm,'desde 29-oct Día · antes de empezar: '+pd.rh+' de '+pd.rn+' (azar '+(pd.rn/100).toFixed(1)+') · próximo: '+tr(()=>pirNext(kd)),pd.m,0.01);out[out.length-1].dg=pd.dg;}}
   if(mt&&mt.list.length){const a={},b={},c={};mt.list.forEach(x=>{a[x.key]=x.hN;b[x.key]=x.hD;c[x.key]=x.hT;});
     add('Mis pronósticos','Mis números','',a);add('Mis pronósticos','Mi decena','',b);add('Mis pronósticos','Mi terminal','',c);}
   return out;}
@@ -1671,7 +1683,7 @@ setTimeout(()=>{try{sepEnsure();}catch(e){}try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=33;var UPD_SHOWN=false;
+const APP_BUILD=34;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
