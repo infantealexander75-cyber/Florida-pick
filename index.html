@@ -40,7 +40,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}</style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 38 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 39 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="ang">Anguila</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
@@ -161,7 +161,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 38</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 39</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -716,6 +716,13 @@ function pirDet(rows,kind){const st=PIR_START.split('|'),start=st[0]+(st[1]==='M
     if(ordKey(r)>=start){m[slotKey(r)]=hit;if(hit)dg[slotKey(r)]=(kind==='pir'?'pirámide ':'vira ')+pred;}else{rn++;if(hit)rh++;}}
   return{m,dg,rh,rn};}
 function pirNext(kind){const l=ROWS[ROWS.length-1];return pirPred(kind,l.d,l.p3);}
+// ---- Consecuente (100 − N), de una tabla popular: del último número, el que completa 100. Solo se mide contra el azar en Aciertos, sin peso en el Top ----
+const CON_START='2026-10-30|MID';
+function conOf(t){return String((100-(+t))%100).padStart(2,'0');}
+function conDet(rows){const st=CON_START.split('|'),start=st[0]+(st[1]==='MID'?'0':'1'),m={},dg={};let rh=0,rn=0;
+  for(let i=1;i<rows.length;i++){const r=rows[i],pv=rows[i-1].p3;if(!pv||pv.length!==3||!r.p3)continue;const c=conOf(pv.slice(1)),hit=c===r.p3.slice(1);
+    if(ordKey(r)>=start){m[slotKey(r)]=hit;if(hit)dg[slotKey(r)]='consecuente '+c;}else{rn++;if(hit)rh++;}}
+  return{m,dg,rh,rn};}
 function ruleGrid(){
   const R=ROWS,out=[],tr=f=>{try{return f();}catch(e){return null;}};
   const add=(g,nm,sub,m,pe)=>{if(!m)return;let h=0,n=0,ex;if(pe!==undefined)ex=0;for(const k in m){if(m[k]===null||m[k]===undefined)continue;n++;if(m[k])h++;if(pe!==undefined)ex+=typeof pe==='function'?(pe(k)||0):pe;}out.push({g,nm,sub,m,h,n,ex});};
@@ -738,6 +745,7 @@ function ruleGrid(){
   add('Reglas','Cadenas (anterior → último)','desde 08-oct Día · solo si hay cadena',tr(()=>chainDet(R)));
   add('Reglas','Únicos del mes anterior','desde 06-oct Noche',tr(()=>uniDet(R)));
   add('Reglas','Frontal = día del mes','desde 05-oct Noche',tr(()=>domDet(R)));
+  {const cd=tr(()=>conDet(R));if(cd){add('Reglas','Consecuente (100 − N)','desde 30-oct Día · antes de empezar: '+cd.rh+' de '+cd.rn+' (azar '+(cd.rn/100).toFixed(1)+') · próximo: '+tr(()=>conOf(R[R.length-1].p3.slice(1))),cd.m,0.01);out[out.length-1].dg=cd.dg;}}
   {const rd=tr(()=>r11Det(R));if(rd){add('Reglas','Regla de 11 (ciclo de 10)','desde 29-oct Noche · antes de empezar: '+rd.rh+' de '+rd.rn+' (azar '+(rd.rn/10).toFixed(1)+') · próximos: '+tr(()=>r11Cycle(R[R.length-1].p3.slice(1)).join(' ')),rd.m,0.1);out[out.length-1].dg=rd.dg;}}
   for(const [kd,nm] of [['pir','Pirámide (cierre de 2 cifras)'],['vira','Vira (inverso del último número)']]){const pd=tr(()=>pirDet(R,kd));if(pd){add('Reglas',nm,'desde 29-oct Noche · fecha del último sorteo · antes de empezar: '+pd.rh+' de '+pd.rn+' (azar '+(pd.rn/100).toFixed(1)+') · próximo: '+tr(()=>pirNext(kd)),pd.m,0.01);out[out.length-1].dg=pd.dg;}}
   if(mt&&mt.list.length){const a={},b={},c={};mt.list.forEach(x=>{a[x.key]=x.hN;b[x.key]=x.hD;c[x.key]=x.hT;});
@@ -1574,7 +1582,7 @@ setTimeout(()=>{try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=38;var UPD_SHOWN=false;
+const APP_BUILD=39;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
