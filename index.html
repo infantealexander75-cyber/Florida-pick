@@ -41,7 +41,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}#nav button[data-t="ens"],#nav button[data-t="patron"]{display:none}
 </style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 43 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 44 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="ang">Anguila</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
@@ -112,7 +112,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 <label>Pega uno o varios sorteos, uno por línea (sirve el chat tal cual: [24/10, 4:23 p. m.] ANGUILA 4PM 22 21 06)</label><textarea id="an-txt" rows="7" placeholder="ANGUILA 4PM 22 21 06"></textarea><label>Fecha del sorteo de Anguila</label><input type="date" id="an-d">
 <button class="btn" id="an-add">Agregar</button> <button class="btn s" id="an-exp">Descargar historial de Anguila (.csv)</button><div class="msg" id="an-msg"></div><div id="an-list"></div></div></section>
 <section id="t-consulta" class="hide">
- <div class="card"><b>Pronóstico de un día</b><p class="meth">Elige una fecha y mira la lista de números del Día y de la Noche. 🔒 = la lista que ya estaba congelada. 🔄 = recalculada con las reglas de ahora y los datos hasta ese sorteo (puede no ser idéntica a la que viste ese día).</p>
+ <div class="card"><b>Pronóstico de un día</b><p class="meth">Elige una fecha y mira la lista de números del Día y de la Noche. 🔒 = la lista que ya estaba congelada. 🔄 = recalculada con los datos hasta ese sorteo (puede no ser idéntica a la que viste ese día).</p>
   <input type="date" id="pf-d"> <button class="btn s" id="pf-go" style="padding:6px 14px;font-size:14px">Ver</button><div id="pf-out"></div></div>
  <div class="card"><b>Consulta de número</b><p class="meth">Escribe un número de 2 cifras y mira qué da cada tabla.</p>
   <input id="q-n" inputmode="numeric" maxlength="2" placeholder="38"><div id="q-out"></div></div>
@@ -164,7 +164,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 43</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 44</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -945,7 +945,8 @@ function finBuild(r){const LS=logicScores(r);r.lp=LS.p;return finLogic(r,LS);}
 // ---- Regla de 11: del último número, se resta 1 a la decena y 1 al terminal, ciclo de 10. Va en un grupo aparte del Top y se mide contra el azar en Aciertos ----
 const R11_START='2026-10-29|EVE';
 function r11Cycle(t){let a=+t[0],b=+t[1];const o=[];for(let i=0;i<10;i++){o.push(''+a+b);a=(a+9)%10;b=(b+9)%10;}return o;}
-function r11Extras(list){return[];if(SEP_ON||!ROWS.length)return[];const have=new Set(list.map(x=>x.n));return r11Cycle(ROWS[ROWS.length-1].p3.slice(1)).filter(n=>!have.has(n)).map(n=>({n,f:'O'}));}
+function corLbl(){const l=ROWS[ROWS.length-1];return l&&l.p4&&l.p4.length>=4?l.p4.slice(0,2)+' · '+l.p4.slice(2,4):'';}
+function r11Extras(list){if(SEP_ON||!ROWS.length)return[];const have=new Set(list.map(x=>x.n)),c=corFijos(ROWS);return Object.keys(c).filter(n=>!have.has(n)).map(n=>({n:n,f:c[n][0]}));}
 function r11Det(rows){const st=R11_START.split('|'),start=st[0]+(st[1]==='MID'?'0':'1'),m={},dg={};let rh=0,rn=0;
   for(let i=1;i<rows.length;i++){const r=rows[i],pv=rows[i-1].p3;if(!pv||pv.length!==3||!r.p3)continue;const hit=r11Cycle(pv.slice(1)).indexOf(r.p3.slice(1))>=0;
     if(ordKey(r)>=start){m[slotKey(r)]=hit;if(hit)dg[slotKey(r)]='regla de 11 del '+pv.slice(1);}else{rn++;if(hit)rh++;}}
@@ -956,8 +957,8 @@ function finGet(r){const key=r.n.date+'|'+r.n.session,z=FROZEN[key],si=shInfo();
 function finFreeze(r){const key=r.n.date+'|'+r.n.session;if(FROZEN[key]&&FROZEN[key].b===FC_BUILD)return;const f=finGet(r);FROZEN[key]={l:f.l,x:f.x||[],p:f.p,d:f.d,t2:f.t,b:FC_BUILD,t:new Date().toISOString()};store('fpa_frozen',FROZEN);}
 function finRender(){try{const r=genList();if(!r)return;const f=finGet(r),L=f.l,g=(a,cl)=>'<div class="chips">'+a.map(x=>'<span class="chip '+cl+'">'+x.n+'<i>'+(x.f||'&nbsp;')+'</i></span>').join('')+'</div>';
   $('g-fin').innerHTML='<b>Esto es lo que vas a compartir</b> · '+DIAS[r.wd]+' '+(r.n.session==='MID'?'Día':'Noche')+(f.frozen?' 🔒 congelado':' · 🔓 aún no congelado')+
-   '<div class="meth">'+(f.frozen?'Ya está congelado: el BINGO se canta contra esta lista.':'Todavía puede cambiar si anotas más sorteos. Se congela al tocar "Compartir" y el BINGO se canta contra esa lista.')+' Total: <b>'+L.length+'</b> números'+(f.x&&f.x.length?' + <b>'+f.x.length+'</b> de la regla de 11':'')+'.</div>'+
-   '<div class="pg r">Rojo · del 1 al 10</div>'+g(L.slice(0,10),'r')+(L.length>10?'<div class="pg a">Azul · del 11 al '+L.length+'</div>'+g(L.slice(10),'a'):'')+(f.x&&f.x.length?'<div class="pg v">Verde · regla de 11 (fuera del Top) · del '+ROWS[ROWS.length-1].p3.slice(1)+'</div>'+g(f.x.map(x=>({n:x.n,f:'R11'})),'v')+'<div class="meth">La regla de 11 no mejora el azar: estos '+f.x.length+' números suman ≈ '+f.x.length+'% por azar, igual que cualquier otro grupo del mismo tamaño.</div>':'')+
+   '<div class="meth">'+(f.frozen?'Ya está congelado: el BINGO se canta contra esta lista.':'Todavía puede cambiar si anotas más sorteos. Se congela al tocar "Compartir" y el BINGO se canta contra esa lista.')+' Total: <b>'+L.length+'</b> números'+(f.x&&f.x.length?' + <b>'+f.x.length+'</b> de corridos':'')+'.</div>'+
+   '<div class="pg r">Rojo · del 1 al 10</div>'+g(L.slice(0,10),'r')+(L.length>10?'<div class="pg a">Azul · del 11 al '+L.length+'</div>'+g(L.slice(10),'a'):'')+(f.x&&f.x.length?'<div class="pg v">Verde · corridos (fuera del Top) · '+corLbl()+'</div>'+g(f.x.map(x=>({n:x.n,f:x.f})),'v')+'<div class="meth">Son los fijos que dan los corridos del último sorteo y no entraron en el Top. También cuentan para el BINGO.</div>':'')+
    '<div class="meth">Decena más fuerte: <b>'+f.d+'</b> · Terminal más fuerte: <b>'+f.t+'</b> (van en la imagen y cuentan para el BINGO)</div>'+
    '<div class="meth"><b>Parlés:</b> '+(f.p.length?f.p.map(x=>x.k).join(' · '):'ninguno')+'</div>'+
    (f.frozen?'<div><button class="btn s" data-act="unf" style="padding:6px 12px;font-size:13px">Recalcular (descongelar)</button></div>':'');
@@ -975,7 +976,7 @@ function bingoRender(){try{const b=$('bingo'),l=ROWS[ROWS.length-1];if(!l){b.cla
     const i=fr.l.findIndex(x=>x.n===t),pl=fr.p.map(p=>{const a=p.k.split('-');return{k:p.k,a:sal.has(a[0]),b:sal.has(a[1])};}),pb=pl.filter(x=>x.a&&x.b),pu=pl.filter(x=>(x.a||x.b)&&!(x.a&&x.b));
     const hd=fr.d!==undefined&&t[0]===String(fr.d),ht=fr.t2!==undefined&&t[1]===String(fr.t2);
     if(i>=0){ti='🎉 ¡BINGO! 🎉';su='DEL PRONÓSTICO';body='<div class="by2">Estaba en tu pronóstico compartido, puesto '+(i+1)+'. Lo proporcionó:</div>'+((fr.l[i].f||'').replace(/(.)(?=.*\1)/g,'').split('').filter(Boolean).map(c=>'<div class="bh">✅ '+(FC_NOM[c]||c)+'</div>').join('')||'<div class="bh">✅ Orden de la lista</div>')+(hd&&!/D/.test(fr.l[i].f)?'<div class="bh">✅ Decena más fuerte '+fr.d+'</div>':'')+(ht&&!/N/.test(fr.l[i].f)?'<div class="bh">✅ Terminal más fuerte '+fr.t2+'</div>':'');}
-    else if(fr.x&&fr.x.some(x=>x.n===t)){ti='🎉 ¡BINGO! 🎉';su='DE LA REGLA DE 11';body='<div class="by2">Estaba en tu pronóstico compartido:</div><div class="bh">✅ Regla de 11 (fuera del Top)</div>';}
+    else if(fr.x&&fr.x.some(x=>x.n===t)){ti='🎉 ¡BINGO! 🎉';su='DE LOS CORRIDOS';body='<div class="by2">Estaba en tu pronóstico compartido:</div><div class="bh">✅ Corrido (fuera del Top)</div>';}
     else if(hd||ht){ti='🎉 ¡BINGO! 🎉';su=hd&&ht?'DE DECENA Y TERMINAL':hd?'DE DECENA '+fr.d:'DE TERMINAL '+fr.t2;body='<div class="by2">Estaba en tu pronóstico compartido:</div>'+(hd?'<div class="bh">✅ Decena más fuerte '+fr.d+'</div>':'')+(ht?'<div class="bh">✅ Terminal más fuerte '+fr.t2+'</div>':'');}
     else if(pb.length){ti='🎯 ¡BINGO! 🎯';su='DE PARLÉ';}
     else if(pu.length){ti='🎉 ¡CORRIDO! 🎉';}
@@ -1003,7 +1004,7 @@ function genImg(X){
   c.fillStyle='#ffee58';c.strokeStyle='#1a237e';c.lineWidth=8;c.beginPath();c.roundRect?c.roundRect(150,50,780,110,40):c.rect(150,50,780,110);c.fill();c.stroke();
   c.fillStyle='#1a237e';c.textAlign='center';c.textBaseline='middle';gcFit(c,ttl,720,62,'800');c.fillText(ttl,W/2,105);
   c.fillStyle='#37474f';gcFit(c,'Florida Pick 3 · '+DIAS[r.wd]+' '+(r.n.session==='MID'?'Día':'Noche')+' · '+r.n.date,900,34,'700');c.fillText('Florida Pick 3 · '+DIAS[r.wd]+' '+(r.n.session==='MID'?'Día':'Noche')+' · '+r.n.date,W/2,195);
-  {const si=X?{dia:DN[parseDate(r.n.date).getUTCDay()]}:shInfo(),tx=si.dia+' · '+NL+' números'+(N>NL?' + '+(N-NL)+' regla de 11':'');c.fillStyle='#455a64';gcFit(c,tx,W-60,28,'700');c.fillText(tx,W/2,228);}
+  {const si=X?{dia:DN[parseDate(r.n.date).getUTCDay()]}:shInfo(),tx=si.dia+' · '+NL+' números'+(N>NL?' + '+(N-NL)+' corridos':'');c.fillStyle='#455a64';gcFit(c,tx,W-60,28,'700');c.fillText(tx,W/2,228);}
   const cols=['#f8bbd0','#fff59d','#c8e6c9','#bbdefb','#e1bee7'],bd=['#d81b60','#f9a825','#2e7d32','#1565c0','#6a1b9a'],bw=170,bh=250,gap=(W-120-5*bw)/4;
   for(let i=0;i<N;i++){
     const row=Math.floor(i/5),col=i%5,x=60+col*(bw+gap),y=250+row*(bh+90),k=list[i].n,nm=pnNm(k)||'',isx=i>=NL;
@@ -1031,7 +1032,7 @@ $('g-share').onclick=async()=>{const m=$('g-msg');try{
   else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pronostico-top10.png';a.click();m.className='msg ok';m.textContent='Se descargó la imagen. Si no, mantén pulsada la imagen para guardarla.';}
 }catch(e){if(e&&e.name==='AbortError')return;m.className='msg bad';m.textContent='No se pudo compartir. Mantén pulsada la imagen para guardarla.';}};
 function finText(){const r=genList();if(!r)return'';finFreeze(r);try{finRender();}catch(e){}const f=finGet(r),si=shInfo(),d=r.n.date;
-  return 'PRONÓSTICO · '+(r.n.session==='MID'?'Día':'Noche')+' · '+si.dia+' '+d.slice(8)+'/'+d.slice(5,7)+'\nDecena más fuerte '+f.d+' · Terminal más fuerte '+f.t+'\nNúmeros ('+f.l.length+'): '+f.l.map(x=>x.n).join(' ')+(f.x&&f.x.length?'\nRegla de 11 (del '+ROWS[ROWS.length-1].p3.slice(1)+'): '+f.x.map(x=>x.n).join(' '):'')+(f.p.length?'\nParlés: '+f.p.map(x=>x.k).join(' · '):'');}
+  return 'PRONÓSTICO · '+(r.n.session==='MID'?'Día':'Noche')+' · '+si.dia+' '+d.slice(8)+'/'+d.slice(5,7)+'\nDecena más fuerte '+f.d+' · Terminal más fuerte '+f.t+'\nNúmeros ('+f.l.length+'): '+f.l.map(x=>x.n).join(' ')+(f.x&&f.x.length?'\nCorridos ('+corLbl()+'): '+f.x.map(x=>x.n).join(' '):'')+(f.p.length?'\nParlés: '+f.p.map(x=>x.k).join(' · '):'');}
 $('g-sharet').onclick=async()=>{const m=$('g-msg');try{const tx=finText();if(!tx){m.className='msg bad';m.textContent='Todavía no hay datos.';return;}
   if(navigator.share){await navigator.share({text:tx});m.className='msg ok';m.textContent='Listo.';}
   else{await navigator.clipboard.writeText(tx);m.className='msg ok';m.textContent='Números copiados. Pégalos donde quieras.';}
@@ -1454,10 +1455,10 @@ function uniAllRender(){try{let r='';for(let i=0;i<100;i++){const n=String(i).pa
 $('un-n').oninput=uniOut;uniAllRender();
 var PF_TX={};
 function pfGet(date,ses){const key=date+'|'+ses,z=FROZEN[key],row=ROWS.find(r=>r.d===date&&r.s===ses);
- if(z&&z.l)return{l:z.l.map(x=>x.n),p:(z.p||[]).map(x=>x.k),d:String(z.d),t:String(z.t2),frozen:true,row:row};
+ if(z&&z.l)return{l:z.l.map(x=>x.n),x:(z.x||[]).map(e=>e.n),p:(z.p||[]).map(x=>x.k),d:String(z.d),t:String(z.t2),frozen:true,row:row};
  const all=ROWS.slice(),i=all.findIndex(r=>r.d===date&&r.s===ses);let res=null;
  try{if(i===0)return null;if(i>0)ROWS=all.slice(0,i);
-  const g=genList();if(g&&g.n.date===date&&g.n.session===ses){const f=finGet(g);res={l:f.l.map(x=>x.n),p:f.p.map(x=>x.k),d:f.d,t:f.t,frozen:false};}
+  const g=genList();if(g&&g.n.date===date&&g.n.session===ses){const f=finGet(g);res={l:f.l.map(x=>x.n),x:(f.x||[]).map(e=>e.n),p:f.p.map(x=>x.k),d:f.d,t:f.t,frozen:false};}
  }catch(e){res=null;}finally{ROWS=all;}
  if(res)res.row=row;return res;}
 function pfRender(){const date=$('pf-d').value,o=$('pf-out');if(!date){o.innerHTML='';return;}
@@ -1467,9 +1468,9 @@ function pfRender(){const date=$('pf-d').value,o=$('pf-out');if(!date){o.innerHT
   if(!f){h+='<span class="meth">No hay pronóstico para este sorteo (sin datos anteriores o todavía no toca).</span></div>';continue;}
   const g=(a,cl)=>'<div class="chips">'+a.map(n=>'<span class="chip '+cl+'">'+n+'<i>&nbsp;</i></span>').join('')+'</div>';
   h+='<div class="pg r">Rojo · del 1 al 10</div>'+g(f.l.slice(0,10),'r')+(f.l.length>10?'<div class="pg a">Azul · del 11 al '+f.l.length+'</div>'+g(f.l.slice(10),'a'):'')+
-   '<div class="meth">Decena más fuerte: <b>'+f.d+'</b> · Terminal más fuerte: <b>'+f.t+'</b></div>'+(f.p.length?'<div class="meth"><b>Parlés:</b> '+f.p.join(' · ')+'</div>':'');
+   '<div class="meth">Decena más fuerte: <b>'+f.d+'</b> · Terminal más fuerte: <b>'+f.t+'</b></div>'+(f.x&&f.x.length?'<div class="pg v">Extras fuera del Top (corridos)</div>'+g(f.x,'v'):'')+(f.p.length?'<div class="meth"><b>Parlés:</b> '+f.p.join(' · ')+'</div>':'');
   if(f.row){const fj=f.row.p3.slice(1),pos=f.l.indexOf(fj);h+='<div class="meth">Salió: <b>'+f.row.p3+'</b>'+(f.row.p4?' · '+f.row.p4:'')+' · fijo <b>'+fj+'</b> · '+(pos<0?'no estaba en la lista':'estaba en la lista, lugar '+(pos+1)+(pos<10?' (rojo)':' (azul)'))+'</div>';}
-  PF_TX[ses]='PRONÓSTICO · '+nm+' · '+dn+' '+dm+'\nDecena más fuerte '+f.d+' · Terminal más fuerte '+f.t+'\nNúmeros ('+f.l.length+'): '+f.l.join(' ')+(f.p.length?'\nParlés: '+f.p.join(' · '):'');
+  PF_TX[ses]='PRONÓSTICO · '+nm+' · '+dn+' '+dm+'\nDecena más fuerte '+f.d+' · Terminal más fuerte '+f.t+'\nNúmeros ('+f.l.length+'): '+f.l.join(' ')+(f.x&&f.x.length?'\nCorridos: '+f.x.join(' '):'')+(f.p.length?'\nParlés: '+f.p.join(' · '):'');
   h+='<button class="btn s" data-pfc="'+ses+'" style="padding:6px 12px;font-size:13px">Copiar números</button></div>';}
  o.innerHTML=h;}
 $('pf-go').onclick=pfRender;$('pf-d').onchange=pfRender;
@@ -1615,7 +1616,7 @@ setTimeout(()=>{try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=43;var UPD_SHOWN=false;
+const APP_BUILD=44;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
