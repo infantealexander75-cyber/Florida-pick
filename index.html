@@ -41,7 +41,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}#nav button[data-t="ens"],#nav button[data-t="patron"]{display:none}
 </style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 44 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 45 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="ang">Anguila</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
@@ -164,7 +164,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 44</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 45</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -1004,10 +1004,10 @@ function genImg(X){
   c.fillStyle='#ffee58';c.strokeStyle='#1a237e';c.lineWidth=8;c.beginPath();c.roundRect?c.roundRect(150,50,780,110,40):c.rect(150,50,780,110);c.fill();c.stroke();
   c.fillStyle='#1a237e';c.textAlign='center';c.textBaseline='middle';gcFit(c,ttl,720,62,'800');c.fillText(ttl,W/2,105);
   c.fillStyle='#37474f';gcFit(c,'Florida Pick 3 · '+DIAS[r.wd]+' '+(r.n.session==='MID'?'Día':'Noche')+' · '+r.n.date,900,34,'700');c.fillText('Florida Pick 3 · '+DIAS[r.wd]+' '+(r.n.session==='MID'?'Día':'Noche')+' · '+r.n.date,W/2,195);
-  {const si=X?{dia:DN[parseDate(r.n.date).getUTCDay()]}:shInfo(),tx=si.dia+' · '+NL+' números'+(N>NL?' + '+(N-NL)+' corridos':'');c.fillStyle='#455a64';gcFit(c,tx,W-60,28,'700');c.fillText(tx,W/2,228);}
+  {const si=X?{dia:DN[parseDate(r.n.date).getUTCDay()]}:shInfo(),tx=si.dia+' · '+N+' números';c.fillStyle='#455a64';gcFit(c,tx,W-60,28,'700');c.fillText(tx,W/2,228);}
   const cols=['#f8bbd0','#fff59d','#c8e6c9','#bbdefb','#e1bee7'],bd=['#d81b60','#f9a825','#2e7d32','#1565c0','#6a1b9a'],bw=170,bh=250,gap=(W-120-5*bw)/4;
   for(let i=0;i<N;i++){
-    const row=Math.floor(i/5),col=i%5,x=60+col*(bw+gap),y=250+row*(bh+90),k=list[i].n,nm=pnNm(k)||'',isx=i>=NL;
+    const row=Math.floor(i/5),col=i%5,x=60+col*(bw+gap),y=250+row*(bh+90),k=list[i].n,nm=pnNm(k)||'',isx=false;
     gcCloud(c,x,y,bw,bh);c.fillStyle=isx?'#c8e6c9':cols[col];c.fill();c.lineWidth=7;c.strokeStyle=isx?'#2e7d32':bd[col];c.stroke();
     c.fillStyle='#1a1a1a';c.textAlign='center';c.textBaseline='middle';gcFit(c,k,bw-40,92,'800');c.fillText(k,x+bw/2,y+bh*0.40);
     c.fillStyle='#263238';gcFit(c,nm,bw-34,26,'700');c.fillText(nm,x+bw/2,y+bh*0.68);
@@ -1021,7 +1021,7 @@ function genImg(X){
     PL.forEach((p,i)=>{const row=Math.floor(i/3),m=Math.min(3,PL.length-row*3),x=(W-(m*pw+(m-1)*pg))/2+(i%3)*(pw+pg),y=y0+35+row*100,tc=TC[p.tier]||TC[2],tx=(p.half?'★ ':'')+p.k;
       c.beginPath();c.roundRect?c.roundRect(x,y,pw,ph,30):c.rect(x,y,pw,ph);c.fillStyle=tc[0];c.fill();c.lineWidth=6;c.strokeStyle=tc[1];c.stroke();
       c.fillStyle='#1a1a1a';c.textAlign='center';c.textBaseline='middle';gcFit(c,tx,pw-40,52,'800');c.fillText(tx,x+pw/2,y+ph/2+2);});}
-  c.fillStyle='#455a64';c.textAlign='center';c.font='700 24px system-ui,Arial,sans-serif';c.fillText('Coincidencia entre reglas. Es entretenimiento: juega con responsabilidad.',W/2,H-70);
+  c.fillStyle='#455a64';c.textAlign='center';c.font='700 24px system-ui,Arial,sans-serif';
   
   return cv;
 }
@@ -1032,7 +1032,7 @@ $('g-share').onclick=async()=>{const m=$('g-msg');try{
   else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pronostico-top10.png';a.click();m.className='msg ok';m.textContent='Se descargó la imagen. Si no, mantén pulsada la imagen para guardarla.';}
 }catch(e){if(e&&e.name==='AbortError')return;m.className='msg bad';m.textContent='No se pudo compartir. Mantén pulsada la imagen para guardarla.';}};
 function finText(){const r=genList();if(!r)return'';finFreeze(r);try{finRender();}catch(e){}const f=finGet(r),si=shInfo(),d=r.n.date;
-  return 'PRONÓSTICO · '+(r.n.session==='MID'?'Día':'Noche')+' · '+si.dia+' '+d.slice(8)+'/'+d.slice(5,7)+'\nDecena más fuerte '+f.d+' · Terminal más fuerte '+f.t+'\nNúmeros ('+f.l.length+'): '+f.l.map(x=>x.n).join(' ')+(f.x&&f.x.length?'\nCorridos ('+corLbl()+'): '+f.x.map(x=>x.n).join(' '):'')+(f.p.length?'\nParlés: '+f.p.map(x=>x.k).join(' · '):'');}
+  return 'PRONÓSTICO · '+(r.n.session==='MID'?'Día':'Noche')+' · '+si.dia+' '+d.slice(8)+'/'+d.slice(5,7)+'\nNúmeros: '+f.l.concat(f.x||[]).map(x=>x.n).join(' ')+'\nDecena '+f.d+' · Terminal '+f.t+(f.p.length?'\nParlés: '+f.p.map(x=>x.k).join(' · '):'');}
 $('g-sharet').onclick=async()=>{const m=$('g-msg');try{const tx=finText();if(!tx){m.className='msg bad';m.textContent='Todavía no hay datos.';return;}
   if(navigator.share){await navigator.share({text:tx});m.className='msg ok';m.textContent='Listo.';}
   else{await navigator.clipboard.writeText(tx);m.className='msg ok';m.textContent='Números copiados. Pégalos donde quieras.';}
@@ -1470,7 +1470,7 @@ function pfRender(){const date=$('pf-d').value,o=$('pf-out');if(!date){o.innerHT
   h+='<div class="pg r">Rojo · del 1 al 10</div>'+g(f.l.slice(0,10),'r')+(f.l.length>10?'<div class="pg a">Azul · del 11 al '+f.l.length+'</div>'+g(f.l.slice(10),'a'):'')+
    '<div class="meth">Decena más fuerte: <b>'+f.d+'</b> · Terminal más fuerte: <b>'+f.t+'</b></div>'+(f.x&&f.x.length?'<div class="pg v">Extras fuera del Top (corridos)</div>'+g(f.x,'v'):'')+(f.p.length?'<div class="meth"><b>Parlés:</b> '+f.p.join(' · ')+'</div>':'');
   if(f.row){const fj=f.row.p3.slice(1),pos=f.l.indexOf(fj);h+='<div class="meth">Salió: <b>'+f.row.p3+'</b>'+(f.row.p4?' · '+f.row.p4:'')+' · fijo <b>'+fj+'</b> · '+(pos<0?'no estaba en la lista':'estaba en la lista, lugar '+(pos+1)+(pos<10?' (rojo)':' (azul)'))+'</div>';}
-  PF_TX[ses]='PRONÓSTICO · '+nm+' · '+dn+' '+dm+'\nDecena más fuerte '+f.d+' · Terminal más fuerte '+f.t+'\nNúmeros ('+f.l.length+'): '+f.l.join(' ')+(f.x&&f.x.length?'\nCorridos: '+f.x.join(' '):'')+(f.p.length?'\nParlés: '+f.p.join(' · '):'');
+  PF_TX[ses]='PRONÓSTICO · '+nm+' · '+dn+' '+dm+'\nNúmeros: '+f.l.concat(f.x||[]).join(' ')+'\nDecena '+f.d+' · Terminal '+f.t+(f.p.length?'\nParlés: '+f.p.join(' · '):'');
   h+='<button class="btn s" data-pfc="'+ses+'" style="padding:6px 12px;font-size:13px">Copiar números</button></div>';}
  o.innerHTML=h;}
 $('pf-go').onclick=pfRender;$('pf-d').onchange=pfRender;
@@ -1616,7 +1616,7 @@ setTimeout(()=>{try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=44;var UPD_SHOWN=false;
+const APP_BUILD=45;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
