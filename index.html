@@ -40,7 +40,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}</style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 39 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 40 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="ang">Anguila</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
@@ -161,7 +161,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 39</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 40</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -751,6 +751,12 @@ function ruleGrid(){
   if(mt&&mt.list.length){const a={},b={},c={};mt.list.forEach(x=>{a[x.key]=x.hN;b[x.key]=x.hD;c[x.key]=x.hT;});
     add('Mis pronósticos','Mis números','',a);add('Mis pronósticos','Mi decena','',b);add('Mis pronósticos','Mi terminal','',c);}
   return out;}
+// ---- Aviso en Aciertos: que alguna tabla acierte casi siempre es lo esperado por la cobertura (exacto: la cobertura media es el azar) ----
+function anyHitLine(){try{const f=qCalc(ROWS).f,yr=ROWS[ROWS.length-1].d.slice(0,4);let n=0,h=0,cv=0;
+  for(let i=1;i<ROWS.length;i++){if(ROWS[i].d.slice(0,4)!==yr)continue;const t=ROWS[i].p3.slice(1),wd=weekdayOf(ROWS[i].d),U=new Set();
+    for(const nm in f)for(const x of f[nm](ROWS[i-1].p3.slice(1),wd))U.add(x);n++;cv+=U.size;if(U.has(t))h++;}
+  if(n<30)return'';const cov=(cv/n).toFixed(0),pc=(100*h/n).toFixed(0);
+  return '<div style="margin-top:8px"><b>¿Casi todos los días acierta alguna regla?</b> Es normal: las '+Object.keys(f).length+' tablas juntas cubren en promedio el <b>'+cov+'%</b> de los números, así que al menos una acierta en el <b>'+pc+'%</b> de los sorteos de '+yr+' (<b>'+h+'</b> de '+n+'). Con esa cobertura, el azar daría <b>'+cov+'%</b>. Mientras los dos números se parezcan, que alguna regla acierte no significa que la app acierte. Con todas las fuentes juntas (Top, tablas, regla de 11 y más) la cobertura sube aún más.</div>';}catch(e){return'';}}
 function renderAcier(){
   renderMine();
   const R=ROWS,l=R[R.length-1];if(!l)return;
@@ -760,7 +766,7 @@ function renderAcier(){
     if(x.g!==g){g=x.g;h+='<tr class="gp"><td colspan="'+nc+'">'+g+'</td></tr>';}
     h+='<tr><td class="nm">'+x.nm+(x.sub?'<div class="sb">'+x.sub+'</div>':'')+'</td>'+cols.map(r=>{const v=x.m[slotKey(r)];return '<td>'+(v===true?'✅':(v===false?'·':'<span class="sb">–</span>'))+'</td>';}).join('')+'<td class="tt">'+(x.n?x.h+'/'+x.n:'–')+'</td></tr>';}
   $('ac-grid').innerHTML=h;
-  $('ac-leg').textContent='✅ acertó · · no acertó · – la regla no aplicó ese sorteo. El total cuenta desde que empezó cada regla.';
+  $('ac-leg').innerHTML='✅ acertó · · no acertó · – la regla no aplicó ese sorteo. El total cuenta desde que empezó cada regla.'+anyHitLine();
   $('ac-more').textContent=AC_N===10?'Ver más sorteos':'Ver menos sorteos';
 }
 $('ac-more').onclick=()=>{AC_N=AC_N===10?30:10;renderAcier();};
@@ -1582,7 +1588,7 @@ setTimeout(()=>{try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=39;var UPD_SHOWN=false;
+const APP_BUILD=40;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
