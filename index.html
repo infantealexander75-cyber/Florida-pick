@@ -40,8 +40,11 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 /* el número buscado siempre se ve amarillo, encima de cadenas/repeticiones/meses */.yr td.sel{background:#ffeb3b!important;color:#000!important;box-shadow:inset 0 0 0 2px #e65100}
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}#nav button[data-t="ens"],#nav button[data-t="patron"]{display:none}
+.yr td.pR{outline:2px solid #e53935;outline-offset:-2px}
+.yr td.pVi{outline:2px dashed #1e88e5;outline-offset:-2px}
+.yr td.pR.pVi{outline:2px solid #e53935;box-shadow:inset 0 0 0 4px #1e88e5}
 </style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 47 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 50 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="ang">Anguila</button><button data-t="dias">Días de semana</button><button data-t="anio">Año (Día/Noche)</button><button data-t="anc">Año consecutivo</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
@@ -139,10 +142,10 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 <section id="t-anc" class="hide">
  <div class="card"><b>Año consecutivo (todos los sorteos del año, uno tras otro)</b>
   <p class="meth">Una columna por mes. Hacia abajo van los sorteos en orden: Día 1, Noche 1, Día 2, Noche 2… Cada casilla es el Pick 3 completo; en negrita el trasero. Los colores marcan las líneas de 3 casillas con el mismo paso, igual que en Año (Día/Noche). Toca una casilla para marcar en amarillo todas las veces que salió. Morado: el próximo sorteo.</p>
-  <div class="lg"><span style="background:#90caf9">Horizontal</span><span style="background:#a5d6a7">Vertical</span><span style="background:#ffcc80">Oblicua ↘</span><span style="background:#ce93d8">Transversal ↗</span><span style="background:#fff176">Número que predice</span></div>
-  <label>Buscar trasero</label><input id="ac-q" inputmode="numeric" maxlength="2" placeholder="Ej.: 64"><div class="msg" id="ac-sel"></div>
-  <div class="yr" id="ac-wrap"><div id="ac-grid"></div></div></div>
- <div class="card"><b>Patrones activos (Año consecutivo)</b><p class="meth">Se actualizan solos con cada sorteo. Cuando aparece uno nuevo, también salta la alerta de arriba y el dígito activado cuenta como en Año (Día/Noche). Es seguimiento de coincidencias, no un pronóstico.</p><div id="ac-pat"></div></div>
+  <div class="lg"><span style="background:#90caf9">Horizontal</span><span style="background:#a5d6a7">Vertical</span><span style="background:#ffcc80">Oblicua ↘</span><span style="background:#ce93d8">Transversal ↗</span><span style="background:#fff176">Número que predice</span><span style="outline:2px solid #e53935;outline-offset:-2px;background:#fff">Número repetido en línea</span><span style="outline:2px dashed #1e88e5;outline-offset:-2px;background:#fff">Viraje en línea</span></div>
+  <label>Buscar trasero</label><input id="cn-q" inputmode="numeric" maxlength="2" placeholder="Ej.: 64"><div class="msg" id="cn-sel"></div>
+  <div class="yr" id="cn-wrap"><div id="cn-grid"></div></div></div>
+ <div class="card"><b>Patrones activos (Año consecutivo)</b><p class="meth">Se actualizan solos con cada sorteo. Cuando aparece uno nuevo, también salta la alerta de arriba y el dígito activado cuenta como en Año (Día/Noche). Es seguimiento de coincidencias, no un pronóstico.</p><div id="cn-pat"></div></div>
 </section>
 <section id="t-ens" class="hide">
  <div class="card"><b>Regla fija: Ensemble (top 5 por puntaje)</b><p class="meth">Después de cada sorteo, cada número recibe un punto por cada regla que lo propone (M1/M2, Pleito, Cuarteta, Números que rodean, 1-Up/Down, Viraje, Igualdad y la transición más frecuente). Se toman los 5 con más puntos. Es seguimiento, no un pronóstico.</p><div id="en-out"></div></div>
@@ -166,6 +169,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 </section>
 
 <section id="t-copia" class="hide">
+ <div class="card"><b>Candidatos prioritarios</b><p class="meth">Pasan de primeros en el Top (en rojo): los repetidos de los últimos 3 sorteos que ya están en el Top o en alguna regla, y el número que dan a la vez «Números que rodean» y «Consecuente». Máximo 4.</p><button class="btn s" id="prio-b" style="padding:6px 14px;font-size:14px"></button></div>
  <div class="card" id="lic-card" style="display:none"><b>Licencia</b><div class="meth" id="lic-st"></div></div>
  <div class="card"><b>Copia de seguridad</b><p class="meth">Guarda tus datos en un archivo o cópialos. Si borras los datos de Chrome o cambias de teléfono, cárgalos de nuevo aquí.</p>
   <button class="btn" id="b-dl">Descargar copia (.csv)</button><button class="btn s" id="b-show">Mostrar texto</button><button class="btn" id="b-full">Copia COMPLETA (.json)</button>
@@ -173,7 +177,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 47</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 50</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -924,9 +928,9 @@ function parRender(){try{const l=ROWS[ROWS.length-1],r=genList();if(!l||!r)retur
   }catch(e){showErr(e,'parlés del día');}}
 // ---- Pronóstico para compartir: fijos de corridos y cadena primero, luego por coincidencias entre reglas; se congela al compartir ----
 var FROZEN=load('fpa_frozen',{});
-const FC_BUILD=3,FC_N=20,FC_MAX=20,FC_W={P:1,E:1.25,U:1,A:1,Y:1.5},FC_NOM={I:'Igualdad',B:'Tabla Abue',P:'Pronóstico',C:'Candidatos',E:'Ensemble',U:'Tablas',A:'Ahorcado',Y:'Patrón del año',K:'Corrido → fijo',S:'Seguidor',H:'Cadena',R:'Patrón del calendario',D:'Decena fuerte',N:'Terminal fuerte',Q:'Tablas con más acierto del año',M:'Único del mes anterior',O:'Regla de 11'};
+const FC_BUILD=3,FC_N=20,FC_MAX=20,FC_W={P:1,E:1.25,U:1,A:1,Y:1.5},FC_NOM={I:'Igualdad',B:'Tabla Abue',P:'Pronóstico',C:'Candidatos',E:'Ensemble',U:'Tablas',A:'Ahorcado',Y:'Patrón del año',K:'Corrido → fijo',S:'Seguidor',H:'Cadena',R:'Patrón del calendario',D:'Decena fuerte',N:'Terminal fuerte',Q:'Tablas con más acierto del año',M:'Único del mes anterior',O:'Regla de 11','★':'Candidato prioritario'};
 // ---- Orden lógico del Top: cada regla pesa según lo que acertó en TODO el historial 2010-oct 2026 (con prudencia, k=150), no según un solo año. Pesos fijos de esta versión. ----
-var LOGIC=true,LAST_G=null;
+var LOGIC=true,LAST_G=null,PRIO_ON=load('fpa_prio',1)!==0;
 const LM_FIX={"C":{"Pleito":1,"M1/M2":1,"Cuarteta":1.0744,"Rodean":1,"Vibración":1,"Compañeros":1.046,"Viraje":1,"Regla II":1,"Maravillosa":1,"Mariposas":1,"Antonio":1,"Igualdad":1.0666,"Valor":1,"Pares":1,"Tabla fundamental":1,"Tabla Abue":1.0763,"1-Up/Down":1},"MID":{"Pleito":0.9594,"M1/M2":1.0454,"Cuarteta":0.9923,"Rodean":1.0539,"Vibración":0.9932,"Compañeros":1.0168,"Viraje":0.9912,"Regla II":0.9452,"Maravillosa":1.0321,"Mariposas":0.9973,"Antonio":0.9732,"Igualdad":1.0169,"Valor":0.9791,"Pares":1.0399,"Tabla fundamental":1.0019,"Tabla Abue":1,"1-Up/Down":1.0286},"EVE":{"Pleito":0.9547,"M1/M2":1.0264,"Cuarteta":1.0051,"Rodean":0.9681,"Vibración":0.9655,"Compañeros":0.9993,"Viraje":1.0042,"Regla II":1.0338,"Maravillosa":1.0352,"Mariposas":1.0372,"Antonio":0.9836,"Igualdad":1.0501,"Valor":1.0406,"Pares":1.0193,"Tabla fundamental":0.9881,"Tabla Abue":1,"1-Up/Down":0.9074}};
 function logicMult(){const mu=LM_FIX[SEP_ON||'C']||LM_FIX.C,src=SEP_ON?{P:1.014,E:.992,U:1.006,A:1.012,D:.995,N:1.041}:{P:.98,E:1,U:.995,A:.995,D:1.033,N:.99};return{mu,src};}
 // ---- Únicos del mes anterior como fuente del Lógico: pesan según lo que acertaron desde 06-oct Noche (con prudencia, k=150) ----
@@ -947,7 +951,19 @@ function logicScores(r){const M=logicMult(),mu=M.mu,src=M.src,qf=qCalc(ROWS).f,s
   for(const k in sc){let v=0;if(pe.has(k))v+=Math.log(src.P);if(en.has(k))v+=Math.log(src.E);if(um.has(k))v+=Math.log(src.U);if(ah.has(k))v+=Math.log(src.A);if(String(si.d)===k[0])v+=Math.log(src.D);if(String(si.t)===k[1])v+=Math.log(src.N);if(uq.set.has(k))v+=Math.log(uq.m);sc[k]+=v;}
   let Z=0;const p={};for(const k in sc)Z+=Math.exp(.5*sc[k]);for(const k in sc)p[k]=Math.exp(.5*sc[k])/Z;return{sc,p};} // probabilidad: se usa la mitad de la evidencia (en la prueba hacia adelante con 10,818 sorteos fue lo más cercano a la realidad)
 function finLogic(r,LS){const ix=new Map(r.all.map((x,i)=>[x.n,i])),eq=(r.base&&T.EQUALITY&&T.EQUALITY[r.base])||'',abn=(!SEP_ON&&r.base&&ABUE[r.base])||[],si=shInfo(),r11c=new Set();
-  return r.all.slice().sort((a,b)=>LS.sc[b.n]-LS.sc[a.n]||ix.get(a.n)-ix.get(b.n)).slice(0,FC_N).map(x=>({n:x.n,f:x.f+(x.n===eq?'I':'')+(abn.indexOf(x.n)>=0?'B':'')+(String(si.d)===x.n[0]?'D':'')+(String(si.t)===x.n[1]?'N':'')+(r.uq&&r.uq.has(x.n)?'M':'')+(r11c.has(x.n)?'O':'')}));}
+  const lst=r.all.slice().sort((a,b)=>LS.sc[b.n]-LS.sc[a.n]||ix.get(a.n)-ix.get(b.n)).slice(0,FC_N).map(x=>({n:x.n,f:x.f+(x.n===eq?'I':'')+(abn.indexOf(x.n)>=0?'B':'')+(String(si.d)===x.n[0]?'D':'')+(String(si.t)===x.n[1]?'N':'')+(r.uq&&r.uq.has(x.n)?'M':'')+(r11c.has(x.n)?'O':'')}));
+  const pr=prioPick(r,lst);if(!pr.length)return lst;
+  const byN=new Map(lst.map(x=>[x.n,x])),allm=new Map(r.all.map(x=>[x.n,x]));
+  return pr.map(n=>({n:n,f:((byN.get(n)||allm.get(n)||{f:''}).f||'')+'★'})).concat(lst.filter(x=>pr.indexOf(x.n)<0)).slice(0,FC_N);}
+// ---- Candidatos prioritarios: (1) repetidos de los últimos 3 sorteos que están en el Top o en alguna regla; (2) el número que dan a la vez 'Números que rodean' y 'Consecuente'. Van de primeros (en rojo) ----
+function prioPick(r,lst){if(!PRIO_ON||SEP_ON)return[];const out=[],add=n=>{if(n&&out.indexOf(n)<0)out.push(n);};
+  try{const rows=ROWS,L=rows.length,qf=qCalc(rows).f,cnt={},fl={},have=new Set(lst.map(x=>x.n));
+    for(const nm in qf){try{for(const x of qf[nm](r.base,r.wd))cnt[x]=1;}catch(e){}}
+    r.all.forEach(x=>{fl[x.n]=(x.f||'').replace(/[^A-Z]/g,'').length>0;});
+    for(let k=1;k<=3&&L-k>=0;k++){const p=rows[L-k].p3;if(!p||p.length!==3)continue;const n=p.slice(1);if(have.has(n)||cnt[n]||fl[n])add(n);}
+    if(r.base&&T.RODEAN){const c=conOf(r.base);if(c!==r.base&&(T.RODEAN[r.base]||[]).indexOf(c)>=0)add(c);}
+  }catch(e){}
+  return out.slice(0,4);}
 function logicLine(r){return '';if(!r||!r.lp||!r.top||!r.top.length)return'';const ps=r.top.map(x=>r.lp[x.n]||.01),mn=Math.min(...ps),mx=Math.max(...ps),sm=ps.reduce((a,b)=>a+b,0),n=r.top.length;
   return 'Probabilidad estimada (prueba hacia adelante): cada número de <b>'+(100*mn).toFixed(2)+'%</b> a <b>'+(100*mx).toFixed(2)+'%</b>; los '+n+' juntos <b>'+(100*sm).toFixed(1)+'%</b>. Sin ninguna regla serían 1% por número y '+n+'% los '+n+'.';}
 function logicShow(r){$('g-prob').innerHTML=logicLine(r);$('g-mode').innerHTML='<div class="meth">Orden del Top: Lógico (por evidencia)</div>';}
@@ -1070,35 +1086,47 @@ function acDig(g,r,c){const out=[];
     if(a[1]===b[1]&&b[1]===e[1])out.push({k:'T',dig:e[1],t:anType(d),d,src:[a,b,e]});
     if(a[0]===b[0]&&b[0]===e[0])out.push({k:'D',dig:e[0],t:anType(d),d,src:[a,b,e]});}
   return out;}
+function acRep(g,r,c){const out=[];
+  for(const d of AC_DIRS){const e=acCell(g,r-d[0],c-d[1]),b=acCell(g,r-2*d[0],c-2*d[1]);if(!e||!b||e!==b)continue;const a=acCell(g,r-3*d[0],c-3*d[1]),tri=a===e;
+    out.push({v:e,t:anType(d),d,src:tri?[a,b,e]:[b,e],len:tri?3:2});}
+  return out;}
+function acVir(g,r,c){const out=[];
+  for(const d of AC_DIRS){const e=acCell(g,r-d[0],c-d[1]),b=acCell(g,r-2*d[0],c-2*d[1]);if(!e||!b||e===b||e[1]+e[0]!==b)continue;
+    out.push({v:b,w:e,t:anType(d),d,src:[b,e]});}
+  return out;}
 function acName(p){const d=p.d,t=p.t,k=Math.abs(d[0]);
   if(t==='V')return k===1?'Vertical, sorteo seguido':'Vertical, cada '+k+' sorteos'+(k%2===0?' (mismo turno, cada '+(k/2)+(k===2?' día':' días')+')':'');
   if(t==='H')return d[1]===1?'Horizontal, mismo sorteo del mes anterior':'Horizontal, mismo sorteo cada 2 meses';
   return (t==='D'?'Oblicua ↘':'Transversal ↗')+', '+k+(k===1?' sorteo':' sorteos')+', mes anterior';}
 function acRender(){try{
   const l=ROWS[ROWS.length-1];if(!l)return;const g=acData(),ns=nextSlot(l.d,l.s),N2=nextSlot(ns.date,ns.session),nm=+ns.date.slice(5,7),mx=Math.min(12,nm),p1=acPos(ns.date,ns.session),p2=acPos(N2.date,N2.session);
-  const P1=acPred(g,p1.r,p1.c),P2=acPred(g,p2.r,p2.c),G1=acDig(g,p1.r,p1.c),G2=acDig(g,p2.r,p2.c),pc={};
+  const P1=acPred(g,p1.r,p1.c),P2=acPred(g,p2.r,p2.c),G1=acDig(g,p1.r,p1.c),G2=acDig(g,p2.r,p2.c),R1=acRep(g,p1.r,p1.c),R2=acRep(g,p2.r,p2.c),V1=acVir(g,p1.r,p1.c),V2=acVir(g,p2.r,p2.c),pc={},rc={},vc={};
   for(const P of [[P1,p1],[P2,p2],[G1,p1],[G2,p2]])for(const p of P[0])p.src.forEach((x,i)=>{const k=(P[1].r-(p.src.length-i)*p.d[0])+'|'+(P[1].c-(p.src.length-i)*p.d[1]);if(!pc[k])pc[k]='p'+p.t;});
-  const tg=(p,P,G)=>{const u=[...new Set(P.map(x=>x.v))],gt=[...new Set(G.filter(x=>x.k==='T').map(x=>'T'+x.dig))].concat([...new Set(G.filter(x=>x.k==='D').map(x=>'D'+x.dig))]);return{u,gt};};
-  const T1=tg(p1,P1,G1),T2=tg(p2,P2,G2);
+  for(const P of [[R1,p1],[R2,p2]])for(const p of P[0])p.src.forEach((x,i)=>{rc[(P[1].r-(p.src.length-i)*p.d[0])+'|'+(P[1].c-(p.src.length-i)*p.d[1])]=1;});
+  for(const P of [[V1,p1],[V2,p2]])for(const p of P[0])p.src.forEach((x,i)=>{vc[(P[1].r-(p.src.length-i)*p.d[0])+'|'+(P[1].c-(p.src.length-i)*p.d[1])]=1;});
+  const tg=(p,P,G,Rp)=>{const u=[...new Set(P.map(x=>x.v).concat((Rp||[]).map(x=>x.v)))],gt=[...new Set(G.filter(x=>x.k==='T').map(x=>'T'+x.dig))].concat([...new Set(G.filter(x=>x.k==='D').map(x=>'D'+x.dig))]);return{u,gt};};
+  const T1=tg(p1,P1,G1,R1.concat(V1)),T2=tg(p2,P2,G2,R2.concat(V2));
   let h='<table><tr><th class="dd"></th>';for(let m=1;m<=mx;m++)h+='<th>'+AN_M[m-1]+'</th>';h+='</tr>';
   for(let r=1;r<=62;r++){const D=r%2===1;h+='<tr><td class="dd">'+Math.ceil(r/2)+(D?'D':'N')+'</td>';
     for(let m=1;m<=mx;m++){const c=m-1,p=g[m]&&g[m][r],cl='c '+(D?'D':'N');
       if(!p){const T=(r===p1.r&&c===p1.c)?T1:(r===p2.r&&c===p2.c)?T2:null,has=T&&(T.u.length||T.gt.length);
         h+='<td class="'+cl+(r===p1.r&&c===p1.c?' nxt':'')+(has?' pr':'')+'"'+(has&&T.u.length?' data-n="'+T.u[0]+'"':'')+' style="font-size:11px">'+(has?(T.u.length?'→'+T.u.slice(0,2).join('/'):'')+(T.gt.length?(T.u.length?'<br>':'')+T.gt.slice(0,3).join(' '):''):'')+'</td>';continue;}
-      const t=p.slice(1);h+='<td class="'+cl+(t===AC_SEL?' sel':'')+(pc[r+'|'+c]?' '+pc[r+'|'+c]:'')+'" data-n="'+t+'"><i>'+p[0]+'</i><b>'+t+'</b></td>';}
+      const t=p.slice(1);h+='<td class="'+cl+(t===AC_SEL?' sel':'')+(pc[r+'|'+c]?' '+pc[r+'|'+c]:'')+(rc[r+'|'+c]?' pR':'')+(vc[r+'|'+c]?' pVi':'')+'" data-n="'+t+'"><i>'+p[0]+'</i><b>'+t+'</b></td>';}
     h+='</tr>';}
-  const w=$('ac-wrap'),sl=w.scrollLeft,st=w.scrollTop;$('ac-grid').innerHTML=h+'</table>';w.scrollLeft=sl;w.scrollTop=st;
+  const w=$('cn-wrap'),sl=w.scrollLeft,st=w.scrollTop;$('cn-grid').innerHTML=h+'</table>';w.scrollLeft=sl;w.scrollTop=st;
   const lbl=(p,d)=>(p.r%2===1?'Día ':'Noche ')+Math.ceil(p.r/2)+' '+AN_M[+d.slice(5,7)-1];
+  const labV=(V,p,d)=>{if(!V.length)return '';const u={};V.forEach(x=>{(u[x.v]=u[x.v]||[]).push(x);});const ks=Object.keys(u).sort((a,b)=>u[b].length-u[a].length||(a<b?-1:1));return '<div class="meth" style="margin:6px 0 2px"><b>Virajes en línea para '+lbl(p,d)+':</b></div><div class="chips">'+ks.map(k=>'<div class="chip k">'+k+'<i>'+(pnNm(k)||'')+' ×'+u[k].length+'</i></div>').join('')+'</div>'+ks.slice(0,5).map(k=>u[k].slice(0,2).map(x=>'<div class="cand"><span class="num" style="font-size:16px">'+x.src.join(' ⇄ ')+' ⇒ '+k+'</span><div class="meth">'+acName(x)+' · el viraje de '+x.v+' es '+x.w+'; vuelve '+k+'</div></div>').join('')).join('');};
+  const labR=(R,p,d)=>{if(!R.length)return '';const u={};R.forEach(x=>{(u[x.v]=u[x.v]||[]).push(x);});const ks=Object.keys(u).sort((a,b)=>u[b].length-u[a].length||(a<b?-1:1));return '<div class="meth" style="margin:6px 0 2px"><b>Números repetidos en línea para '+lbl(p,d)+':</b></div><div class="chips">'+ks.map(k=>'<div class="chip r">'+k+'<i>'+(pnNm(k)||'')+' ×'+u[k].length+'</i></div>').join('')+'</div>'+ks.slice(0,5).map(k=>u[k].slice(0,2).map(x=>'<div class="cand"><span class="num" style="font-size:16px">'+x.src.join(' → ')+' ⇒ '+k+'</span><div class="meth">'+acName(x)+(x.len===3?' · ★ 3 casillas iguales':'')+'</div></div>').join('')).join('');};
   const lab=(P,G,p,d)=>{const u={};P.forEach(x=>{(u[x.v]=u[x.v]||[]).push(x);});const ks=Object.keys(u).sort((a,b)=>u[b].length-u[a].length||(a<b?-1:1));
     const gu={};G.forEach(x=>{(gu[x.k+x.dig]=gu[x.k+x.dig]||[]).push(x);});
     return '<div class="msg"><b>'+lbl(p,d)+'</b>: '+(ks.length?ks.length+' número'+(ks.length>1?'s':''):'ningún patrón')+'</div>'+
      (ks.length?'<div class="chips">'+ks.map(k=>'<div class="chip a">'+k+'<i>'+(pnNm(k)||'')+' ×'+u[k].length+'</i></div>').join('')+'</div>':'')+
      ks.slice(0,6).map(k=>u[k].slice(0,3).map(x=>'<div class="cand"><span class="num" style="font-size:16px">'+x.src.join(' → ')+' ⇒ '+k+'</span><div class="meth">'+acName(x)+' · '+anSt(x.st)+(x.len===4?' · ★ 4 casillas':'')+'</div></div>').join('')).join('')+
      (Object.keys(gu).length?'<div class="meth" style="margin:4px 0"><b>Dígitos repetidos en línea:</b></div>'+Object.keys(gu).sort((a,b)=>gu[b].length-gu[a].length).slice(0,6).map(k=>'<div class="cand"><span class="num" style="font-size:16px">'+(k[0]==='T'?'Terminal ':'Decena ')+k[1]+'</span> <b>×'+gu[k].length+'</b><div class="meth">'+gu[k][0].src.join(' → ')+' · '+acName(gu[k][0])+'</div></div>').join(''):'');};
-  AC_ST={P1,P2,G1,G2,l1:lbl(p1,ns.date),l2:lbl(p2,N2.date)};
-  $('ac-pat').innerHTML=lab(P1,G1,p1,ns.date)+lab(P2,G2,p2,N2.date);
+  AC_ST={P1,P2,G1,G2,R1,R2,V1,V2,l1:lbl(p1,ns.date),l2:lbl(p2,N2.date)};
+  $('cn-pat').innerHTML=lab(P1,G1,p1,ns.date)+labR(R1,p1,ns.date)+labV(V1,p1,ns.date)+lab(P2,G2,p2,N2.date)+labR(R2,p2,N2.date)+labV(V2,p2,N2.date);
   if(AC_SEL){const L=[];for(const m in g)for(const r in g[m])if(g[m][r].slice(1)===AC_SEL)L.push(Math.ceil(r/2)+' '+AN_M[m-1]+(r%2===1?' Día':' Noche'));
-    $('ac-sel').innerHTML=pnTag(AC_SEL)+': salió <b>'+L.length+'</b> '+(L.length===1?'vez':'veces')+' desde enero'+(L.length?'<div class="meth">'+L.join(' · ')+'</div>':'');}else $('ac-sel').innerHTML='';
+    $('cn-sel').innerHTML=pnTag(AC_SEL)+': salió <b>'+L.length+'</b> '+(L.length===1?'vez':'veces')+' desde enero'+(L.length?'<div class="meth">'+L.join(' · ')+'</div>':'');}else $('cn-sel').innerHTML='';
   }catch(e){}}
 function anCell(g,r,c){const m=Math.floor(c/2)+1,s=c%2?'EVE':'MID';if(r<1||r>31||c<0||m>12)return null;const p=g[m]&&g[m][r]&&g[m][r][s];return p?p.slice(1):null;}
 function anType(d){return d[1]===0?'V':d[0]===0?'H':d[0]>0?'D':'A';}
@@ -1200,9 +1228,12 @@ $('an-grid').onclick=e=>{const td=e.target&&e.target.closest?e.target.closest('t
 $('an-q').oninput=()=>{const v=$('an-q').value.replace(/\D/g,'').slice(0,2);AN_SEL=v.length===2?v:'';anioRender();};
 document.querySelector('#nav button[data-t="anio"]').addEventListener('click',()=>{anioRender();setTimeout(()=>{const w=$('an-wrap'),l=ROWS[ROWS.length-1];if(l)w.scrollLeft=Math.max(0,(+nextSlot(l.d,l.s).date.slice(5,7)-2)*2*47);},0);});
 
-$('ac-grid').onclick=e=>{const td=e.target&&e.target.closest?e.target.closest('td[data-n]'):null;if(td){AC_SEL=AC_SEL===td.dataset.n?'':td.dataset.n;$('ac-q').value=AC_SEL;acRender();}};
-$('ac-q').oninput=()=>{const v=$('ac-q').value.replace(/\D/g,'').slice(0,2);AC_SEL=v.length===2?v:'';acRender();};
-document.querySelector('#nav button[data-t="anc"]').addEventListener('click',()=>{acRender();setTimeout(()=>{const w=$('ac-wrap'),l=ROWS[ROWS.length-1];if(l){const q=nextSlot(l.d,l.s),p=acPos(q.date,q.session);w.scrollLeft=Math.max(0,(p.c-2)*50);w.scrollTop=Math.max(0,(p.r-5)*27);}},0);});
+$('cn-grid').onclick=e=>{const td=e.target&&e.target.closest?e.target.closest('td[data-n]'):null;if(td){AC_SEL=AC_SEL===td.dataset.n?'':td.dataset.n;$('cn-q').value=AC_SEL;acRender();}};
+$('cn-q').oninput=()=>{const v=$('cn-q').value.replace(/\D/g,'').slice(0,2);AC_SEL=v.length===2?v:'';acRender();};
+document.querySelector('#nav button[data-t="anc"]').addEventListener('click',()=>{acRender();setTimeout(()=>{const w=$('cn-wrap'),l=ROWS[ROWS.length-1];if(l){const q=nextSlot(l.d,l.s),p=acPos(q.date,q.session);w.scrollLeft=Math.max(0,(p.c-2)*50);w.scrollTop=Math.max(0,(p.r-5)*27);}},0);});
+
+$('prio-b').textContent=PRIO_ON?'Activado':'Desactivado';
+$('prio-b').onclick=()=>{PRIO_ON=!PRIO_ON;store('fpa_prio',PRIO_ON?1:0);$('prio-b').textContent=PRIO_ON?'Activado':'Desactivado';render();};
 
 // ---- Aviso cuando se activa una cadena o un patrón ----
 var AV_SIG=null,AV_NEW=false,AV_HIDE='',AV_ALL='';
@@ -1218,6 +1249,8 @@ function avisoRender(){try{
       if(C.G.length)it.push({l:1,t:'Dígito consecutivo para <b>'+S.l1+'</b>: '+C.G.map(x=>(x.k==='T'?'terminal ':'decena ')+x.dig).join(', ')+' (3 sorteos seguidos)'});}
     }
   const A2=AC_ST;if(A2){[[A2.P1,A2.l1],[A2.P2,A2.l2]].forEach(a=>{const P=a[0]||[];if(P.length)it.push({l:2,c2:true,t:'Patrón en línea (Año consecutivo) para <b>'+a[1]+'</b>: <b>'+[...new Set(P.map(x=>x.v))].join(', ')+'</b>'});});
+    [[A2.R1,A2.l1],[A2.R2,A2.l2]].forEach(a=>{const R=a[0]||[];if(R.length)it.push({l:R.some(x=>x.len===3)?2:1,c2:true,t:'Número repetido en línea (Año consecutivo) para <b>'+a[1]+'</b>: <b>'+[...new Set(R.map(x=>x.v))].join(', ')+'</b>'});});
+    [[A2.V1,A2.l1],[A2.V2,A2.l2]].forEach(a=>{const V=a[0]||[];if(V.length)it.push({l:1,c2:true,t:'Viraje en línea (Año consecutivo) para <b>'+a[1]+'</b>: <b>'+[...new Set(V.map(x=>x.v))].join(', ')+'</b> (viraje de '+[...new Set(V.map(x=>x.w))].join(', ')+')'});});
     [[A2.G1,A2.l1],[A2.G2,A2.l2]].forEach(a=>{const G=a[0]||[];if(G.length)it.push({l:1,c2:true,t:'Dígito en línea (Año consecutivo) para <b>'+a[1]+'</b>: '+[...new Set(G.map(x=>(x.k==='T'?'terminal ':'decena ')+x.dig))].join(', ')});});}
   if(S){
     if(S.LD&&S.LD.length)it.push({l:1,t:'El último sorteo completó '+S.LD.length+(S.LD.length===1?' línea':' líneas')+' con el mismo paso'});
@@ -1713,7 +1746,7 @@ setTimeout(()=>{try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=47;var UPD_SHOWN=false;
+const APP_BUILD=50;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
