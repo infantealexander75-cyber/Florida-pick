@@ -41,10 +41,10 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 .chip.k{color:#7b1fa2;border-color:#7b1fa2}.pg.k{color:#7b1fa2;border-color:#7b1fa2}
 .rg{border-collapse:collapse;font-size:12px}.rg th,.rg td{border:1px solid var(--bd);padding:3px 5px;text-align:center;white-space:nowrap}.rg .nm{position:sticky;left:0;background:var(--card);text-align:left;white-space:normal;min-width:118px;z-index:1}.rg .tt{position:sticky;right:0;background:var(--card);font-weight:700;z-index:1}.rg .sb{font-size:10px;color:var(--mut);font-weight:400}.rg .gp td{background:rgba(128,128,128,.12);text-align:left;font-weight:700;font-size:11px}#nav button[data-t="ens"],#nav button[data-t="patron"]{display:none}
 </style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 45 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 47 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
-<nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="ang">Anguila</button><button data-t="dias">Días de semana</button><button data-t="anio">Año</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
+<nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="ang">Anguila</button><button data-t="dias">Días de semana</button><button data-t="anio">Año (Día/Noche)</button><button data-t="anc">Año consecutivo</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
 <main>
 <div class="warn">Herramienta de entretenimiento. Las "coincidencias" no son probabilidades de ganar. Juega solo lo que estés dispuesto a perder.</div>
 
@@ -136,6 +136,14 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 </section>
 
 
+<section id="t-anc" class="hide">
+ <div class="card"><b>Año consecutivo (todos los sorteos del año, uno tras otro)</b>
+  <p class="meth">Una columna por mes. Hacia abajo van los sorteos en orden: Día 1, Noche 1, Día 2, Noche 2… Cada casilla es el Pick 3 completo; en negrita el trasero. Los colores marcan las líneas de 3 casillas con el mismo paso, igual que en Año (Día/Noche). Toca una casilla para marcar en amarillo todas las veces que salió. Morado: el próximo sorteo.</p>
+  <div class="lg"><span style="background:#90caf9">Horizontal</span><span style="background:#a5d6a7">Vertical</span><span style="background:#ffcc80">Oblicua ↘</span><span style="background:#ce93d8">Transversal ↗</span><span style="background:#fff176">Número que predice</span></div>
+  <label>Buscar trasero</label><input id="ac-q" inputmode="numeric" maxlength="2" placeholder="Ej.: 64"><div class="msg" id="ac-sel"></div>
+  <div class="yr" id="ac-wrap"><div id="ac-grid"></div></div></div>
+ <div class="card"><b>Patrones activos (Año consecutivo)</b><p class="meth">Se actualizan solos con cada sorteo. Cuando aparece uno nuevo, también salta la alerta de arriba y el dígito activado cuenta como en Año (Día/Noche). Es seguimiento de coincidencias, no un pronóstico.</p><div id="ac-pat"></div></div>
+</section>
 <section id="t-ens" class="hide">
  <div class="card"><b>Regla fija: Ensemble (top 5 por puntaje)</b><p class="meth">Después de cada sorteo, cada número recibe un punto por cada regla que lo propone (M1/M2, Pleito, Cuarteta, Números que rodean, 1-Up/Down, Viraje, Igualdad y la transición más frecuente). Se toman los 5 con más puntos. Es seguimiento, no un pronóstico.</p><div id="en-out"></div></div>
 </section>
@@ -158,13 +166,14 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 </section>
 
 <section id="t-copia" class="hide">
+ <div class="card" id="lic-card" style="display:none"><b>Licencia</b><div class="meth" id="lic-st"></div></div>
  <div class="card"><b>Copia de seguridad</b><p class="meth">Guarda tus datos en un archivo o cópialos. Si borras los datos de Chrome o cambias de teléfono, cárgalos de nuevo aquí.</p>
   <button class="btn" id="b-dl">Descargar copia (.csv)</button><button class="btn s" id="b-show">Mostrar texto</button><button class="btn" id="b-full">Copia COMPLETA (.json)</button>
   <label>Texto de la copia (copiar o pegar aquí)</label><textarea id="ta"></textarea>
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 45</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 47</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -576,7 +585,7 @@ function render(){
   try{const bl=BASE.reduce((a,b)=>!a||ordKey(b)>ordKey(a)?b:a,null);if(l&&bl)$('hdr-data').textContent='Datos hasta: '+l.d+' '+sesName(l.s)+(ordKey(l)>ordKey(bl)?' (base '+bl.d+' '+sesName(bl.s)+' + actualizaciones)':'');}catch(e){}
   $('last').innerHTML=l?`<span class="num">${l.p3}</span> ${l.p4?'· Pick 4 <b>'+l.p4+'</b> ':''}<div class="meth">${l.d} · ${sesName(l.s)} · ${ROWS.length} sorteos en total</div>`:'Sin datos';
   ensurePred();renderCand();genRender();dwRender();renderHist();renderAcier();renderFoll();renderChain();
-  try{generarPanelPatrones();}catch(e){}try{anioRender();}catch(e){}try{chRender();}catch(e){}try{avisoRender();}catch(e){}try{redTrackRender();}catch(e){}try{corRender();}catch(e){}try{parRender();}catch(e){}try{finRender();}catch(e){}try{bingoRender();}catch(e){}
+  try{generarPanelPatrones();}catch(e){}try{anioRender();}catch(e){}try{acRender();}catch(e){}try{chRender();}catch(e){}try{avisoRender();}catch(e){}try{redTrackRender();}catch(e){}try{corRender();}catch(e){}try{parRender();}catch(e){}try{finRender();}catch(e){}try{bingoRender();}catch(e){}
 }
 let SNAP=load('fpa_snap',{});
 let ANG=load('fpa_ang',[]);
@@ -673,6 +682,7 @@ function anActive(rows,date,ses){const g={},WK={};
   for(const r of rows){WK[r.d+'|'+r.s]=r.p3.slice(1);if(r.d<'2026-01-01')continue;const m=+r.d.slice(5,7),d=+r.d.slice(8,10);if(!g[m])g[m]={};if(!g[m][d])g[m][d]={};g[m][d][r.s]=r.p3;}
   const T={},D={},put=(o,dig,why)=>{(o[dig]=o[dig]||[]).push(why);},rA=+date.slice(8,10),cA=2*(+date.slice(5,7)-1)+(ses==='EVE'?1:0);
   for(const p of anDig(g,rA,cA))put(p.k==='T'?T:D,p.dig,anName(p));
+  {const g2=acData(rows),pp=acPos(date,ses);for(const p of acDig(g2,pp.r,pp.c))put(p.k==='T'?T:D,p.dig,'Año consecutivo: '+acName(p));}
   for(const p of anWeek(WK,date,ses))put(p.k==='T'?T:D,p.dig,anName(p));
   for(const p of anDays(WK,date,ses).G)put(p.k==='T'?T:D,p.dig,anName(p));
   return{T,D};}
@@ -1044,6 +1054,52 @@ const AN_M=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','D
 function anData(){const g={};for(const r of ROWS){if(r.d<'2026-01-01')continue;const m=+r.d.slice(5,7),d=+r.d.slice(8,10);if(!g[m])g[m]={};if(!g[m][d])g[m][d]={};g[m][d][r.s]=r.p3;}return g;}
 
 const AN_DIRS=[];[1,2,3,5,7,10].forEach(k=>AN_DIRS.push([k,0]));[1,2].forEach(c=>AN_DIRS.push([0,c]));[1,2,3,5].forEach(k=>[1,2].forEach(c=>{AN_DIRS.push([k,c]);AN_DIRS.push([-k,c]);}));
+// ---- Año consecutivo: una columna por mes; hacia abajo Día 1, Noche 1, Día 2, Noche 2… ----
+const AC_DIRS=[];[1,2,3,4,5,6,7,8,10,14].forEach(k=>AC_DIRS.push([k,0]));[1,2].forEach(c=>AC_DIRS.push([0,c]));[1,2,3,5,7,14].forEach(k=>{AC_DIRS.push([k,1]);AC_DIRS.push([-k,1]);});
+var AC_SEL='',AC_ST=null;
+function acData(rows){const g={};for(const r of (rows||ROWS)){if(r.d<'2026-01-01')continue;const m=+r.d.slice(5,7),d=+r.d.slice(8,10);(g[m]=g[m]||{})[2*(d-1)+(r.s==='EVE'?2:1)]=r.p3;}return g;}
+function acCell(g,r,c){if(r<1||r>62||c<0||c>11)return null;const p=g[c+1]&&g[c+1][r];return p?p.slice(1):null;}
+function acPos(date,ses){return{r:2*(+date.slice(8,10)-1)+(ses==='EVE'?2:1),c:+date.slice(5,7)-1};}
+function acPred(g,r,c){const out=[];
+  for(const d of AC_DIRS){const a=acCell(g,r-3*d[0],c-3*d[1]),b=acCell(g,r-2*d[0],c-2*d[1]),e=acCell(g,r-d[0],c-d[1]);if(!a||!b||!e)continue;
+    const st=anStep(a,b,e);if(!st)continue;const v=((+e[0]+st[0])%10)+''+((+e[1]+st[1])%10),f=acCell(g,r-4*d[0],c-4*d[1]),q=f&&anStep(f,a,b),big=!!q&&q[0]===st[0]&&q[1]===st[1];
+    out.push({v,t:anType(d),d,st,src:big?[f,a,b,e]:[a,b,e],len:big?4:3});}
+  return out;}
+function acDig(g,r,c){const out=[];
+  for(const d of AC_DIRS){const a=acCell(g,r-3*d[0],c-3*d[1]),b=acCell(g,r-2*d[0],c-2*d[1]),e=acCell(g,r-d[0],c-d[1]);if(!a||!b||!e)continue;
+    if(a[1]===b[1]&&b[1]===e[1])out.push({k:'T',dig:e[1],t:anType(d),d,src:[a,b,e]});
+    if(a[0]===b[0]&&b[0]===e[0])out.push({k:'D',dig:e[0],t:anType(d),d,src:[a,b,e]});}
+  return out;}
+function acName(p){const d=p.d,t=p.t,k=Math.abs(d[0]);
+  if(t==='V')return k===1?'Vertical, sorteo seguido':'Vertical, cada '+k+' sorteos'+(k%2===0?' (mismo turno, cada '+(k/2)+(k===2?' día':' días')+')':'');
+  if(t==='H')return d[1]===1?'Horizontal, mismo sorteo del mes anterior':'Horizontal, mismo sorteo cada 2 meses';
+  return (t==='D'?'Oblicua ↘':'Transversal ↗')+', '+k+(k===1?' sorteo':' sorteos')+', mes anterior';}
+function acRender(){try{
+  const l=ROWS[ROWS.length-1];if(!l)return;const g=acData(),ns=nextSlot(l.d,l.s),N2=nextSlot(ns.date,ns.session),nm=+ns.date.slice(5,7),mx=Math.min(12,nm),p1=acPos(ns.date,ns.session),p2=acPos(N2.date,N2.session);
+  const P1=acPred(g,p1.r,p1.c),P2=acPred(g,p2.r,p2.c),G1=acDig(g,p1.r,p1.c),G2=acDig(g,p2.r,p2.c),pc={};
+  for(const P of [[P1,p1],[P2,p2],[G1,p1],[G2,p2]])for(const p of P[0])p.src.forEach((x,i)=>{const k=(P[1].r-(p.src.length-i)*p.d[0])+'|'+(P[1].c-(p.src.length-i)*p.d[1]);if(!pc[k])pc[k]='p'+p.t;});
+  const tg=(p,P,G)=>{const u=[...new Set(P.map(x=>x.v))],gt=[...new Set(G.filter(x=>x.k==='T').map(x=>'T'+x.dig))].concat([...new Set(G.filter(x=>x.k==='D').map(x=>'D'+x.dig))]);return{u,gt};};
+  const T1=tg(p1,P1,G1),T2=tg(p2,P2,G2);
+  let h='<table><tr><th class="dd"></th>';for(let m=1;m<=mx;m++)h+='<th>'+AN_M[m-1]+'</th>';h+='</tr>';
+  for(let r=1;r<=62;r++){const D=r%2===1;h+='<tr><td class="dd">'+Math.ceil(r/2)+(D?'D':'N')+'</td>';
+    for(let m=1;m<=mx;m++){const c=m-1,p=g[m]&&g[m][r],cl='c '+(D?'D':'N');
+      if(!p){const T=(r===p1.r&&c===p1.c)?T1:(r===p2.r&&c===p2.c)?T2:null,has=T&&(T.u.length||T.gt.length);
+        h+='<td class="'+cl+(r===p1.r&&c===p1.c?' nxt':'')+(has?' pr':'')+'"'+(has&&T.u.length?' data-n="'+T.u[0]+'"':'')+' style="font-size:11px">'+(has?(T.u.length?'→'+T.u.slice(0,2).join('/'):'')+(T.gt.length?(T.u.length?'<br>':'')+T.gt.slice(0,3).join(' '):''):'')+'</td>';continue;}
+      const t=p.slice(1);h+='<td class="'+cl+(t===AC_SEL?' sel':'')+(pc[r+'|'+c]?' '+pc[r+'|'+c]:'')+'" data-n="'+t+'"><i>'+p[0]+'</i><b>'+t+'</b></td>';}
+    h+='</tr>';}
+  const w=$('ac-wrap'),sl=w.scrollLeft,st=w.scrollTop;$('ac-grid').innerHTML=h+'</table>';w.scrollLeft=sl;w.scrollTop=st;
+  const lbl=(p,d)=>(p.r%2===1?'Día ':'Noche ')+Math.ceil(p.r/2)+' '+AN_M[+d.slice(5,7)-1];
+  const lab=(P,G,p,d)=>{const u={};P.forEach(x=>{(u[x.v]=u[x.v]||[]).push(x);});const ks=Object.keys(u).sort((a,b)=>u[b].length-u[a].length||(a<b?-1:1));
+    const gu={};G.forEach(x=>{(gu[x.k+x.dig]=gu[x.k+x.dig]||[]).push(x);});
+    return '<div class="msg"><b>'+lbl(p,d)+'</b>: '+(ks.length?ks.length+' número'+(ks.length>1?'s':''):'ningún patrón')+'</div>'+
+     (ks.length?'<div class="chips">'+ks.map(k=>'<div class="chip a">'+k+'<i>'+(pnNm(k)||'')+' ×'+u[k].length+'</i></div>').join('')+'</div>':'')+
+     ks.slice(0,6).map(k=>u[k].slice(0,3).map(x=>'<div class="cand"><span class="num" style="font-size:16px">'+x.src.join(' → ')+' ⇒ '+k+'</span><div class="meth">'+acName(x)+' · '+anSt(x.st)+(x.len===4?' · ★ 4 casillas':'')+'</div></div>').join('')).join('')+
+     (Object.keys(gu).length?'<div class="meth" style="margin:4px 0"><b>Dígitos repetidos en línea:</b></div>'+Object.keys(gu).sort((a,b)=>gu[b].length-gu[a].length).slice(0,6).map(k=>'<div class="cand"><span class="num" style="font-size:16px">'+(k[0]==='T'?'Terminal ':'Decena ')+k[1]+'</span> <b>×'+gu[k].length+'</b><div class="meth">'+gu[k][0].src.join(' → ')+' · '+acName(gu[k][0])+'</div></div>').join(''):'');};
+  AC_ST={P1,P2,G1,G2,l1:lbl(p1,ns.date),l2:lbl(p2,N2.date)};
+  $('ac-pat').innerHTML=lab(P1,G1,p1,ns.date)+lab(P2,G2,p2,N2.date);
+  if(AC_SEL){const L=[];for(const m in g)for(const r in g[m])if(g[m][r].slice(1)===AC_SEL)L.push(Math.ceil(r/2)+' '+AN_M[m-1]+(r%2===1?' Día':' Noche'));
+    $('ac-sel').innerHTML=pnTag(AC_SEL)+': salió <b>'+L.length+'</b> '+(L.length===1?'vez':'veces')+' desde enero'+(L.length?'<div class="meth">'+L.join(' · ')+'</div>':'');}else $('ac-sel').innerHTML='';
+  }catch(e){}}
 function anCell(g,r,c){const m=Math.floor(c/2)+1,s=c%2?'EVE':'MID';if(r<1||r>31||c<0||m>12)return null;const p=g[m]&&g[m][r]&&g[m][r][s];return p?p.slice(1):null;}
 function anType(d){return d[1]===0?'V':d[0]===0?'H':d[0]>0?'D':'A';}
 function anStep(a,b,e){const s1=(+b[0]-+a[0]+10)%10,s2=(+b[1]-+a[1]+10)%10;return(+e[0]===(+b[0]+s1)%10&&+e[1]===(+b[1]+s2)%10)?[s1,s2]:null;}
@@ -1144,6 +1200,10 @@ $('an-grid').onclick=e=>{const td=e.target&&e.target.closest?e.target.closest('t
 $('an-q').oninput=()=>{const v=$('an-q').value.replace(/\D/g,'').slice(0,2);AN_SEL=v.length===2?v:'';anioRender();};
 document.querySelector('#nav button[data-t="anio"]').addEventListener('click',()=>{anioRender();setTimeout(()=>{const w=$('an-wrap'),l=ROWS[ROWS.length-1];if(l)w.scrollLeft=Math.max(0,(+nextSlot(l.d,l.s).date.slice(5,7)-2)*2*47);},0);});
 
+$('ac-grid').onclick=e=>{const td=e.target&&e.target.closest?e.target.closest('td[data-n]'):null;if(td){AC_SEL=AC_SEL===td.dataset.n?'':td.dataset.n;$('ac-q').value=AC_SEL;acRender();}};
+$('ac-q').oninput=()=>{const v=$('ac-q').value.replace(/\D/g,'').slice(0,2);AC_SEL=v.length===2?v:'';acRender();};
+document.querySelector('#nav button[data-t="anc"]').addEventListener('click',()=>{acRender();setTimeout(()=>{const w=$('ac-wrap'),l=ROWS[ROWS.length-1];if(l){const q=nextSlot(l.d,l.s),p=acPos(q.date,q.session);w.scrollLeft=Math.max(0,(p.c-2)*50);w.scrollTop=Math.max(0,(p.r-5)*27);}},0);});
+
 // ---- Aviso cuando se activa una cadena o un patrón ----
 var AV_SIG=null,AV_NEW=false,AV_HIDE='',AV_ALL='';
 function avisoRender(){try{
@@ -1156,6 +1216,10 @@ function avisoRender(){try{
     [[S.G1,S.l1],[S.G2,S.l2]].forEach(a=>{const G=a[0]||[];if(G.length)it.push({l:1,t:'Dígito en línea para <b>'+a[1]+'</b>: '+[...new Set(G.map(x=>(x.k==='T'?'terminal ':'decena ')+x.dig+(x.t==='W'?(x.dd?' ('+anDT(x.dd)+')':' (columna semanal)'):'')))].join(', ')});});
     if(S.C){const C=S.C;if(C.P.length)it.push({l:C.P[0].len===4?2:1,t:'Patrón consecutivo para <b>'+S.l1+'</b>: <b>'+C.P[0].v+'</b> ('+C.P[0].src.join(' → ')+' en sorteos seguidos)'+(C.P[0].len===4?' · ★ 4 sorteos':'')});
       if(C.G.length)it.push({l:1,t:'Dígito consecutivo para <b>'+S.l1+'</b>: '+C.G.map(x=>(x.k==='T'?'terminal ':'decena ')+x.dig).join(', ')+' (3 sorteos seguidos)'});}
+    }
+  const A2=AC_ST;if(A2){[[A2.P1,A2.l1],[A2.P2,A2.l2]].forEach(a=>{const P=a[0]||[];if(P.length)it.push({l:2,c2:true,t:'Patrón en línea (Año consecutivo) para <b>'+a[1]+'</b>: <b>'+[...new Set(P.map(x=>x.v))].join(', ')+'</b>'});});
+    [[A2.G1,A2.l1],[A2.G2,A2.l2]].forEach(a=>{const G=a[0]||[];if(G.length)it.push({l:1,c2:true,t:'Dígito en línea (Año consecutivo) para <b>'+a[1]+'</b>: '+[...new Set(G.map(x=>(x.k==='T'?'terminal ':'decena ')+x.dig))].join(', ')});});}
+  if(S){
     if(S.LD&&S.LD.length)it.push({l:1,t:'El último sorteo completó '+S.LD.length+(S.LD.length===1?' línea':' líneas')+' con el mismo paso'});
   }
   try{const l1=ROWS[ROWS.length-1];if(l1){const WKs=anWK(),n1=nextSlot(l1.d,l1.s),n2=nextSlot(n1.date,n1.session);[n1,n2].forEach(ns=>{const st=dwStep(WKs,ns.date,ns.session);if(st.length)it.push({l:1,t:'Paso semanal para <b>'+DIAS[weekdayOf(ns.date)]+' '+(ns.session==='MID'?'Día':'Noche')+'</b> (pestaña Días de semana): '+[...new Set(st.map(x=>'<b>'+x.v+'</b> (cada '+x.k+(x.k===1?' semana':' semanas')+')'))].join(', ')});});}}catch(e){}
@@ -1164,12 +1228,12 @@ function avisoRender(){try{
   const sig=JSON.stringify(it.map(x=>x.t)),al=$('alerta'),bt=document.querySelector('#nav button[data-t="anio"]');
   const loud=it.filter(x=>!x.q),sigL=JSON.stringify(loud.map(x=>x.t));AV_ALL=sig;
   if(AV_SIG!==null&&sigL!==AV_SIG&&loud.length)AV_NEW=true;AV_SIG=sigL;
-  {const la=loud.filter(x=>!x.s);if(bt)bt.textContent='Año'+(la.length?(Math.max(...la.map(x=>x.l))===2?' 🔴':' 🟡'):'');}
+  {const la=loud.filter(x=>!x.s&&!x.c2);if(bt)bt.textContent='Año (Día/Noche)'+(la.length?(Math.max(...la.map(x=>x.l))===2?' 🔴':' 🟡'):'');const lb=loud.filter(x=>x.c2&&!x.s),b2=document.querySelector('#nav button[data-t="anc"]');if(b2)b2.textContent='Año consecutivo'+(lb.length?(Math.max(...lb.map(x=>x.l))===2?' 🔴':' 🟡'):'');}
   if(!it.length){al.classList.add('hide');return;}
   if(AV_HIDE===sig){al.classList.add('hide');return;}
   const mx=Math.max(...it.map(x=>x.l));
   al.style.borderLeftColor=mx===2?'#d32f2f':'#f59e0b';
-  al.innerHTML='⚠️ <b>ALERTAS ACTIVAS ('+it.length+')</b>'+it.map(x=>'<div style="margin-top:4px">'+(x.l===2?'🔴 ':'🟡 ')+x.t+'</div>').join('')+'<div><button class="btn" data-act="ver" style="padding:6px 12px;font-size:13px">Ver patrones</button><button class="btn s" data-act="x" style="padding:6px 12px;font-size:13px">Cerrar</button></div>';
+  al.innerHTML='⚠️ <b>ALERTAS ACTIVAS ('+it.length+')</b>'+it.map(x=>'<div style="margin-top:4px">'+(x.l===2?'🔴 ':'🟡 ')+x.t+'</div>').join('')+'<div><button class="btn" data-act="ver" style="padding:6px 12px;font-size:13px">Ver patrones</button>'+(it.some(x=>x.c2)?'<button class="btn s" data-act="ver2" style="padding:6px 12px;font-size:13px">Ver consecutivo</button>':'')+'<button class="btn s" data-act="x" style="padding:6px 12px;font-size:13px">Cerrar</button></div>';
   al.classList.remove('hide');
 }catch(e){}}
 function avisoSenal(){
@@ -1178,7 +1242,7 @@ function avisoSenal(){
   try{const A=new(window.AudioContext||window.webkitAudioContext)();[0,0.32].forEach(t=>{const o=A.createOscillator(),g=A.createGain();o.frequency.value=880;g.gain.value=0.2;o.connect(g);g.connect(A.destination);o.start(A.currentTime+t);o.stop(A.currentTime+t+0.22);});}catch(e){}
 }
 $('av-on').checked=load('fpa_av',true);$('av-on').onchange=()=>store('fpa_av',$('av-on').checked);
-$('alerta').onclick=e=>{const a=e.target&&e.target.dataset?e.target.dataset.act:'';if(a==='ver')document.querySelector('#nav button[data-t="anio"]').click();if(a==='x'){AV_HIDE=AV_ALL;$('alerta').classList.add('hide');}};
+$('alerta').onclick=e=>{const a=e.target&&e.target.dataset?e.target.dataset.act:'';if(a==='ver')document.querySelector('#nav button[data-t="anio"]').click();if(a==='ver2')document.querySelector('#nav button[data-t="anc"]').click();if(a==='x'){AV_HIDE=AV_ALL;$('alerta').classList.add('hide');}};
 
 // ---- Cadenas semánticas de la charada ----
 const CH_DEF='El Ciclo de la Vida: 15 16 26 08 68 78\nEl Castigo: 20 88 84 63 97\nLa Fe: 05 40 17 00\nEl Banquete: 28 54 65 49 44\nLa Persecución: 46 52 20 51 07\nLa Ruina del Dinero: 38 44 59 33\nLa Salud: 26 86 89 31\nEl Lado Oscuro: 06 36 59 66\nLa Transportación: 52 46 51\nLa Realeza y el Poder: 01 02 03\nEl Dinero y la Mujer: 38 16 54\nLa Justicia Divina: 17 08 68';
@@ -1261,7 +1325,7 @@ function csvText(){
   return t;}
 function addRows(list){for(const r of list){EXTRA=EXTRA.filter(e=>slotKey(e)!==slotKey(r));EXTRA.push(r);DEL=DEL.filter(k=>k!==slotKey(r));}const a=store('fpa_extra',EXTRA),b=store('fpa_del',DEL);return a&&b;}
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('on',x===b));
-  for(const t of ['nuevo','gen','cand','hist','consulta','dias','anio','ens','patron','copia','ang'])$('t-'+t).classList.toggle('hide',t!==b.dataset.t);});
+  for(const t of ['nuevo','gen','cand','hist','consulta','dias','anio','anc','ens','patron','copia','ang'])$('t-'+t).classList.toggle('hide',t!==b.dataset.t);});
 function flLine(t,nx){t=String(t).toUpperCase().replace(/[*_~]/g,' ');let d=nx.date,s=null;
   const p=t.match(/\[(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?,?\s*(\d{1,2}):(\d{2})\s*([AP])\.?\s*M\.?\]/);
   if(p){const y=p[3]?(p[3].length===2?'20'+p[3]:p[3]):nx.date.slice(0,4);d=y+'-'+p[2].padStart(2,'0')+'-'+p[1].padStart(2,'0');s=((+p[4]%12)+(p[6]==='P'?12:0))<17?'MID':'EVE';t=t.replace(p[0],' ');}
@@ -1477,6 +1541,39 @@ $('pf-go').onclick=pfRender;$('pf-d').onchange=pfRender;
 $('pf-out').onclick=async e=>{const b=e.target.closest('[data-pfc]');if(!b)return;const tx=PF_TX[b.getAttribute('data-pfc')];if(!tx)return;
  try{if(navigator.share){await navigator.share({text:tx});}else{await navigator.clipboard.writeText(tx);b.textContent='Copiado ✓';}}catch(er){try{await navigator.clipboard.writeText(tx);b.textContent='Copiado ✓';}catch(e2){}}};
 try{const l=ROWS[ROWS.length-1];if(l)$('pf-d').value=l.d;}catch(e){}
+// ---- Licencia por código (se activa solo si LIC_PUB tiene la clave pública; vacío = sin licencia) ----
+const LIC_PUB='';
+const LIC_EP=Date.UTC(2026,0,1),LIC_AL='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+function licUn(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return Uint8Array.from(atob(s),c=>c.charCodeAt(0));}
+function licDay(){const n=new Date();let t=Math.floor((Date.UTC(n.getFullYear(),n.getMonth(),n.getDate())-LIC_EP)/864e5),s=0;try{s=parseInt(localStorage.getItem('lic_seen')||'0',10)||0;}catch(e){}if(s>t)t=s;try{if(t>s)localStorage.setItem('lic_seen',String(t));}catch(e){}return t;}
+function licDev(){let d='';try{d=localStorage.getItem('lic_dev')||'';}catch(e){}if(!/^[A-HJ-NP-Z2-9]{8}$/.test(d)){const a=new Uint8Array(8);crypto.getRandomValues(a);d=[...a].map(x=>LIC_AL[x%32]).join('');try{localStorage.setItem('lic_dev',d);}catch(e){}}return d;}
+function licFmt(d){return d.slice(0,4)+'-'+d.slice(4);}
+async function licCheck(code){
+  if(!window.crypto||!crypto.subtle)return{ok:false,msg:'Este teléfono no permite verificar la licencia aquí.'};
+  let raw;try{raw=licUn(code.replace(/\s+/g,''));}catch(e){return{ok:false,msg:'El código está dañado. Cópialo completo.'};}
+  if(raw.length!==74)return{ok:false,msg:'El código está incompleto o dañado. Cópialo completo.'};
+  const pay=raw.slice(0,10),sig=raw.slice(10);
+  const key=await crypto.subtle.importKey('raw',licUn(LIC_PUB),{name:'ECDSA',namedCurve:'P-256'},false,['verify']);
+  if(!(await crypto.subtle.verify({name:'ECDSA',hash:'SHA-256'},key,sig,pay)))return{ok:false,msg:'Código no válido.'};
+  if(String.fromCharCode(...pay.slice(0,8))!==licDev())return{ok:false,msg:'Este código es de otro equipo.'};
+  const e=(pay[8]<<8)|pay[9];
+  if(e!==65535&&licDay()>e)return{ok:false,msg:'Esta licencia venció. Pide un código nuevo.',exp:e};
+  return{ok:true,exp:e};}
+function licStatus(r){const c=$('lic-card');if(!c)return;if(!r||!r.ok){c.style.display='none';return;}c.style.display='';
+  $('lic-st').textContent=(r.exp===65535?'Permanente.':'Activa hasta '+new Date(LIC_EP+r.exp*864e5).toISOString().slice(0,10)+' (quedan '+Math.max(0,r.exp-licDay())+' días).')+' ID del equipo: '+licFmt(licDev())+'.';}
+function licShow(msg){let o=document.getElementById('lic-ov');
+  if(!o){o=document.createElement('div');o.id='lic-ov';o.style.cssText='position:fixed;inset:0;z-index:99999;background:#5b36b3;color:#fff;overflow:auto;padding:24px 18px;font-family:system-ui,Arial,sans-serif';
+    o.innerHTML='<div style="max-width:460px;margin:30px auto"><h2 style="margin:0 0 6px">Activar la aplicación</h2><div style="opacity:.9;margin-bottom:18px">Manda este ID a quien te dio la aplicación y te devolverá un código.</div>'+
+    '<div style="background:#fff;color:#1a1a2e;border-radius:14px;padding:16px;text-align:center"><div style="font-size:13px;color:#5f6377">ID del equipo</div><div id="lic-id" style="font-size:32px;font-weight:800;letter-spacing:3px;margin:4px 0 8px"></div><button id="lic-cp" style="background:#fff;color:#5b36b3;border:1px solid #5b36b3;border-radius:10px;padding:9px 16px;font-size:15px;font-weight:600">Copiar ID</button></div>'+
+    '<div style="margin:18px 0 6px">Pega aquí el código que recibiste:</div><textarea id="lic-in" style="width:100%;min-height:90px;border-radius:10px;border:0;padding:10px;font:13px ui-monospace,Consolas,monospace;box-sizing:border-box"></textarea>'+
+    '<button id="lic-go" style="margin-top:10px;background:#ffd54f;color:#1a1a2e;border:0;border-radius:10px;padding:12px 22px;font-size:16px;font-weight:700">Activar</button><div id="lic-m" style="margin-top:14px;font-weight:600;min-height:22px"></div></div>';
+    document.body.appendChild(o);$('lic-id').textContent=licFmt(licDev());
+    $('lic-cp').onclick=async()=>{try{await navigator.clipboard.writeText(licFmt(licDev()));$('lic-m').textContent='ID copiado.';}catch(e){$('lic-m').textContent='Mantén pulsado el ID para copiarlo.';}};
+    $('lic-go').onclick=async()=>{const m=$('lic-m');try{const r=await licCheck($('lic-in').value);if(r.ok){try{localStorage.setItem('lic_code',$('lic-in').value.replace(/\s+/g,''));}catch(e){}o.remove();licStatus(r);}else m.textContent=r.msg;}catch(e){m.textContent='No se pudo verificar el código.';}};}
+  o.style.display='';$('lic-m').textContent=msg||'';}
+async function licInit(){if(!LIC_PUB)return;try{let c='';try{c=localStorage.getItem('lic_code')||'';}catch(e){}
+  if(!c){licShow('');return;}const r=await licCheck(c);if(r.ok){const o=document.getElementById('lic-ov');if(o)o.remove();licStatus(r);}else licShow(r.msg);}catch(e){licShow('No se pudo verificar la licencia.');}}
+licInit();document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')licInit();});
 $('q-n').oninput=()=>{const t=$('q-n').value.replace(/\D/g,'');if(!t){$('q-out').innerHTML='';return;}
   const n=t.padStart(2,'0'),v=x=>x==null?[]:(typeof x==='string'?[x]:x.filter(y=>y&&y!=='?'&&/^\d\d$/.test(y)));
   const dk=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date().getDay()],dkn={Mon:'lunes',Tue:'martes',Wed:'miércoles',Thu:'jueves',Fri:'viernes',Sat:'sábado',Sun:'domingo'}[dk];
@@ -1608,7 +1705,7 @@ function ofInit(){try{const l=ROWS[ROWS.length-1],dt=l?parseDate(nextSlot(l.d,l.
   [1,2,3,4,5,6,0].forEach(i=>a+='<option value="'+i+'">'+DN[i]+'</option>');['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'].forEach((x,i)=>b+='<option value="'+(i+1)+'">'+x+'</option>');
   $('of-w').innerHTML=a;$('of-m').innerHTML=b;$('of-w').value=dt.getUTCDay();$('of-m').value=dt.getUTCMonth()+1;$('of-t').value=l?(nextSlot(l.d,l.s).session==='EVE'?1:0):2;$('of-w').onchange=$('of-m').onchange=$('of-t').onchange=ofRender;ofRender();}catch(e){showErr(e,'consulta histórica');}}
 angInit();ofInit();try{renderChain();}catch(e){}try{avisoRender();}catch(e){}
-function selfCheck(){const T=[['lista de 100',()=>{const r=genList();if(!r||new Set(r.all.map(x=>x.n)).size!==100)throw new Error('la lista no tiene 100 números distintos');}],['tabla de reglas',()=>{ruleGrid().forEach(x=>{if(x.h>x.n)throw new Error(x.nm+': aciertos > sorteos');});}],['corridos',()=>{corRender();}],['parlés del día',()=>{parRender();}],['pronóstico para compartir',()=>{finRender();}],['pestaña Año',()=>{anioRender();}],['consulta histórica',()=>{const S=ofStats();if(S.W[2].reduce((a,g)=>a+g.n,0)!==OFI.s.length/3)throw new Error('faltan sorteos');shInfo();}]];
+function selfCheck(){const T=[['lista de 100',()=>{const r=genList();if(!r||new Set(r.all.map(x=>x.n)).size!==100)throw new Error('la lista no tiene 100 números distintos');}],['tabla de reglas',()=>{ruleGrid().forEach(x=>{if(x.h>x.n)throw new Error(x.nm+': aciertos > sorteos');});}],['corridos',()=>{corRender();}],['parlés del día',()=>{parRender();}],['pronóstico para compartir',()=>{finRender();}],['pestaña Año',()=>{anioRender();}],['pestaña Año consecutivo',()=>{acRender();}],['consulta histórica',()=>{const S=ofStats();if(S.W[2].reduce((a,g)=>a+g.n,0)!==OFI.s.length/3)throw new Error('faltan sorteos');shInfo();}]];
   T.forEach(([n,f])=>{try{f();}catch(e){showErr(e,'Autoprueba «'+n+'»');}});}
 setTimeout(selfCheck,900);
 var SEP_ON='';
@@ -1616,7 +1713,7 @@ setTimeout(()=>{try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=45;var UPD_SHOWN=false;
+const APP_BUILD=47;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
