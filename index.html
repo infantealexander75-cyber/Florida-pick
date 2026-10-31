@@ -44,7 +44,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 .yr td.pVi{outline:2px dashed #1e88e5;outline-offset:-2px}
 .yr td.pR.pVi{outline:2px solid #e53935;box-shadow:inset 0 0 0 4px #1e88e5}
 </style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 51 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 52 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="ang">Anguila</button><button data-t="dias">Días de semana</button><button data-t="anio">Año (Día/Noche)</button><button data-t="anc">Año consecutivo</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
@@ -178,7 +178,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 51</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 52</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -828,8 +828,8 @@ function genList(){
     anDays(anWK(),n.date,n.session).P.forEach(p=>{(pat[p.v]=pat[p.v]||[]).push(anDT(p.dd));});}catch(e){showErr(e,'patrones del año');}
   const all=[];
   const yhas=x=>x&&x.items.some(q=>String(q[0]).indexOf('Patrón del año')===0);
-  for(let i=0;i<100;i++){const k=p2(i),P=pr.B.includes(k)?1:0,x=cm.get(k),Cn=x?x.nm/mx:0,T=0,E=ens.has(k)?1:0,U=um.has(k)?um.get(k)/mu:(ahs.has(k)?1/mu:0),Y=yhas(x)?1:0;
-    all.push({n:k,sc:5*P+4*Cn+3*T+2*E+U+2.5*Y,f:[P?'P':'',x?'C':'',T?'T':'',E?'E':'',um.has(k)?'U':'',ahs.has(k)?'A':'',Y?'Y':''].join(''),cn:x?x.nm:0,cs:x?x.score:0});}
+  for(let i=0;i<100;i++){const k=p2(i),P=pr.B.includes(k)?1:0,x=cm.get(k),Cn=x?x.nm/mx:0,T=0,E=ens.has(k)?1:0,U=0,Y=yhas(x)?1:0;
+    all.push({n:k,sc:5*P+4*Cn+3*T+2*E+U+2.5*Y,f:[P?'P':'',x?'C':'',T?'T':'',E?'E':'','','',Y?'Y':''].join(''),cn:x?x.nm:0,cs:x?x.score:0});}
   all.sort((a,b)=>b.sc-a.sc||b.cn-a.cn||b.cs-a.cs||(a.n<b.n?-1:1));
   const cad={};try{const cc=chainNow(ROWS);if(cc&&cc.list)cc.list.forEach(x=>{(cad[x.n]=cad[x.n]||[]).push(cc.a+'→'+cc.b+' ('+x.d+')');});}catch(e){showErr(e,'cadena en el pronóstico');}
   const fol={};try{folSummary(followersTable(ROWS)[base]||[]).forEach(e=>{fol[e[0]]=e[1];});}catch(e){showErr(e,'seguidores en el pronóstico');}
@@ -846,7 +846,7 @@ function genRender(){try{
   const cs=r.c.slice().sort((a,b)=>b.nm-a.nm||b.score-a.score).slice(0,12).map(x=>x.n+'('+x.nm+')').join(' ');
   const TP=finGet(r).l,TPS=new Set(TP.map(x=>x.n)),RS=r.all.filter(x=>!TPS.has(x.n)),RV=RS.filter(x=>/[KRHS]/.test(x.f)),RN=RS.filter(x=>!/[KRHS]/.test(x.f));
   $('gen-out').innerHTML=
-   '<div class="msg">Para el sorteo: <b>'+r.n.date+' ('+DIAS[r.wd]+') · '+sesName(r.n.session)+'</b><div class="meth">Último trasero '+r.base+'. El TOP lleva 20 números: primero los de la cadena, los corridos, los seguidores y los activados en el Año (sin repetir), y se completa hasta 20 con lo que más coinciden las demás fuentes (Pronóstico, Candidatos, Ensemble, Patrones del año, Tablas, decena y terminal más fuertes). Las letras de cada número dicen qué fuentes lo traen: P Pronóstico, C Candidatos, E Ensemble, U Tablas, A Ahorcado, Y Patrón del año, D Decena fuerte, N Terminal fuerte, I Igualdad (va de primera), B Tabla Abue (vecino del último trasero; solo en el consecutivo), K Corrido, S Seguidor (número que salió después de este último trasero), G Anguila (salió en Anguila en esta sesión; en la Noche las horas fuertes ('+angHN(ANG_FUERTE.EVE)+') entran primero y las demás pesan poco; en el Día solo marca y la '+angHN(ANG_FUERTE.MID)+' ayuda a desempatar), H Cadena (número que salió después de esta misma cadena), R Patrón activo del calendario (número que sale en un patrón activado), Q Tabla de las que más acertaron este año (ver abajo; solo ayuda a completar el Top, no desplaza a los de K, S, H, R y G). Los de K, S, H y R (y en la Noche los de Anguila de las '+angHN(ANG_FUERTE.EVE)+') entran siempre al Top, hasta el tope de 20.</div></div>'+
+   '<div class="msg">Para el sorteo: <b>'+r.n.date+' ('+DIAS[r.wd]+') · '+sesName(r.n.session)+'</b><div class="meth">Último trasero '+r.base+'. El TOP lleva 20 números: primero los de la cadena, los corridos, los seguidores y los activados en el Año (sin repetir), y se completa hasta 20 con lo que más coinciden las demás fuentes (Pronóstico, Candidatos, Ensemble, Patrones del año, Tablas, decena y terminal más fuertes). Las letras de cada número dicen qué fuentes lo traen: P Pronóstico, C Candidatos, E Ensemble, Y Patrón del año, Z decena y terminal activados en el Año, z terminal activado en el Año (estos van de primeros, hasta 8), D Decena fuerte, N Terminal fuerte, I Igualdad (va de primera), B Tabla Abue (vecino del último trasero; solo en el consecutivo), K Corrido, S Seguidor (número que salió después de este último trasero), G Anguila (salió en Anguila en esta sesión; en la Noche las horas fuertes ('+angHN(ANG_FUERTE.EVE)+') entran primero y las demás pesan poco; en el Día solo marca y la '+angHN(ANG_FUERTE.MID)+' ayuda a desempatar), H Cadena (número que salió después de esta misma cadena), R Patrón activo del calendario (número que sale en un patrón activado), Q Tabla de las que más acertaron este año (ver abajo; solo ayuda a completar el Top, no desplaza a los de K, S, H, R y G). Los de K, S, H y R (y en la Noche los de Anguila de las '+angHN(ANG_FUERTE.EVE)+') entran siempre al Top, hasta el tope de 20.</div></div>'+
    (r.qInfo||'')+'<div class="pg r">TOP · Rojo · del 1 al 10</div>'+g(TP.slice(0,10),'r')+(TP.length>10?'<div class="pg a">TOP · Azul · del 11 al '+TP.length+'</div>'+g(TP.slice(10),'a'):'')+(RV.length?'<div class="pg k">Violeta · fijos, seguidores, patrones o cadena que no caben en el tope de 20 ('+RV.length+')</div>'+g(RV,'k'):'')+'<div class="pg">Negro · el resto</div>'+g(RN,'n')+
    '<div class="msg"><b>Por fuente</b></div>'+
    '<div class="meth"><b>1 · Pronóstico:</b> '+(r.pr.B.join(' · ')||'—')+(r.pr.D!==undefined&&r.pr.D!==''?' · decena '+r.pr.D+' · terminal '+r.pr.T:'')+'</div>'+
@@ -929,7 +929,7 @@ function parRender(){try{const l=ROWS[ROWS.length-1],r=genList();if(!l||!r)retur
   }catch(e){showErr(e,'parlés del día');}}
 // ---- Pronóstico para compartir: fijos de corridos y cadena primero, luego por coincidencias entre reglas; se congela al compartir ----
 var FROZEN=load('fpa_frozen',{});
-const FC_BUILD=3,FC_N=20,FC_MAX=20,FC_W={P:1,E:1.25,U:1,A:1,Y:1.5},FC_NOM={I:'Igualdad',B:'Tabla Abue',P:'Pronóstico',C:'Candidatos',E:'Ensemble',U:'Tablas',A:'Ahorcado',Y:'Patrón del año',K:'Corrido → fijo',S:'Seguidor',H:'Cadena',R:'Patrón del calendario',D:'Decena fuerte',N:'Terminal fuerte',Q:'Tablas con más acierto del año',M:'Único del mes anterior',O:'Regla de 11','★':'Candidato prioritario'};
+const FC_BUILD=3,FC_N=20,FC_MAX=20,FC_W={P:1,E:1.25,U:1,A:1,Y:1.5},FC_NOM={I:'Igualdad',B:'Tabla Abue',P:'Pronóstico',C:'Candidatos',E:'Ensemble',U:'Tablas',A:'Ahorcado',Y:'Patrón del año',K:'Corrido → fijo',S:'Seguidor',H:'Cadena',R:'Patrón del calendario',D:'Decena fuerte',N:'Terminal fuerte',Q:'Tablas con más acierto del año',M:'Único del mes anterior',O:'Regla de 11','★':'Candidato prioritario',Z:'Decena y terminal activados en el Año',z:'Terminal activado en el Año'};
 // ---- Orden lógico del Top: cada regla pesa según lo que acertó en TODO el historial 2010-oct 2026 (con prudencia, k=150), no según un solo año. Pesos fijos de esta versión. ----
 var LOGIC=true,LAST_G=null,PRIO_ON=load('fpa_prio',1)!==0,PRIO_PAT=load('fpa_priopat',1)!==0;
 const LM_FIX={"C":{"Pleito":1,"M1/M2":1,"Cuarteta":1.0744,"Rodean":1,"Vibración":1,"Compañeros":1.046,"Viraje":1,"Regla II":1,"Maravillosa":1,"Mariposas":1,"Antonio":1,"Igualdad":1.0666,"Valor":1,"Pares":1,"Tabla fundamental":1,"Tabla Abue":1.0763,"1-Up/Down":1},"MID":{"Pleito":0.9594,"M1/M2":1.0454,"Cuarteta":0.9923,"Rodean":1.0539,"Vibración":0.9932,"Compañeros":1.0168,"Viraje":0.9912,"Regla II":0.9452,"Maravillosa":1.0321,"Mariposas":0.9973,"Antonio":0.9732,"Igualdad":1.0169,"Valor":0.9791,"Pares":1.0399,"Tabla fundamental":1.0019,"Tabla Abue":1,"1-Up/Down":1.0286},"EVE":{"Pleito":0.9547,"M1/M2":1.0264,"Cuarteta":1.0051,"Rodean":0.9681,"Vibración":0.9655,"Compañeros":0.9993,"Viraje":1.0042,"Regla II":1.0338,"Maravillosa":1.0352,"Mariposas":1.0372,"Antonio":0.9836,"Igualdad":1.0501,"Valor":1.0406,"Pares":1.0193,"Tabla fundamental":0.9881,"Tabla Abue":1,"1-Up/Down":0.9074}};
@@ -948,14 +948,27 @@ function uniNext(rows,date){const none={set:new Set(),m:1};
 function logicScores(r){const M=logicMult(),mu=M.mu,src=M.src,qf=qCalc(ROWS).f,sc={};
   for(let i=0;i<100;i++)sc[p2(i)]=0;
   for(const nm in qf){const m=mu[nm];if(!m||m===1)continue;const ln=Math.log(m);for(const z of qf[nm](r.base,r.wd))if(sc[z]!==undefined)sc[z]+=ln;}
-  const si=shInfo(),pe=new Set(r.pr.B||[]),en=new Set(r.en||[]),um=new Set((r.un||[]).map(e=>e[0])),ah=new Set(r.ah||[]);const uq=uniNext(ROWS,r.n.date);r.uq=uq.set;
-  for(const k in sc){let v=0;if(pe.has(k))v+=Math.log(src.P);if(en.has(k))v+=Math.log(src.E);if(um.has(k))v+=Math.log(src.U);if(ah.has(k))v+=Math.log(src.A);if(String(si.d)===k[0])v+=Math.log(src.D);if(String(si.t)===k[1])v+=Math.log(src.N);if(uq.set.has(k))v+=Math.log(uq.m);sc[k]+=v;}
+  const si=shInfo(),pe=new Set(r.pr.B||[]),en=new Set(r.en||[]),um=new Set((r.un||[]).map(e=>e[0])),ah=new Set(r.ah||[]);const uq=uniNext(ROWS,r.n.date);r.uq=new Set();
+  for(const k in sc){let v=0;if(pe.has(k))v+=Math.log(src.P);if(en.has(k))v+=Math.log(src.E);if(um.has(k))v+=Math.log(src.U);if(ah.has(k))v+=Math.log(src.A);if(String(si.d)===k[0])v+=Math.log(src.D);if(String(si.t)===k[1])v+=Math.log(src.N);sc[k]+=v;}
   let Z=0;const p={};for(const k in sc)Z+=Math.exp(.5*sc[k]);for(const k in sc)p[k]=Math.exp(.5*sc[k])/Z;return{sc,p};} // probabilidad: se usa la mitad de la evidencia (en la prueba hacia adelante con 10,818 sorteos fue lo más cercano a la realidad)
+var ACT_CAP=8,ACT_AFTER=0;
+// ---- Activados del Año al Top: (0) decena Y terminal activados a la vez; (1) terminal activado por el Año consecutivo o por 2+ reglas; (2) terminal activado con un solo terminal activo ese sorteo. Medido en 2026: 5 de 79 / 1.9x / 1.66x el azar. Máximo ACT_CAP números; dentro de cada grupo, los de mejor puntaje del Lógico ----
+function actPick(r,LS){try{const n=r.n,a=anActive(ROWS,n.date,n.session),T=Object.keys(a.T),cand=[];
+  const strong=t=>(a.T[t]||[]).length>=2||(a.T[t]||[]).some(s=>s.indexOf('Año consecutivo')===0);
+  for(let i=0;i<100;i++){const k=p2(i),d=k[0],t=k[1];
+    if(a.D[d]&&a.T[t])cand.push({n:k,tier:0});else if(a.T[t]&&(strong(t)||T.length===1))cand.push({n:k,tier:strong(t)?1:2});}
+  cand.sort((x,y)=>x.tier-y.tier||(LS.sc[y.n]-LS.sc[x.n])||(x.n<y.n?-1:1));
+  return cand.slice(0,ACT_CAP);}catch(e){return[];}}
 function finLogic(r,LS){const ix=new Map(r.all.map((x,i)=>[x.n,i])),eq=(r.base&&T.EQUALITY&&T.EQUALITY[r.base])||'',abn=(!SEP_ON&&r.base&&ABUE[r.base])||[],si=shInfo(),r11c=new Set();
   const lst=r.all.slice().sort((a,b)=>LS.sc[b.n]-LS.sc[a.n]||ix.get(a.n)-ix.get(b.n)).slice(0,FC_N).map(x=>({n:x.n,f:x.f+(x.n===eq?'I':'')+(abn.indexOf(x.n)>=0?'B':'')+(String(si.d)===x.n[0]?'D':'')+(String(si.t)===x.n[1]?'N':'')+(r.uq&&r.uq.has(x.n)?'M':'')+(r11c.has(x.n)?'O':'')}));
-  const pr=prioPick(r,lst);if(!pr.length)return lst;
-  const byN=new Map(lst.map(x=>[x.n,x])),allm=new Map(r.all.map(x=>[x.n,x]));
-  return pr.map(n=>({n:n,f:((byN.get(n)||allm.get(n)||{f:''}).f||'')+'★'})).concat(lst.filter(x=>pr.indexOf(x.n)<0)).slice(0,FC_N);}
+  const pr=prioPick(r,lst),ap=actPick(r,LS);if(!pr.length&&!ap.length)return lst;
+  const byN=new Map(lst.map(x=>[x.n,x])),allm=new Map(r.all.map(x=>[x.n,x])),seen=new Set(),out=[];
+  const put=(n,extra)=>{if(seen.has(n))return;seen.add(n);const b=byN.get(n)||allm.get(n)||{f:''};out.push({n:n,f:(b.f||'')+extra});};
+  pr.forEach(n=>put(n,'★'));
+  lst.slice(0,ACT_AFTER).forEach(x=>put(x.n,''));
+  ap.forEach(x=>put(x.n,x.tier===0?'Z':'z'));
+  lst.forEach(x=>put(x.n,''));
+  return out.slice(0,FC_N);}
 // ---- Candidatos prioritarios: (1) hasta 3 números de los patrones de Año consecutivo (primero los que también salen en Año); (2) repetidos de los últimos 3 sorteos que están en el Top o en alguna regla (máx. 4); (3) el número que dan a la vez 'Números que rodean' y 'Consecuente'. Van de primeros (en rojo) ----
 function patPick(r){try{const n=r.n;if(!n||!n.date)return[];const gC=acData(ROWS),pp=acPos(n.date,n.session),cnt={};
     for(const x of [...acPred(gC,pp.r,pp.c),...acRep(gC,pp.r,pp.c),...acVir(gC,pp.r,pp.c)])cnt[x.v]=(cnt[x.v]||0)+1;
@@ -1755,7 +1768,7 @@ setTimeout(()=>{try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=51;var UPD_SHOWN=false;
+const APP_BUILD=52;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
