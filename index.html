@@ -44,7 +44,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 .yr td.pVi{outline:2px dashed #1e88e5;outline-offset:-2px}
 .yr td.pR.pVi{outline:2px solid #e53935;box-shadow:inset 0 0 0 4px #1e88e5}
 </style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 50 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 51 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="ang">Anguila</button><button data-t="dias">Días de semana</button><button data-t="anio">Año (Día/Noche)</button><button data-t="anc">Año consecutivo</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
@@ -169,7 +169,8 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 </section>
 
 <section id="t-copia" class="hide">
- <div class="card"><b>Candidatos prioritarios</b><p class="meth">Pasan de primeros en el Top (en rojo): los repetidos de los últimos 3 sorteos que ya están en el Top o en alguna regla, y el número que dan a la vez «Números que rodean» y «Consecuente». Máximo 4.</p><button class="btn s" id="prio-b" style="padding:6px 14px;font-size:14px"></button></div>
+ <div class="card"><b>Candidatos prioritarios</b><p class="meth">Pasan de primeros en el Top (en rojo, con ★). <b>Patrones:</b> hasta 3 números de Año consecutivo; van primero los que también salen en Año (Día/Noche). <b>Repetidos:</b> los de los últimos 3 sorteos que ya están en el Top o en alguna regla, y el número que dan a la vez «Números que rodean» y «Consecuente» (máx. 4).</p>
+  <button class="btn s" id="pat-b" style="padding:6px 14px;font-size:14px"></button> <button class="btn s" id="prio-b" style="padding:6px 14px;font-size:14px"></button></div>
  <div class="card" id="lic-card" style="display:none"><b>Licencia</b><div class="meth" id="lic-st"></div></div>
  <div class="card"><b>Copia de seguridad</b><p class="meth">Guarda tus datos en un archivo o cópialos. Si borras los datos de Chrome o cambias de teléfono, cárgalos de nuevo aquí.</p>
   <button class="btn" id="b-dl">Descargar copia (.csv)</button><button class="btn s" id="b-show">Mostrar texto</button><button class="btn" id="b-full">Copia COMPLETA (.json)</button>
@@ -177,7 +178,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 50</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 51</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -930,7 +931,7 @@ function parRender(){try{const l=ROWS[ROWS.length-1],r=genList();if(!l||!r)retur
 var FROZEN=load('fpa_frozen',{});
 const FC_BUILD=3,FC_N=20,FC_MAX=20,FC_W={P:1,E:1.25,U:1,A:1,Y:1.5},FC_NOM={I:'Igualdad',B:'Tabla Abue',P:'Pronóstico',C:'Candidatos',E:'Ensemble',U:'Tablas',A:'Ahorcado',Y:'Patrón del año',K:'Corrido → fijo',S:'Seguidor',H:'Cadena',R:'Patrón del calendario',D:'Decena fuerte',N:'Terminal fuerte',Q:'Tablas con más acierto del año',M:'Único del mes anterior',O:'Regla de 11','★':'Candidato prioritario'};
 // ---- Orden lógico del Top: cada regla pesa según lo que acertó en TODO el historial 2010-oct 2026 (con prudencia, k=150), no según un solo año. Pesos fijos de esta versión. ----
-var LOGIC=true,LAST_G=null,PRIO_ON=load('fpa_prio',1)!==0;
+var LOGIC=true,LAST_G=null,PRIO_ON=load('fpa_prio',1)!==0,PRIO_PAT=load('fpa_priopat',1)!==0;
 const LM_FIX={"C":{"Pleito":1,"M1/M2":1,"Cuarteta":1.0744,"Rodean":1,"Vibración":1,"Compañeros":1.046,"Viraje":1,"Regla II":1,"Maravillosa":1,"Mariposas":1,"Antonio":1,"Igualdad":1.0666,"Valor":1,"Pares":1,"Tabla fundamental":1,"Tabla Abue":1.0763,"1-Up/Down":1},"MID":{"Pleito":0.9594,"M1/M2":1.0454,"Cuarteta":0.9923,"Rodean":1.0539,"Vibración":0.9932,"Compañeros":1.0168,"Viraje":0.9912,"Regla II":0.9452,"Maravillosa":1.0321,"Mariposas":0.9973,"Antonio":0.9732,"Igualdad":1.0169,"Valor":0.9791,"Pares":1.0399,"Tabla fundamental":1.0019,"Tabla Abue":1,"1-Up/Down":1.0286},"EVE":{"Pleito":0.9547,"M1/M2":1.0264,"Cuarteta":1.0051,"Rodean":0.9681,"Vibración":0.9655,"Compañeros":0.9993,"Viraje":1.0042,"Regla II":1.0338,"Maravillosa":1.0352,"Mariposas":1.0372,"Antonio":0.9836,"Igualdad":1.0501,"Valor":1.0406,"Pares":1.0193,"Tabla fundamental":0.9881,"Tabla Abue":1,"1-Up/Down":0.9074}};
 function logicMult(){const mu=LM_FIX[SEP_ON||'C']||LM_FIX.C,src=SEP_ON?{P:1.014,E:.992,U:1.006,A:1.012,D:.995,N:1.041}:{P:.98,E:1,U:.995,A:.995,D:1.033,N:.99};return{mu,src};}
 // ---- Únicos del mes anterior como fuente del Lógico: pesan según lo que acertaron desde 06-oct Noche (con prudencia, k=150) ----
@@ -955,15 +956,22 @@ function finLogic(r,LS){const ix=new Map(r.all.map((x,i)=>[x.n,i])),eq=(r.base&&
   const pr=prioPick(r,lst);if(!pr.length)return lst;
   const byN=new Map(lst.map(x=>[x.n,x])),allm=new Map(r.all.map(x=>[x.n,x]));
   return pr.map(n=>({n:n,f:((byN.get(n)||allm.get(n)||{f:''}).f||'')+'★'})).concat(lst.filter(x=>pr.indexOf(x.n)<0)).slice(0,FC_N);}
-// ---- Candidatos prioritarios: (1) repetidos de los últimos 3 sorteos que están en el Top o en alguna regla; (2) el número que dan a la vez 'Números que rodean' y 'Consecuente'. Van de primeros (en rojo) ----
-function prioPick(r,lst){if(!PRIO_ON||SEP_ON)return[];const out=[],add=n=>{if(n&&out.indexOf(n)<0)out.push(n);};
+// ---- Candidatos prioritarios: (1) hasta 3 números de los patrones de Año consecutivo (primero los que también salen en Año); (2) repetidos de los últimos 3 sorteos que están en el Top o en alguna regla (máx. 4); (3) el número que dan a la vez 'Números que rodean' y 'Consecuente'. Van de primeros (en rojo) ----
+function patPick(r){try{const n=r.n;if(!n||!n.date)return[];const gC=acData(ROWS),pp=acPos(n.date,n.session),cnt={};
+    for(const x of [...acPred(gC,pp.r,pp.c),...acRep(gC,pp.r,pp.c),...acVir(gC,pp.r,pp.c)])cnt[x.v]=(cnt[x.v]||0)+1;
+    const AN=new Set();try{const gA=anData(),rr=+n.date.slice(8,10),cc=2*(+n.date.slice(5,7)-1)+(n.session==='EVE'?1:0);anPred(gA,rr,cc).forEach(x=>AN.add(x.v));anDays(anWK(),n.date,n.session).P.forEach(x=>AN.add(x.v));}catch(e){}
+    return Object.keys(cnt).sort((a,b)=>(AN.has(b)?1:0)-(AN.has(a)?1:0)||cnt[b]-cnt[a]||(a<b?-1:1)).slice(0,3);}catch(e){return[];}}
+function prioPick(r,lst){if(SEP_ON||(!PRIO_ON&&!PRIO_PAT))return[];const out=[],add=n=>{if(n&&out.indexOf(n)<0)out.push(n);};
+  if(PRIO_PAT)patPick(r).forEach(add);
+  if(PRIO_ON){const o2=[],ad2=n=>{if(n&&out.indexOf(n)<0&&o2.indexOf(n)<0)o2.push(n);};
   try{const rows=ROWS,L=rows.length,qf=qCalc(rows).f,cnt={},fl={},have=new Set(lst.map(x=>x.n));
     for(const nm in qf){try{for(const x of qf[nm](r.base,r.wd))cnt[x]=1;}catch(e){}}
     r.all.forEach(x=>{fl[x.n]=(x.f||'').replace(/[^A-Z]/g,'').length>0;});
-    for(let k=1;k<=3&&L-k>=0;k++){const p=rows[L-k].p3;if(!p||p.length!==3)continue;const n=p.slice(1);if(have.has(n)||cnt[n]||fl[n])add(n);}
-    if(r.base&&T.RODEAN){const c=conOf(r.base);if(c!==r.base&&(T.RODEAN[r.base]||[]).indexOf(c)>=0)add(c);}
+    for(let k=1;k<=3&&L-k>=0;k++){const p=rows[L-k].p3;if(!p||p.length!==3)continue;const n=p.slice(1);if(have.has(n)||cnt[n]||fl[n])ad2(n);}
+    if(r.base&&T.RODEAN){const c=conOf(r.base);if(c!==r.base&&(T.RODEAN[r.base]||[]).indexOf(c)>=0)ad2(c);}
   }catch(e){}
-  return out.slice(0,4);}
+  o2.slice(0,4).forEach(add);}
+  return out;}
 function logicLine(r){return '';if(!r||!r.lp||!r.top||!r.top.length)return'';const ps=r.top.map(x=>r.lp[x.n]||.01),mn=Math.min(...ps),mx=Math.max(...ps),sm=ps.reduce((a,b)=>a+b,0),n=r.top.length;
   return 'Probabilidad estimada (prueba hacia adelante): cada número de <b>'+(100*mn).toFixed(2)+'%</b> a <b>'+(100*mx).toFixed(2)+'%</b>; los '+n+' juntos <b>'+(100*sm).toFixed(1)+'%</b>. Sin ninguna regla serían 1% por número y '+n+'% los '+n+'.';}
 function logicShow(r){$('g-prob').innerHTML=logicLine(r);$('g-mode').innerHTML='<div class="meth">Orden del Top: Lógico (por evidencia)</div>';}
@@ -1232,8 +1240,9 @@ $('cn-grid').onclick=e=>{const td=e.target&&e.target.closest?e.target.closest('t
 $('cn-q').oninput=()=>{const v=$('cn-q').value.replace(/\D/g,'').slice(0,2);AC_SEL=v.length===2?v:'';acRender();};
 document.querySelector('#nav button[data-t="anc"]').addEventListener('click',()=>{acRender();setTimeout(()=>{const w=$('cn-wrap'),l=ROWS[ROWS.length-1];if(l){const q=nextSlot(l.d,l.s),p=acPos(q.date,q.session);w.scrollLeft=Math.max(0,(p.c-2)*50);w.scrollTop=Math.max(0,(p.r-5)*27);}},0);});
 
-$('prio-b').textContent=PRIO_ON?'Activado':'Desactivado';
-$('prio-b').onclick=()=>{PRIO_ON=!PRIO_ON;store('fpa_prio',PRIO_ON?1:0);$('prio-b').textContent=PRIO_ON?'Activado':'Desactivado';render();};
+const prioTx=()=>{$('pat-b').textContent='Patrones: '+(PRIO_PAT?'Activado':'Desactivado');$('prio-b').textContent='Repetidos: '+(PRIO_ON?'Activado':'Desactivado');};prioTx();
+$('pat-b').onclick=()=>{PRIO_PAT=!PRIO_PAT;store('fpa_priopat',PRIO_PAT?1:0);prioTx();render();};
+$('prio-b').onclick=()=>{PRIO_ON=!PRIO_ON;store('fpa_prio',PRIO_ON?1:0);prioTx();render();};
 
 // ---- Aviso cuando se activa una cadena o un patrón ----
 var AV_SIG=null,AV_NEW=false,AV_HIDE='',AV_ALL='';
@@ -1746,7 +1755,7 @@ setTimeout(()=>{try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=50;var UPD_SHOWN=false;
+const APP_BUILD=51;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
