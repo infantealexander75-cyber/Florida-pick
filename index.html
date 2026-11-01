@@ -44,7 +44,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 .yr td.pVi{outline:2px dashed #1e88e5;outline-offset:-2px}
 .yr td.pR.pVi{outline:2px solid #e53935;box-shadow:inset 0 0 0 4px #1e88e5}
 </style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 52 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 55 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="ang">Anguila</button><button data-t="dias">Días de semana</button><button data-t="anio">Año (Día/Noche)</button><button data-t="anc">Año consecutivo</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
@@ -178,7 +178,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 52</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 55</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -751,6 +751,7 @@ function ruleGrid(){
   if(rt){const a={},b={};rt.det.forEach(x=>{a[x.k]=x.hr;b[x.k]=x.ha;});add('Pronósticos','Lista roja (1 al 10)','desde 22-oct Día',a,0.10);add('Pronósticos','Lista azul (11 al 20)','desde 22-oct Día',b,0.10);}
   add('Pronósticos','Corridos → fijos','desde 22-oct Noche',tr(()=>corDet(R)),tr(()=>{const z={};for(let i=1;i<R.length;i++){if(ordKey(R[i])<COR_START||!R[i-1].p4)continue;z[slotKey(R[i])]=Object.keys(corFijos(R.slice(0,i))).length/100;}return k=>z[k];}));
   add('Anguila','Anguila mañana → Día','desde que anotes',angDet(ROWS,true),0.165);add('Anguila','Anguila '+angHN(ANG_FUERTE.MID)+' → Día','desde que anotes',angDetH(ROWS,true,ANG_FUERTE.MID),0.03*ANG_FUERTE.MID.length);add('Anguila','Anguila tarde → Noche','desde que anotes',angDet(ROWS,false),0.214);add('Anguila','Anguila '+angHN(ANG_FUERTE.EVE)+' → Noche','desde que anotes',angDetH(ROWS,false,ANG_FUERTE.EVE),0.03*ANG_FUERTE.EVE.length);
+  {const rl=tr(()=>anRitLog());if(rl){add('Año','Repetición con ritmo del mes','desde 1-ene',rl.R.m,k=>rl.R.pe[k]);add('Año','Viraje con ritmo del mes','desde 1-ene',rl.V.m,k=>rl.V.pe[k]);}}
   {const al=tr(()=>anActLog());if(al){add('Año','Terminal activado en el Año','desde 15-ene',al.T.m,k=>al.T.ex[k]);out[out.length-1].dg=al.T.dg;add('Año','Decena activada en el Año','desde 15-ene',al.D.m,k=>al.D.ex[k]);out[out.length-1].dg=al.D.dg;}}
   {const dl=tr(()=>dwLog());if(dl){add('Días de semana','Paso semanal exacto (columna del día)','desde 15-ene',dl.m,k=>dl.ex[k]);out[out.length-1].dg=dl.dg;}}
   {const ab=tr(()=>abueDet(R));if(ab){add('Reglas','Tabla Abue (8 vecinos)','desde 28-oct Día · solo consecutivo',ab.m,k=>ab.ex[k]);out[out.length-1].dg=ab.dg;}}
@@ -1028,8 +1029,7 @@ function bingoRender(){try{const b=$('bingo'),l=ROWS[ROWS.length-1];if(!l){b.cla
     else if(pb.length){ti='🎯 ¡BINGO! 🎯';su='DE PARLÉ';}
     else if(pu.length){ti='🎉 ¡CORRIDO! 🎉';}
     if(ti&&(pb.length||pu.length))body+='<div class="by2">Parlés del pronóstico:</div>'+pb.map(x=>'<div class="bh">🎯 bingo '+x.k+'</div>').join('')+pu.slice(0,3).map(x=>'<div class="bh">✅ corrido '+x.k+' (salió '+(x.a?x.k.split('-')[0]:x.k.split('-')[1])+')</div>').join('');
-    if(!ti&&hits.length){ti='✅ Acierto';su='DE OTRA REGLA';cls='bingo alt';body='<div class="by2">No estaba en tu pronóstico compartido. La regla fue:</div>'+hl;}
-  }else if(hits.length){ti='🎉 ¡ACIERTO! 🎉';body='<div class="by2">No compartiste pronóstico para este sorteo. Lo proporcionó:</div>'+hl;}
+  }
   if(!ti||BG_OFF===key){b.classList.add('hide');return;}
   b.className=cls;
   b.innerHTML='<h2>'+ti+'</h2>'+(su?'<div class="bsub">'+su+'</div>':'')+'<div class="by"><b>'+l.d.slice(8)+'-'+l.d.slice(5,7)+' '+sesName(l.s)+'</b> · salió <b>'+t+'</b> (Pick 3 '+l.p3+(l.p4?' · Pick 4 '+l.p4:'')+')</div>'+body+'<div class="by3">Toca para cerrar</div>';
@@ -1203,6 +1203,33 @@ function anConsHTML(C){const L=ROWS.slice(-3).map(r=>r.p3.slice(1)).join(' → '
     C.P.map(p=>'<div class="cand"><span class="num" style="font-size:16px">'+p.src.join(' → ')+' ⇒ '+p.v+'</span><div class="meth">Sorteos seguidos ('+p.dates.join(', ')+') · '+anSt(p.st)+(p.len===4?' · ★ 4 sorteos':'')+'</div></div>').join('')+
     C.G.map(g=>'<div class="cand"><span class="num" style="font-size:16px">'+(g.k==='T'?'Terminal ':'Decena ')+g.dig+'</span><div class="meth">Se repitió en 3 sorteos seguidos ('+g.dates.join(', ')+')</div></div>').join(''):
     '<div class="meth">Ningún paso ni dígito repetido en los últimos 3 sorteos seguidos.</div>');}
+// ---- Ritmo del mes: en el mes en curso se anota cada vez que un sorteo REPITE un número que ya salió ese mes (repetición) o saca el VIRAJE de uno que ya salió (viraje). Si las dos últimas repeticiones (o virajes) están separadas por N sorteos, avisa en qué fecha y sorteo toca la siguiente (±1 sorteo). Solo alerta, sin peso en el Top; se mide en Aciertos por regla ----
+function ritPos(r){return 2*(+r.d.slice(8,10)-1)+(r.s==='EVE'?1:0);}
+function ritEv(rows,mo){const rv=n=>n[1]+n[0],seen=new Set(),E={R:[],V:[]},arr=[];
+  const due=(e,p)=>{if(e.length<2)return false;const g=e[e.length-1].p-e[e.length-2].p;return Math.abs(p-(e[e.length-1].p+Math.max(g,1)))<=1;};
+  for(const r of rows){if(r.d.slice(0,7)!==mo)continue;const x=r.p3.slice(1),p=ritPos(r),rs=new Set();seen.forEach(y=>{if(y!==rv(y))rs.add(rv(y));});
+    const isR=seen.has(x),isV=x!==rv(x)&&seen.has(rv(x));
+    arr.push({d:r.d,s:r.s,isR:isR,isV:isV,eR:seen.size/100,eV:rs.size/100,dueR:due(E.R,p),dueV:due(E.V,p)});
+    if(isR)E.R.push({p:p,x:x,d:r.d,s:r.s});if(isV)E.V.push({p:p,x:x,d:r.d,s:r.s});seen.add(x);}
+  return{arr:arr,E:E,seen:seen};}
+function anRitmo(rows){const out={R:null,V:null,seen:[]};try{if(!rows||rows.length<2)return out;
+  const l=rows[rows.length-1],ns=nextSlot(l.d,l.s),mo=ns.date.slice(0,7),np=ritPos({d:ns.date,s:ns.session}),dim=new Date(+mo.slice(0,4),+mo.slice(5,7),0).getDate(),q=ritEv(rows,mo);
+  ['R','V'].forEach(k=>{const e=q.E[k],o={k:k,n:e.length,ev:e.slice(-3)};
+    if(e.length>=2){const g=e[e.length-1].p-e[e.length-2].p,p=e[e.length-1].p+Math.max(g,1);o.g=g;o.p=p;if(p<=2*dim-1){o.d=mo+'-'+String(Math.floor(p/2)+1).padStart(2,'0');o.s=p%2?'EVE':'MID';}o.toca=Math.abs(np-p)<=1;}
+    out[k]=o;});out.seen=[...q.seen];}catch(e){}return out;}
+var RIT_C=null;
+function anRitLog(){const key=ROWS.length+'|'+(ROWS.length?slotKey(ROWS[ROWS.length-1]):'');if(RIT_C&&RIT_C.k===key)return RIT_C.v;
+  const R={m:{},pe:{}},V={m:{},pe:{}};
+  [...new Set(ROWS.filter(r=>r.d>='2026-01-01').map(r=>r.d.slice(0,7)))].forEach(mo=>{ritEv(ROWS,mo).arr.forEach(a=>{const k=slotKey(a);if(a.dueR){R.m[k]=a.isR;R.pe[k]=a.eR;}if(a.dueV){V.m[k]=a.isV;V.pe[k]=a.eV;}});});
+  RIT_C={k:key,v:{R:R,V:V}};return RIT_C.v;}
+function anRitHTML(C){const dl=(d,s)=>d.slice(8)+'/'+d.slice(5,7)+' '+(s==='MID'?'Día':'Noche'),rv=n=>n[1]+n[0],nom={R:'Repetición',V:'Viraje'};
+  let top=[];try{top=genList().top.map(x=>x.n);}catch(e){}const seen=new Set(C.seen||[]);
+  let h='<div class="msg"><b>Ritmo del mes</b> (cada cuántos sorteos se repite un número ya salido este mes, o sale el viraje de uno ya salido)</div>';
+  ['R','V'].forEach(k=>{const o=C[k];if(!o)return;const lst=o.ev.map(z=>z.x+' ('+dl(z.d,z.s)+')').join(' → ');
+    if(o.n<2){h+='<div class="cand"><span class="num" style="font-size:16px">'+nom[k]+'</span><div class="meth">'+(o.n?'Solo una este mes: '+lst:'Ninguna todavía este mes')+' · hacen falta 2 para ver el ritmo</div></div>';return;}
+    const cands=(k==='R'?top.filter(n=>seen.has(n)):top.filter(n=>n!==rv(n)&&seen.has(rv(n)))).slice(0,6);
+    h+='<div class="cand"><span class="num" style="font-size:16px">'+nom[k]+(o.toca?' · TOCA':'')+'</span><div class="meth">'+lst+' · cada '+o.g+' sorteos · '+(o.d?'siguiente hacia '+dl(o.d,o.s):'la siguiente caería después de fin de mes')+(o.toca?' · del Top podría ser: '+(cands.length?cands.join(', '):'ninguno del Top'):'')+' · solo alerta</div></div>';});
+  return h;}
 function anioRender(){try{
   const l=ROWS[ROWS.length-1];if(!l)return;const g=anData(),ns=nextSlot(l.d,l.s),nm=+ns.date.slice(5,7),nd=+ns.date.slice(8,10),mx=Math.min(12,nm);
   const chS=chParse(CH_TXT).find(c=>c.t===CH_SEL),chm={};if(chS)chS.n.forEach((x,i)=>{(chm[x]=chm[x]||[]).push(i+1);});
@@ -1227,7 +1254,7 @@ function anioRender(){try{
       ks.slice(0,6).map(k=>u[k].slice(0,3).map(p=>'<div class="cand"><span class="num" style="font-size:16px">'+p.src.join(' → ')+' ⇒ '+k+'</span><div class="meth">'+anName(p)+' · '+anSt(p.st)+(p.len===4?' · ★ 4 casillas':'')+'</div></div>').join('')).join('');};
   const LD=anDone(g,+l.d.slice(8,10),2*(+l.d.slice(5,7)-1)+(l.s==='EVE'?1:0));
   $('an-pat').innerHTML=lab(P1a,r1,c1,ns.date,ns.session)+labG(G1a)+colLn(ns.date,ns.session)+lab(P2a,r2,c2,N2.date,N2.session)+labG(G2a)+colLn(N2.date,N2.session)+'<div class="msg"><b>Completado por el último sorteo</b> ('+l.d.slice(8,10)+' '+AN_M[+l.d.slice(5,7)-1]+' '+(l.s==='MID'?'Día':'Noche')+' '+l.p3.slice(1)+')</div>'+(LD.length?LD.slice(0,6).map(p=>'<div class="cand"><span class="num" style="font-size:16px">'+p.src.join(' → ')+'</span><div class="meth">'+anName(p)+' · '+anSt(p.st)+'</div></div>').join(''):'<div class="meth">Ninguna línea de 3 casillas con el último número.</div>');
-  AN_ST={P1:P1a,P2:P2a,G1:G1a,G2:G2a,LD,l1:(ns.session==='MID'?'Día ':'Noche ')+r1+' '+AN_M[nm-1],l2:(N2.session==='MID'?'Día ':'Noche ')+r2+' '+AN_M[+N2.date.slice(5,7)-1],C:anConsec(ROWS)};$('an-pat').innerHTML+=anConsHTML(AN_ST.C);
+  AN_ST={P1:P1a,P2:P2a,G1:G1a,G2:G2a,LD,l1:(ns.session==='MID'?'Día ':'Noche ')+r1+' '+AN_M[nm-1],l2:(N2.session==='MID'?'Día ':'Noche ')+r2+' '+AN_M[+N2.date.slice(5,7)-1],C:anConsec(ROWS)};$('an-pat').innerHTML+=anConsHTML(AN_ST.C)+anRitHTML(anRitmo(ROWS));
   // número marcado
   if(AN_SEL){const L=[];for(const m in g)for(const d in g[m])for(const s in g[m][d])if(g[m][d][s].slice(1)===AN_SEL)L.push(d+' '+AN_M[m-1]+(s==='MID'?' Día':' Noche'));
     $('an-sel').innerHTML=pnTag(AN_SEL)+': salió <b>'+L.length+'</b> '+(L.length===1?'vez':'veces')+' desde enero'+(L.length?'<div class="meth">'+L.join(' · ')+'</div>':'');}else $('an-sel').innerHTML='';
@@ -1768,7 +1795,7 @@ setTimeout(()=>{try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=52;var UPD_SHOWN=false;
+const APP_BUILD=55;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
