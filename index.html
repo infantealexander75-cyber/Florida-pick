@@ -44,7 +44,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 .yr td.pVi{outline:2px dashed #1e88e5;outline-offset:-2px}
 .yr td.pR.pVi{outline:2px solid #e53935;box-shadow:inset 0 0 0 4px #1e88e5}
 </style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 59 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 61 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="ang">Anguila</button><button data-t="dias">Días de semana</button><button data-t="anio">Año (Día/Noche)</button><button data-t="anc">Año consecutivo</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
@@ -178,7 +178,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 59</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 61</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -748,6 +748,13 @@ function secDet(rows){const st=SEC_START.split('|'),start=st[0]+(st[1]==='MID'?'
   for(let i=1;i<rows.length;i++){const r=rows[i],pv=rows[i-1].p3;if(!pv||pv.length!==3||!r.p3)continue;const pn=pv.slice(1),c=secOf(pn),hit=c.indexOf(r.p3.slice(1))>=0;
     if(ordKey(r)>=start){m[slotKey(r)]=hit;if(hit)dg[slotKey(r)]='secuencia '+pn+' → '+r.p3.slice(1);}else{rn++;if(hit)rh++;}}
   return{m,dg,rh,rn};}
+// ---- Seguidores 2010-2026 (tabla fija): después de un número, ¿sale uno de los 5 que más salieron tras él en 2010-oct 2026? Solo se mide contra el azar (5 de 100) en Aciertos, sin peso en el Top. La tabla no se recalcula ----
+const SGF_START='2026-11-02|EVE',SGF_T={"00":["28","82","19","96","89"],"01":["33","85","72","20","21"],"02":["34","03","76","11","95"],"03":["10","17","33","95","28"],"04":["21","79","06","13","02"],"05":["32","48","96","22","90"],"06":["59","22","89","78","05"],"07":["21","17","62","59","31"],"08":["95","64","99","31","22"],"09":["94","05","21","33","89"],"10":["75","52","47","93","19"],"11":["47","29","28","73","13"],"12":["77","43","54","41","11"],"13":["65","73","62","02","44"],"14":["84","21","73","96","59"],"15":["00","72","42","47","92"],"16":["74","67","03","85","39"],"17":["88","50","95","13","18"],"18":["18","44","39","20","53"],"19":["74","83","14","67","25"],"20":["05","22","80","65","24"],"21":["43","53","79","14","92"],"22":["51","77","08","40","70"],"23":["85","48","66","73","89"],"24":["30","42","13","52","88"],"25":["64","72","99","62","34"],"26":["16","35","11","33","18"],"27":["89","44","59","09","56"],"28":["05","02","44","54","75"],"29":["96","13","61","78","85"],"30":["70","31","22","80","35"],"31":["15","27","51","89","13"],"32":["38","99","33","58","11"],"33":["74","38","52","15","50"],"34":["74","27","64","28","58"],"35":["34","06","28","18","31"],"36":["95","28","17","35","92"],"37":["06","04","99","89","70"],"38":["13","44","08","83","54"],"39":["11","94","87","96","59"],"40":["65","11","95","06","73"],"41":["55","06","33","02","30"],"42":["33","71","57","70","30"],"43":["11","72","31","71","29"],"44":["06","72","83","28","96"],"45":["88","49","46","06","62"],"46":["05","23","76","21","33"],"47":["28","62","70","31","32"],"48":["12","21","99","74","70"],"49":["31","40","90","13","55"],"50":["31","36","63","33","43"],"51":["11","95","34","10","37"],"52":["69","07","21","47","26"],"53":["98","30","81","96","70"],"54":["89","06","73","62","59"],"55":["83","95","62","89","79"],"56":["62","00","95","21","77"],"57":["61","34","43","05","94"],"58":["89","18","39","77","49"],"59":["41","11","52","29","33"],"60":["73","62","00","21","18"],"61":["82","06","62","12","21"],"62":["34","21","99","89","78"],"63":["87","30","35","38","95"],"64":["13","43","20","42","37"],"65":["73","55","31","61","27"],"66":["91","62","78","32","01"],"67":["57","55","61","06","85"],"68":["32","23","94","10","33"],"69":["83","74","59","32","39"],"70":["80","55","39","21","74"],"71":["28","85","93","66","11"],"72":["26","85","10","65","05"],"73":["08","15","95","55","61"],"74":["52","62","66","73","13"],"75":["73","37","65","95","02"],"76":["15","47","82","09","87"],"77":["05","70","77","37","11"],"78":["72","52","58","25","21"],"79":["96","18","44","40","26"],"80":["94","32","05","21","78"],"81":["06","73","62","89","14"],"82":["44","70","01","50","99"],"83":["97","99","74","19","05"],"84":["34","86","95","28","49"],"85":["11","35","75","23","06"],"86":["56","11","18","42","64"],"87":["11","18","78","44","94"],"88":["34","83","87","86","28"],"89":["21","62","85","32","88"],"90":["40","11","74","18","30"],"91":["05","57","95","28","55"],"92":["11","61","45","13","18"],"93":["62","13","79","01","10"],"94":["08","30","14","45","99"],"95":["46","68","91","90","89"],"96":["31","82","21","73","30"],"97":["62","28","84","93","29"],"98":["89","26","06","13","77"],"99":["21","74","64","23","36"]};
+function sgfOf(t){return SGF_T[t]||[];}
+function sgfDet(rows){const st=SGF_START.split('|'),start=st[0]+(st[1]==='MID'?'0':'1'),m={},dg={};
+  for(let i=1;i<rows.length;i++){const r=rows[i],pv=rows[i-1].p3;if(!pv||pv.length!==3||!r.p3)continue;const pn=pv.slice(1),hit=sgfOf(pn).indexOf(r.p3.slice(1))>=0;
+    if(ordKey(r)>=start){m[slotKey(r)]=hit;if(hit)dg[slotKey(r)]='seguidor de '+pn+' → '+r.p3.slice(1);}}
+  return{m,dg};}
 function ruleGrid(){
   const R=ROWS,out=[],tr=f=>{try{return f();}catch(e){return null;}};
   const add=(g,nm,sub,m,pe)=>{if(!m)return;let h=0,n=0,ex;if(pe!==undefined)ex=0;for(const k in m){if(m[k]===null||m[k]===undefined)continue;n++;if(m[k])h++;if(pe!==undefined)ex+=typeof pe==='function'?(pe(k)||0):pe;}out.push({g,nm,sub,m,h,n,ex});};
@@ -774,6 +781,7 @@ function ruleGrid(){
   {const cd=tr(()=>conDet(R));if(cd){add('Reglas','Consecuente (100 − N)','desde 30-oct Día · antes de empezar: '+cd.rh+' de '+cd.rn+' (azar '+(cd.rn/100).toFixed(1)+') · próximo: '+tr(()=>conOf(R[R.length-1].p3.slice(1))),cd.m,0.01);out[out.length-1].dg=cd.dg;}}
   {const sd=tr(()=>secDet(R));if(sd){add('Reglas','Secuencias (compañeros de grupo)','desde 01-nov Día · antes de empezar: '+sd.rh+' de '+sd.rn+' (azar '+(sd.rn*0.03).toFixed(1)+') · próximo: '+tr(()=>secOf(R[R.length-1].p3.slice(1)).join(' ')),sd.m,0.03);out[out.length-1].dg=sd.dg;}}
   {const rd=tr(()=>r11Det(R));if(rd){add('Reglas','Regla de 11 (ciclo de 10)','desde 29-oct Noche · antes de empezar: '+rd.rh+' de '+rd.rn+' (azar '+(rd.rn/10).toFixed(1)+') · próximos: '+tr(()=>r11Cycle(R[R.length-1].p3.slice(1)).join(' ')),rd.m,0.1);out[out.length-1].dg=rd.dg;}}
+  {const sg=tr(()=>sgfDet(R));if(sg){add('Reglas','Seguidores 2010-2026 (tabla fija)','desde 02-nov Noche · próximos: '+tr(()=>sgfOf(R[R.length-1].p3.slice(1)).join(' ')),sg.m,0.05);out[out.length-1].dg=sg.dg;}}
   for(const [kd,nm] of [['pir','Pirámide (cierre de 2 cifras)'],['vira','Vira (inverso del último número)']]){const pd=tr(()=>pirDet(R,kd));if(pd){add('Reglas',nm,'desde 29-oct Noche · fecha del último sorteo · antes de empezar: '+pd.rh+' de '+pd.rn+' (azar '+(pd.rn/100).toFixed(1)+') · próximo: '+tr(()=>pirNext(kd)),pd.m,0.01);out[out.length-1].dg=pd.dg;}}
   if(mt&&mt.list.length){const a={},b={},c={};mt.list.forEach(x=>{a[x.key]=x.hN;b[x.key]=x.hD;c[x.key]=x.hT;});
     add('Mis pronósticos','Mis números','',a);add('Mis pronósticos','Mi decena','',b);add('Mis pronósticos','Mi terminal','',c);}
@@ -1319,9 +1327,9 @@ function avisoRender(){try{
   {const la=loud.filter(x=>!x.s&&!x.c2);if(bt)bt.textContent='Año (Día/Noche)'+(la.length?(Math.max(...la.map(x=>x.l))===2?' 🔴':' 🟡'):'');const lb=loud.filter(x=>x.c2&&!x.s),b2=document.querySelector('#nav button[data-t="anc"]');if(b2)b2.textContent='Año consecutivo'+(lb.length?(Math.max(...lb.map(x=>x.l))===2?' 🔴':' 🟡'):'');}
   if(!it.length){al.classList.add('hide');return;}
   if(AV_HIDE===sig){al.classList.add('hide');return;}
-  const mx=Math.max(...it.map(x=>x.l));
+  AV_ITEMS=it;const mx=Math.max(...it.map(x=>x.l));
   al.style.borderLeftColor=mx===2?'#d32f2f':'#f59e0b';
-  al.innerHTML='⚠️ <b>ALERTAS ACTIVAS ('+it.length+')</b>'+it.map(x=>'<div style="margin-top:4px">'+(x.l===2?'🔴 ':'🟡 ')+x.t+'</div>').join('')+'<div><button class="btn" data-act="ver" style="padding:6px 12px;font-size:13px">Ver patrones</button>'+(it.some(x=>x.c2)?'<button class="btn s" data-act="ver2" style="padding:6px 12px;font-size:13px">Ver consecutivo</button>':'')+'<button class="btn s" data-act="x" style="padding:6px 12px;font-size:13px">Cerrar</button></div>';
+  al.innerHTML='⚠️ <b>ALERTAS ACTIVAS ('+it.length+')</b>'+it.map(x=>'<div style="margin-top:4px">'+(x.l===2?'🔴 ':'🟡 ')+x.t+'</div>').join('')+'<div><button class="btn" data-act="ver" style="padding:6px 12px;font-size:13px">Ver patrones</button>'+(it.some(x=>x.c2)?'<button class="btn s" data-act="ver2" style="padding:6px 12px;font-size:13px">Ver consecutivo</button>':'')+'<button class="btn s" data-act="x" style="padding:6px 12px;font-size:13px">Cerrar</button></div><div style="margin-top:6px"><button class="btn" data-act="img" style="padding:6px 12px;font-size:13px">Compartir imagen</button><button class="btn s" data-act="txt" style="padding:6px 12px;font-size:13px">Compartir texto</button></div>';
   al.classList.remove('hide');
 }catch(e){}}
 function avisoSenal(){
@@ -1330,7 +1338,33 @@ function avisoSenal(){
   try{const A=new(window.AudioContext||window.webkitAudioContext)();[0,0.32].forEach(t=>{const o=A.createOscillator(),g=A.createGain();o.frequency.value=880;g.gain.value=0.2;o.connect(g);g.connect(A.destination);o.start(A.currentTime+t);o.stop(A.currentTime+t+0.22);});}catch(e){}
 }
 $('av-on').checked=load('fpa_av',true);$('av-on').onchange=()=>store('fpa_av',$('av-on').checked);
-$('alerta').onclick=e=>{const a=e.target&&e.target.dataset?e.target.dataset.act:'';if(a==='ver')document.querySelector('#nav button[data-t="anio"]').click();if(a==='ver2')document.querySelector('#nav button[data-t="anc"]').click();if(a==='x'){AV_HIDE=AV_ALL;$('alerta').classList.add('hide');}};
+var AV_ITEMS=[];
+function avLineas(){return AV_ITEMS.map(x=>({l:x.l,t:String(x.t).replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ')}));}
+function avTitulo(){try{const l1=ROWS[ROWS.length-1],n1=nextSlot(l1.d,l1.s),d=n1.date;return 'ALERTAS · '+(n1.session==='MID'?'Día':'Noche')+' · '+DIAS[weekdayOf(d)]+' '+d.slice(8)+'/'+d.slice(5,7);}catch(e){return 'ALERTAS';}}
+function avTexto(){const L=avLineas();return avTitulo()+'\n'+L.map(x=>(x.l===2?'🔴 ':'🟡 ')+x.t).join('\n');}
+function avImg(){const L=avLineas(),W=1080,c0=document.createElement('canvas').getContext('2d'),FS=34,LH=46,MW=W-220;
+  c0.font='700 '+FS+'px system-ui,Arial,sans-serif';
+  const blocks=L.map(x=>{const w=x.t.split(' '),ls=[];let cur='';w.forEach(p=>{const t=cur?cur+' '+p:p;if(c0.measureText(t).width>MW&&cur){ls.push(cur);cur=p;}else cur=t;});if(cur)ls.push(cur);return{l:x.l,ls};});
+  let H=300+60;blocks.forEach(b=>{H+=b.ls.length*LH+34;});
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;const c=cv.getContext('2d');
+  c.fillStyle='#fffdf5';c.fillRect(0,0,W,H);c.lineWidth=14;c.strokeStyle='#42a5f5';c.strokeRect(10,10,W-20,H-20);
+  gcStar(c,70,70,38,'#ffd54f');gcStar(c,W-70,70,38,'#ffd54f');gcStar(c,70,H-70,38,'#ffd54f');gcStar(c,W-70,H-70,38,'#ffd54f');
+  c.fillStyle='#ffee58';c.strokeStyle='#1a237e';c.lineWidth=8;c.beginPath();c.roundRect?c.roundRect(150,50,780,110,40):c.rect(150,50,780,110);c.fill();c.stroke();
+  const tt=avTitulo();c.fillStyle='#1a237e';c.textAlign='center';c.textBaseline='middle';gcFit(c,tt,720,56,'800');c.fillText(tt,W/2,105);
+  c.fillStyle='#37474f';gcFit(c,'Florida Pick 3',900,34,'700');c.fillText('Florida Pick 3',W/2,205);
+  let y=260;c.textAlign='left';
+  blocks.forEach(b=>{const hh=b.ls.length*LH+14;c.beginPath();c.roundRect?c.roundRect(70,y,W-140,hh+10,24):c.rect(70,y,W-140,hh+10);c.fillStyle=b.l===2?'#ffebee':'#fff8e1';c.fill();c.lineWidth=5;c.strokeStyle=b.l===2?'#d32f2f':'#f59e0b';c.stroke();
+    c.fillStyle=b.l===2?'#d32f2f':'#f59e0b';c.beginPath();c.arc(112,y+hh/2+5,14,0,7);c.fill();
+    c.fillStyle='#1a1a1a';c.font='700 '+FS+'px system-ui,Arial,sans-serif';c.textBaseline='middle';b.ls.forEach((t,i)=>c.fillText(t,142,y+14+LH/2+i*LH));y+=hh+34;});
+  return cv;}
+async function avCompartir(tipo,btn){const o=btn.textContent;try{
+  if(!AV_ITEMS.length)return;
+  if(tipo==='txt'){const tx=avTexto();if(navigator.share){await navigator.share({text:tx});}else{await navigator.clipboard.writeText(tx);btn.textContent='Copiado ✓';setTimeout(()=>{btn.textContent=o;},1800);}}
+  else{const cv=avImg(),blob=await new Promise(r=>cv.toBlob(r,'image/png')),f=new File([blob],'alertas.png',{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Alertas'});}
+    else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='alertas.png';a.click();btn.textContent='Descargada ✓';setTimeout(()=>{btn.textContent=o;},1800);}}
+}catch(e){if(e&&e.name==='AbortError')return;btn.textContent='No se pudo';setTimeout(()=>{btn.textContent=o;},1800);}}
+$('alerta').onclick=e=>{const a=e.target&&e.target.dataset?e.target.dataset.act:'';if(a==='img'||a==='txt'){avCompartir(a,e.target);return;}if(a==='ver')document.querySelector('#nav button[data-t="anio"]').click();if(a==='ver2')document.querySelector('#nav button[data-t="anc"]').click();if(a==='x'){AV_HIDE=AV_ALL;$('alerta').classList.add('hide');}};
 
 // ---- Cadenas semánticas de la charada ----
 const CH_DEF='El Ciclo de la Vida: 15 16 26 08 68 78\nEl Castigo: 20 88 84 63 97\nLa Fe: 05 40 17 00\nEl Banquete: 28 54 65 49 44\nLa Persecución: 46 52 20 51 07\nLa Ruina del Dinero: 38 44 59 33\nLa Salud: 26 86 89 31\nEl Lado Oscuro: 06 36 59 66\nLa Transportación: 52 46 51\nLa Realeza y el Poder: 01 02 03\nEl Dinero y la Mujer: 38 16 54\nLa Justicia Divina: 17 08 68';
@@ -1802,7 +1836,7 @@ setTimeout(()=>{try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=59;var UPD_SHOWN=false;
+const APP_BUILD=61;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
