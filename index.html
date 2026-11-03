@@ -44,7 +44,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 .yr td.pVi{outline:2px dashed #1e88e5;outline-offset:-2px}
 .yr td.pR.pVi{outline:2px solid #e53935;box-shadow:inset 0 0 0 4px #1e88e5}
 </style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 63 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 64 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <div id="av-ctc" class="alerta hide"></div>
@@ -60,6 +60,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <p class="meth">Cuando la app encuentra un sorteo nuevo (con la app abierta en pantalla) te avisa con una notificación y te prepara el mensaje para tus contactos por WhatsApp o SMS. Tú solo tocas enviar.</p>
   <button class="btn" id="b-notif">Activar notificaciones</button> <button class="btn s" id="b-notif-t">Probar</button><div class="msg" id="m-notif"></div>
   <div class="meth" style="margin-top:12px"><b>Contactos a avisar</b> (el número con código de país; si pones 8 dígitos, se añade el 53 de Cuba)</div>
+  <button class="btn" id="b-ctc-pick" style="margin-top:6px">Elegir de mis contactos</button><div class="meth" style="margin-top:6px">Se abre la lista de contactos del teléfono: buscas por nombre, marcas y listo (nombre y número se guardan solos). Si tu teléfono no lo permite, escríbelo a mano:</div>
   <input id="ctc-n" placeholder="Nombre" style="width:100%;margin-top:6px"><input id="ctc-t" placeholder="Teléfono" inputmode="tel" style="width:100%;margin-top:6px">
   <label class="meth" style="display:block;margin-top:6px"><input type="checkbox" id="ctc-a" checked> Avisar siempre que salga un sorteo</label>
   <button class="btn" id="b-ctc" style="margin-top:6px">Guardar contacto</button><div class="msg" id="m-ctc"></div>
@@ -188,7 +189,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 63</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 64</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -1823,7 +1824,7 @@ function ctcTel(t){let d=String(t||'').replace(/\D/g,'');if(d.length===8)d='53'+
 function ctcMsg(rows){return 'Florida Pick 3\n'+rows.slice(-4).map(r=>sesName(r.s)+' '+r.d.slice(8)+'/'+r.d.slice(5,7)+': '+r.p3+' (trasero '+r.p3.slice(1)+')'+(r.p4?' · Pick 4 '+r.p4:'')).join('\n');}
 function ctcLinks(list,rows){const m=encodeURIComponent(ctcMsg(rows)),st='display:inline-block;width:auto;text-decoration:none;margin:4px 6px 0 0;padding:8px 12px;font-size:14px';
   return list.map(c=>{const t=ctcTel(c.t);return '<div style="margin-top:4px"><b>'+ctcEsc(c.n)+'</b><br><a class="btn" style="'+st+'" target="_blank" rel="noopener" href="https://wa.me/'+t+'?text='+m+'">WhatsApp</a><a class="btn s" style="'+st+'" href="sms:+'+t+'?body='+m+'">SMS</a></div>';}).join('');}
-function ctcRender(){try{const L=$('ctc-l');L.innerHTML=CTC.length?CTC.map((c,i)=>'<div class="meth" style="margin-top:6px">• <b>'+ctcEsc(c.n)+'</b> · '+ctcEsc(c.t)+(c.auto?' · avisa siempre':' · solo manual')+' <button class="btn s" data-ctcdel="'+i+'" style="padding:2px 8px;font-size:12px;width:auto">Quitar</button></div>').join(''):'<div class="meth" style="margin-top:6px">Todavía no hay contactos.</div>';}catch(e){}}
+function ctcRender(){try{const L=$('ctc-l');L.innerHTML=CTC.length?CTC.map((c,i)=>'<div class="meth" style="margin-top:6px">• <b>'+ctcEsc(c.n)+'</b> · '+ctcEsc(c.t)+(c.auto?' · avisa siempre':' · solo manual')+' <button class="btn s" data-ctcauto="'+i+'" style="padding:2px 8px;font-size:12px;width:auto">'+(c.auto?'Solo manual':'Avisar siempre')+'</button> <button class="btn s" data-ctcdel="'+i+'" style="padding:2px 8px;font-size:12px;width:auto">Quitar</button></div>').join(''):'<div class="meth" style="margin-top:6px">Todavía no hay contactos.</div>';}catch(e){}}
 function avSistema(rows){try{if(!NOTIF_ON||!('Notification' in window)||Notification.permission!=='granted'||!rows.length)return;
   const r=rows[rows.length-1],title='Sorteo '+sesName(r.s)+' '+r.d.slice(8)+'/'+r.d.slice(5,7),opts={body:'Pick 3 '+r.p3+' (trasero '+r.p3.slice(1)+')'+(r.p4?' · Pick 4 '+r.p4:''),tag:'fpa-sorteo',renotify:true,vibrate:[200,100,200],icon:'icon-192.png'};
   if(navigator.serviceWorker&&navigator.serviceWorker.ready)navigator.serviceWorker.ready.then(reg=>reg.showNotification(title,opts)).catch(()=>{try{new Notification(title,opts);}catch(e){}});else new Notification(title,opts);
@@ -1840,7 +1841,11 @@ $('b-ctc').onclick=()=>{const m=$('m-ctc'),n=$('ctc-n').value.trim(),t=ctcTel($(
   if(!n||t.length<8){m.className='msg bad';m.textContent='Pon el nombre y un teléfono válido.';return;}
   CTC=CTC.filter(c=>ctcTel(c.t)!==t);CTC.push({n:n,t:t,auto:!!$('ctc-a').checked});const ok=store('fpa_ctc',CTC);
   m.className='msg '+(ok?'ok':'bad');m.textContent=ok?'Guardado: '+n+' (+'+t+')':'No se pudo guardar en este teléfono.';$('ctc-n').value='';$('ctc-t').value='';ctcRender();};
-$('ctc-l').onclick=e=>{const i=e.target&&e.target.dataset?e.target.dataset.ctcdel:undefined;if(i===undefined)return;CTC.splice(+i,1);store('fpa_ctc',CTC);ctcRender();};
+$('ctc-l').onclick=e=>{const d=e.target&&e.target.dataset?e.target.dataset:{};if(d.ctcauto!==undefined){const c=CTC[+d.ctcauto];if(c){c.auto=!c.auto;store('fpa_ctc',CTC);ctcRender();}return;}if(d.ctcdel===undefined)return;CTC.splice(+d.ctcdel,1);store('fpa_ctc',CTC);ctcRender();};
+$('b-ctc-pick').onclick=async()=>{const m=$('m-ctc');try{if(!('contacts' in navigator)||!navigator.contacts||!navigator.contacts.select){m.className='msg bad';m.textContent='Este teléfono o navegador no deja elegir contactos desde la app. Escríbelo a mano abajo.';return;}
+  const r=await navigator.contacts.select(['name','tel'],{multiple:true});let n=0;
+  for(const c of r){const nom=(c.name&&c.name[0])||'',tl=ctcTel((c.tel&&c.tel[0])||'');if(!tl||tl.length<8)continue;CTC=CTC.filter(x=>ctcTel(x.t)!==tl);CTC.push({n:nom||('+'+tl),t:tl,auto:!!$('ctc-a').checked});n++;}
+  store('fpa_ctc',CTC);ctcRender();m.className='msg '+(n?'ok':'bad');m.textContent=n?'Agregados '+n+' contacto(s).':'No se agregó ninguno (el contacto no tenía teléfono).';}catch(e){if(e&&e.name==='AbortError')return;m.className='msg bad';m.textContent='No se pudo abrir tus contactos: '+e.message;}};
 $('b-ctc-now').onclick=()=>{const o=$('ctc-now'),l=ROWS[ROWS.length-1];if(!l)return;o.innerHTML=CTC.length?'<div class="meth" style="white-space:pre-line;margin-top:6px">'+ctcEsc(ctcMsg([l]))+'</div>'+ctcLinks(CTC,[l]):'<div class="msg bad">Primero guarda un contacto.</div>';};
 ctcRender();
 $('b-upd').onclick=()=>doUpdate(false);
@@ -1877,7 +1882,7 @@ setTimeout(()=>{try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=63;var UPD_SHOWN=false;
+const APP_BUILD=64;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
