@@ -44,7 +44,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 .yr td.pVi{outline:2px dashed #1e88e5;outline-offset:-2px}
 .yr td.pR.pVi{outline:2px solid #e53935;box-shadow:inset 0 0 0 4px #1e88e5}
 </style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 64 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 65 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <div id="av-ctc" class="alerta hide"></div>
@@ -128,6 +128,9 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 <section id="t-consulta" class="hide">
  <div class="card"><b>Pronóstico de un día</b><p class="meth">Elige una fecha y mira la lista de números del Día y de la Noche. 🔒 = la lista que ya estaba congelada. 🔄 = recalculada con los datos hasta ese sorteo (puede no ser idéntica a la que viste ese día).</p>
   <input type="date" id="pf-d"> <button class="btn s" id="pf-go" style="padding:6px 14px;font-size:14px">Ver</button><div id="pf-out"></div></div>
+ <div class="card"><b>Después de la decena (día a día · noche a noche · consecutivo)</b><p class="meth">Toma el último sorteo del turno que eliges, mira su decena (o terminal) y busca qué salió después cada vez que pasó lo mismo. Abajo ves cuántos aciertos dio esa regla en el historial. Es respaldo histórico, no probabilidad.</p>
+  <div class="row"><div><label>Análisis</label><select id="da-m"><option value="DD">Día a día</option><option value="NN">Noche a noche</option><option value="CC">Consecutivos</option></select></div><div><label>Mirar</label><select id="da-k"><option value="d">Decena del anterior</option><option value="t">Terminal del anterior</option></select></div><div><label>Periodo</label><select id="da-p"><option value="y">Año en curso</option><option value="a">Todo 2010-2026</option></select></div></div>
+  <button class="btn s" id="da-go" style="padding:6px 14px;font-size:14px;margin-top:6px">Ver</button><div id="da-out"></div></div>
  <div class="card"><b>Consulta de número</b><p class="meth">Escribe un número de 2 cifras y mira qué da cada tabla.</p>
   <input id="q-n" inputmode="numeric" maxlength="2" placeholder="38"><div id="q-out"></div></div>
  <div class="card"><b>Tabla unificada</b><p class="meth">Escribe un número y mira todos los que le dan las tablas, sin repetir. ×4 = coinciden en 4 tablas. Arriba van los que coinciden en más. Es coincidencia entre reglas, no probabilidad.</p>
@@ -189,7 +192,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 64</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 65</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -1732,6 +1735,35 @@ $('q-n').oninput=()=>{const t=$('q-n').value.replace(/\D/g,'');if(!t){$('q-out')
   h+='<table>'+rows.map(r=>{const st=r[1]==='g'?'color:#2e7d32;font-weight:bold;font-size:15px;':r[1]==='o'?'color:#f57c00;font-weight:bold;':r[1]==='b'?'color:#1976d2;font-weight:bold;':r[1]==='x'?'color:#9e9e9e;':'';
    return '<tr><td style="'+st+'">'+r[0]+'</td><td><b>'+(r[2].length?r[2].join(' · '):'—')+'</b></td></tr>';}).join('')+'</table>';
   $('q-out').innerHTML=h;};
+// ---- Después de la decena/terminal: día a día, noche a noche o consecutivo (respaldo histórico, sin pronosticar) ----
+function daRun(){const mode=$('da-m').value,kk=$('da-k').value,per=$('da-p').value,out=$('da-out');
+  try{const all=chRowsAll().filter(r=>r.p3&&r.p3.length===3);
+  const seq=mode==='DD'?all.filter(r=>r.s==='MID'):mode==='NN'?all.filter(r=>r.s==='EVE'):all;
+  if(seq.length<3){out.innerHTML='<div class="msg bad">No hay datos suficientes.</div>';return;}
+  const tr=r=>r.p3.slice(1),key=r=>kk==='d'?tr(r)[0]:tr(r)[1],last=seq[seq.length-1],lk=key(last),yr=last.d.slice(0,4);
+  const nom=mode==='DD'?'Día':mode==='NN'?'Noche':(last.s==='MID'?'Día':'Noche'),kn=kk==='d'?'decena':'terminal';
+  const cs=[];for(let j=0;j<seq.length-1;j++){if(key(seq[j])!==lk)continue;if(per==='y'&&seq[j+1].d.slice(0,4)!==yr)continue;cs.push(tr(seq[j+1]));}
+  const cn={},dd={},tt={};cs.forEach(x=>{cn[x]=(cn[x]||0)+1;dd[x[0]]=(dd[x[0]]||0)+1;tt[x[1]]=(tt[x[1]]||0)+1;});
+  const srt=o=>Object.keys(o).sort((a,b)=>o[b]-o[a]||(a<b?-1:1));
+  const nums=srt(cn),rep=nums.filter(x=>cn[x]>1);
+  const chip=x=>'<span class="chip">'+x+(cn[x]>1?'×'+cn[x]:'')+'</span>';
+  // aciertos históricos (hacia adelante, desde 2012, 10 números por sorteo)
+  const st=seq.findIndex(r=>r.d>='2012-01-01'),cond={};
+  const add=(k,x)=>{(cond[k]=cond[k]||{})[x]=((cond[k]||{})[x]||0)+1;};
+  for(let i=1;i<st;i++)add(key(seq[i-1]),tr(seq[i]));
+  let H=0,T=0,H26=0,T26=0;
+  for(let i=Math.max(st,1);i<seq.length;i++){const k=key(seq[i-1]),c=cond[k]||{},tg=tr(seq[i]);
+    const top=Object.keys(c).sort((a,b)=>c[b]-c[a]||(a<b?-1:1)).slice(0,10),hit=top.indexOf(tg)>=0;H+=hit;T++;
+    if(seq[i].d.slice(0,4)===yr){H26+=hit;T26++;}add(k,tg);}
+  const dTxt=o=>srt(o).slice(0,4).map(k=>k+' ('+o[k]+')').join(' · ');
+  let h='<div class="meth" style="margin-top:8px">Último '+(mode==='CC'?'sorteo':nom)+': <b>'+tr(last)+'</b> ('+last.d.slice(8)+'/'+last.d.slice(5,7)+' '+(last.s==='MID'?'Día':'Noche')+') → '+kn+' <b>'+lk+'</b></div>';
+  h+='<div style="margin-top:8px"><b>'+cs.length+' casos</b> '+(per==='y'?'en '+yr:'desde 2010')+'. Lo que salió después'+(mode==='CC'?' (siguiente sorteo)':' ('+nom+' siguiente)')+':</div>';
+  h+='<div class="chips" style="margin-top:6px">'+(nums.length?nums.slice(0,40).map(chip).join(''):'—')+'</div>'+(nums.length>40?'<div class="meth">Se muestran los 40 que más salieron de '+nums.length+'.</div>':'');
+  h+='<div class="meth" style="margin-top:6px">Repetidos: '+(rep.length?rep.slice(0,12).map(x=>x+' ×'+cn[x]).join(' · '):'ninguno')+'<br>Decena que más salió: '+dTxt(dd)+'<br>Terminal que más salió: '+dTxt(tt)+'</div>';
+  const e=T*0.1,e26=T26*0.1;
+  h+='<div style="margin-top:8px;padding:8px;border-left:4px solid #1976d2;background:#e3f2fd"><b>Aciertos de esta regla</b> (probando hacia adelante desde 2012, 10 números por sorteo)<br>Todo el historial: <b>'+H+' de '+T+'</b> ('+(H/T*100).toFixed(1)+'%) · azar: '+Math.round(e)+'<br>'+yr+': <b>'+H26+' de '+T26+'</b> · azar: '+Math.round(e26)+'</div>';
+  out.innerHTML=h;}catch(er){out.innerHTML='<div class="msg bad">No se pudo calcular: '+er.message+'</div>';}}
+$('da-go').onclick=daRun;
 // ---- Sueños -> números (usa la charada mixta) ----
 var SU_IDX=null;
 const SU_STOP=new Set('el la los las un una unos unas de del al y e o u en con sin por para que se me mi mis tu tus su sus lo le les es era fue ser estar estaba estaban estuve habia hay he ha han como cuando donde mas pero si no ni muy tan ya ese esa eso esos esas este esta esto estos estas alla aqui ahi otro otra otros otras todo toda todos todas algo alguien nada cada hacia desde hasta entre sobre bajo tras ante sone soñe soñando sonando sueno sueño vi veia ver iba ir voy fui tenia tener tengo nos habia habian quien cual cuales'.split(' '));
@@ -1882,7 +1914,7 @@ setTimeout(()=>{try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=64;var UPD_SHOWN=false;
+const APP_BUILD=65;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
