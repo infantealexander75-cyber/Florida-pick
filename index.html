@@ -44,7 +44,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 .yr td.pVi{outline:2px dashed #1e88e5;outline-offset:-2px}
 .yr td.pR.pVi{outline:2px solid #e53935;box-shadow:inset 0 0 0 4px #1e88e5}
 </style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 68 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 69 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <div id="av-ctc" class="alerta hide"></div>
@@ -192,7 +192,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 68</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 69</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -738,6 +738,10 @@ const SEM_START='2026-11-04|EVE',SEM_T={Sun:[4,1,'41 46 49','11 31 51'],Mon:[9,7
 function semDet(rows){const st=SEM_START.split('|'),start=st[0]+(st[1]==='MID'?'0':'1'),m={},dg={};
   for(let i=0;i<rows.length;i++){const r=rows[i];if(!r.p3||r.p3.length!==3)continue;if(ordKey(r)<start)continue;const w=SEM_T[weekdayOf(r.d)];if(!w)continue;const t=r.p3.slice(1),hD=+t[0]===w[0],hT=+t[1]===w[1];m[slotKey(r)]=hD||hT;if(hD||hT)dg[slotKey(r)]='regla semanal '+(hD?'decena '+w[0]:'')+(hD&&hT?' y ':'')+(hT?'terminal '+w[1]:'')+' → '+t;}
   return{m,dg};}
+function semResp(wk){const yr=ROWS[ROWS.length-1].d.slice(0,4),w=SEM_T[wk];let n=0,h=0,n2=0,h2=0;
+  for(const r of ROWS){if(!r.p3||r.p3.length!==3||weekdayOf(r.d)!==wk)continue;const x=r.p3.slice(1),hit=(+x[0]===w[0])||(+x[1]===w[1]);n++;if(hit)h++;if(r.d.slice(0,4)===yr){n2++;if(hit)h2++;}}
+  const lb=(c,m)=>{if(!m)return'';const z=(c-.19*m)/Math.sqrt(m*.19*.81);return z>=2?'por encima del azar':z<=-2?'por debajo del azar':'dentro del azar';};
+  return{yr,n,h,n2,h2,l1:lb(h,n),l2:lb(h2,n2),p1:n?(100*h/n).toFixed(1):'0',p2:n2?(100*h2/n2).toFixed(1):'0'};}
 function ruleGrid(){
   const R=ROWS,out=[],tr=f=>{try{return f();}catch(e){return null;}};
   const add=(g,nm,sub,m,pe)=>{if(!m)return;let h=0,n=0,ex;if(pe!==undefined)ex=0;for(const k in m){if(m[k]===null||m[k]===undefined)continue;n++;if(m[k])h++;if(pe!==undefined)ex+=typeof pe==='function'?(pe(k)||0):pe;}out.push({g,nm,sub,m,h,n,ex});};
@@ -1304,7 +1308,7 @@ function avisoRender(){try{
   }
   try{const l1=ROWS[ROWS.length-1];if(l1){const WKs=anWK(),n1=nextSlot(l1.d,l1.s),n2=nextSlot(n1.date,n1.session);[n1,n2].forEach(ns=>{const st=dwStep(WKs,ns.date,ns.session);if(st.length)it.push({l:1,t:'Paso semanal para <b>'+DIAS[weekdayOf(ns.date)]+' '+(ns.session==='MID'?'Día':'Noche')+'</b> (pestaña Días de semana): '+[...new Set(st.map(x=>'<b>'+x.v+'</b> (cada '+x.k+(x.k===1?' semana':' semanas')+')'))].join(', ')});});}}catch(e){}
   try{const l0=ROWS[ROWS.length-1],bs=l0?l0.p3.slice(1):'',ft=bs?(followersTable(ROWS)[bs]||[]):[];if(ft.length){const sm=folSummary(ft);it.push({l:sm[0][1]>=2?2:1,q:sm[0][1]<2,t:'Seguidor <b>'+bs+'</b> (salió '+ft.length+(ft.length===1?' vez':' veces')+' desde el 1 de enero). Después salió: '+sm.map(e=>'<b>'+e[0]+'</b>'+(e[1]>1?' ×'+e[1]:'')).join(', ')});}}catch(e){}
-  try{const l1=ROWS[ROWS.length-1];if(l1){const n1=nextSlot(l1.d,l1.s),w=SEM_T[weekdayOf(n1.date)];if(w)it.push({l:1,q:true,t:'Regla semanal para <b>'+DIAS[weekdayOf(n1.date)]+' '+(n1.session==='MID'?'Día':'Noche')+'</b>: decena <b>'+w[0]+'</b> ('+w[2]+') y terminal <b>'+w[1]+'</b> ('+w[3]+')'});}}catch(e){}
+  try{const l1=ROWS[ROWS.length-1];if(l1){const n1=nextSlot(l1.d,l1.s),w=SEM_T[weekdayOf(n1.date)],sr=w?semResp(weekdayOf(n1.date)):null;if(w)it.push({l:1,q:true,t:'Regla semanal para <b>'+DIAS[weekdayOf(n1.date)]+' '+(n1.session==='MID'?'Día':'Noche')+'</b>: decena <b>'+w[0]+'</b> ('+w[2]+') y terminal <b>'+w[1]+'</b> ('+w[3]+'). Respaldo histórico del '+DIAS[weekdayOf(n1.date)]+' (decena o terminal): <b>2010-2026 '+sr.h+' de '+sr.n+' ('+sr.p1+'%, '+sr.l1+')</b> · <b>'+sr.yr+' '+sr.h2+' de '+sr.n2+' ('+sr.p2+'%, '+sr.l2+')</b> · azar 19%'});}}catch(e){}
   chActive().forEach(a=>it.push({l:2,t:'Cadena <b>'+a.t+'</b>: salieron '+a.nums.join(' → ')+(a.next?'; sigue <b>'+a.next+'</b>'+(pnNm(a.next)?' ('+pnNm(a.next)+')':''):'; la cadena llegó a su final')}));
   const sig=JSON.stringify(it.map(x=>x.t)),al=$('alerta'),bt=document.querySelector('#nav button[data-t="anio"]');
   const loud=it.filter(x=>!x.q),sigL=JSON.stringify(loud.map(x=>x.t));AV_ALL=sig;
@@ -1792,7 +1796,7 @@ setTimeout(()=>{try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=68;var UPD_SHOWN=false;
+const APP_BUILD=69;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
