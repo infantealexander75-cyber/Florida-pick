@@ -44,7 +44,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 .yr td.pVi{outline:2px dashed #1e88e5;outline-offset:-2px}
 .yr td.pR.pVi{outline:2px solid #e53935;box-shadow:inset 0 0 0 4px #1e88e5}
 </style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 71 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 72 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <div id="av-ctc" class="alerta hide"></div>
@@ -192,7 +192,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 71</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 72</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -489,6 +489,18 @@ function chainNow(rows){
   const L=rows.length;if(L<2||!consec(rows[L-2],rows[L-1]))return null;
   const a=rows[L-2].p3.slice(1),b=rows[L-1].p3.slice(1);return{a,b,list:chainFind(chRowsAll(rows),a,b)};
 }
+// ---- Cadena de 3 (dos anteriores + último): ej. 25 → 82 → 97 → ? Busca en todo el historial 2010-2026 los tres seguidos y muestra qué salió después. Hacia atrás (2010-2026): 73 casos, 0 aciertos; se cuenta hacia adelante desde 04-nov Noche ----
+const CH3_START='2026-11-04|EVE';
+function chain3Find(rows,a,b,c,limit){limit=limit===undefined?rows.length:limit;const out=[];
+  for(let i=0;i<limit-3;i++){if(rows[i].p3.slice(1)===a&&rows[i+1].p3.slice(1)===b&&rows[i+2].p3.slice(1)===c&&consec(rows[i],rows[i+1])&&consec(rows[i+1],rows[i+2])&&consec(rows[i+2],rows[i+3]))out.push({n:rows[i+3].p3.slice(1),d:rows[i+3].d,s:rows[i+3].s,d0:rows[i].d,s0:rows[i].s});}
+  return out;}
+function chain3Now(rows){const L=rows.length;if(L<3||!consec(rows[L-3],rows[L-2])||!consec(rows[L-2],rows[L-1]))return null;
+  const a=rows[L-3].p3.slice(1),b=rows[L-2].p3.slice(1),c=rows[L-1].p3.slice(1);return{a,b,c,list:chain3Find(chRowsAll(rows),a,b,c)};}
+function chain3Det(rows){const st=CH3_START.split('|'),start=st[0]+(st[1]==='MID'?'0':'1'),m={},ex={};const A=chRowsAll(rows);
+  for(let t=3;t<rows.length;t++){const r=rows[t];if(ordKey(r)<start)continue;const q=[rows[t-3],rows[t-2],rows[t-1],r];if(!(consec(q[0],q[1])&&consec(q[1],q[2])&&consec(q[2],q[3])))continue;
+    const k=A.findIndex(x=>x.d===q[0].d&&x.s===q[0].s),lim=k>=0?k+3:A.length;const S=new Set(chain3Find(A,q[0].p3.slice(1),q[1].p3.slice(1),q[2].p3.slice(1),Math.min(lim,A.length)).map(x=>x.n));
+    if(!S.size)continue;m[slotKey(r)]=S.has(r.p3.slice(1));ex[slotKey(r)]=S.size/100;}
+  return{m,ex};}
 function chainStats(rows){
   const st=CHAIN_START.split('|'),start=st[0]+(st[1]==='MID'?'0':'1'),acc={retro:{h:0,e:0,n:0},fwd:{h:0,e:0,n:0}},prf=[];
   for(let t=1;t<rows.length-1;t++){
@@ -742,7 +754,7 @@ function semResp(wk){const yr=ROWS[ROWS.length-1].d.slice(0,4),w=SEM_T[wk];let n
   for(const r of ROWS){if(!r.p3||r.p3.length!==3||weekdayOf(r.d)!==wk)continue;const x=r.p3.slice(1),hit=(+x[0]===w[0])||(+x[1]===w[1]);n++;if(hit)h++;if(r.d.slice(0,4)===yr){n2++;if(hit)h2++;}}
   const lb=(c,m)=>{if(!m)return'';const z=(c-.19*m)/Math.sqrt(m*.19*.81);return z>=2?'por encima del azar':z<=-2?'por debajo del azar':'dentro del azar';};
   return{yr,n,h,n2,h2,l1:lb(h,n),l2:lb(h2,n2),p1:n?(100*h/n).toFixed(1):'0',p2:n2?(100*h2/n2).toFixed(1):'0'};}
-// ---- TOP (desde compilación 71): solo las fuentes que mejor aguantaron en el historial 2010-2026: Tabla Abue B, Cuarteta J, Ensemble E, Únicos del mes anterior M (pesan la mitad y solos no entran). Corridos K y cadena H van al frente; Seguidor S solo suma si ya viene de una de las cuatro. Tamaño variable, hasta 20 ----
+// ---- TOP (desde compilación 72): solo las fuentes que mejor aguantaron en el historial 2010-2026: Tabla Abue B, Cuarteta J, Ensemble E, Únicos del mes anterior M (pesan la mitad y solos no entran). Corridos K y cadena H van al frente; Seguidor S solo suma si ya viene de una de las cuatro. Tamaño variable, hasta 20 ----
 function topbList(r){const base=r.base,pt={},ad=(n,l)=>{if(n&&/^\d\d$/.test(n))(pt[n]=pt[n]||new Set()).add(l);};
   const qf=qCalc(ROWS).f;try{qf['Tabla Abue'](base,r.wd).forEach(n=>ad(n,'B'));}catch(e){}try{qf['Cuarteta'](base,r.wd).forEach(n=>ad(n,'J'));}catch(e){}
   (r.en||[]).forEach(n=>ad(n,'E'));try{uniNext(ROWS,r.n.date).set.forEach(n=>ad(n,'M'));}catch(e){}
@@ -771,6 +783,7 @@ function ruleGrid(){
   add('Reglas','Ensemble (top 5)','desde 11-oct Noche',tr(()=>{const m={};enRule(R).det.forEach(x=>{m[x.d+'|'+x.s]=x.hit;});return m;}),0.05);
   add('Reglas','Ahorcados','desde 17-oct Día',tr(()=>hangDet()));
   add('Reglas','Seguidores (qué sale después)','desde 08-oct Día',tr(()=>folDet(R)));
+  {const c3=tr(()=>chain3Det(R));if(c3)add('Reglas','Cadena de 3 (dos anteriores + último)','desde 04-nov Noche · solo si hay cadena · 2010-2026: 73 casos, 0 aciertos',c3.m,k=>c3.ex[k]);}
   add('Reglas','Cadenas (anterior → último)','desde 08-oct Día · solo si hay cadena',tr(()=>chainDet(R)));
   add('Reglas','Únicos del mes anterior','desde 06-oct Noche',tr(()=>uniDet(R)));
   add('Reglas','Frontal = día del mes','desde 05-oct Noche',tr(()=>domDet(R)));
@@ -1299,6 +1312,7 @@ $('prio-b').onclick=()=>{PRIO_ON=!PRIO_ON;store('fpa_prio',PRIO_ON?1:0);prioTx()
 var AV_SIG=null,AV_NEW=false,AV_HIDE='',AV_ALL='';
 function avisoRender(){try{
   const it=[],cc=chainNow(ROWS),S=AN_ST;
+  try{const c3=chain3Now(ROWS);if(c3&&c3.list.length)it.push({l:2,t:'Cadena de 3 (dos anteriores) <b>'+c3.a+' → '+c3.b+' → '+c3.c+'</b> ya ocurrió '+c3.list.length+(c3.list.length===1?' vez':' veces')+' desde 2010. Después salió: <b>'+[...new Set(c3.list.map(x=>x.n))].join(', ')+'</b>'});}catch(e){}
   if(cc&&cc.list.length)it.push({l:2,t:'Cadena <b>'+cc.a+' → '+cc.b+'</b> ya ocurrió '+cc.list.length+(cc.list.length===1?' vez':' veces')+'. Después salió: <b>'+[...new Set(cc.list.map(x=>x.n))].join(', ')+'</b>'});
   if(S){
     [[S.P1,S.l1],[S.P2,S.l2]].forEach(a=>{const P=a[0]||[],A=P.filter(x=>!x.dd),B=P.filter(x=>x.dd);
@@ -1805,7 +1819,7 @@ setTimeout(()=>{try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=71;var UPD_SHOWN=false;
+const APP_BUILD=72;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
