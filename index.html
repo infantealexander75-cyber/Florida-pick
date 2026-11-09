@@ -22,7 +22,7 @@ textarea{min-height:110px;font:13px monospace}
 .num{display:inline-block;font:700 22px monospace;color:var(--pri);min-width:34px}
 .cand{padding:8px 0;border-top:1px solid var(--bd)}.cand:first-child{border-top:0}.meth{font-size:12px;color:var(--mut)}
 .warn{font-size:13px;color:var(--mut);background:var(--card);border:1px dashed var(--bd);border-radius:10px;padding:10px;margin-bottom:12px}
-.bingo{margin:10px 12px;padding:12px 10px 8px;border-radius:16px;background:#fff1f0;border:3px solid #e53935;text-align:center;cursor:pointer}.bingo h2{margin:0 0 4px;color:#e53935;font-size:40px;letter-spacing:2px;font-weight:900;animation:bgp .9s ease-in-out infinite alternate}@keyframes bgp{from{transform:scale(1)}to{transform:scale(1.07)}}.bingo .bsub{font-weight:800;color:#e53935;letter-spacing:1px;margin-bottom:4px}.bingo.alt{background:#fff8e1;border-color:#f57c00}.bingo.alt h2{color:#ef6c00;font-size:26px;animation:none}.bingo.alt .bsub{color:#ef6c00}.bingo .by{font-size:16px;color:#37474f}.bingo .by2{margin-top:8px;font-size:14px;color:#b71c1c;font-weight:700}.bingo .bh{font-size:15px;color:#263238;margin-top:3px}.bingo .by3{margin-top:8px;font-size:11px;color:#90a4ae}.row{display:flex;gap:8px}.row>*{flex:1}.msg{margin:8px 0;font-size:14px}.ok{color:var(--ok)}.bad{color:var(--bad)}
+.bingo{margin:10px 12px;padding:12px 10px 8px;border-radius:16px;background:#fff1f0;border:3px solid #e53935;text-align:center;cursor:pointer}.bgsh{margin:8px 0 4px;padding:10px 22px;border:0;border-radius:12px;background:#e53935;color:#fff;font-size:17px;font-weight:800}.bingo h2{margin:0 0 4px;color:#e53935;font-size:40px;letter-spacing:2px;font-weight:900;animation:bgp .9s ease-in-out infinite alternate}@keyframes bgp{from{transform:scale(1)}to{transform:scale(1.07)}}.bingo .bsub{font-weight:800;color:#e53935;letter-spacing:1px;margin-bottom:4px}.bingo.alt{background:#fff8e1;border-color:#f57c00}.bingo.alt h2{color:#ef6c00;font-size:26px;animation:none}.bingo.alt .bsub{color:#ef6c00}.bingo .by{font-size:16px;color:#37474f}.bingo .by2{margin-top:8px;font-size:14px;color:#b71c1c;font-weight:700}.bingo .bh{font-size:15px;color:#263238;margin-top:3px}.bingo .by3{margin-top:8px;font-size:11px;color:#90a4ae}.row{display:flex;gap:8px}.row>*{flex:1}.msg{margin:8px 0;font-size:14px}.ok{color:var(--ok)}.bad{color:var(--bad)}
 table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;border-bottom:1px solid var(--bd);text-align:left}
 .hide{display:none}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}.chip{font:700 18px monospace;padding:4px 8px;border-radius:8px;border:2px solid;background:var(--card);min-width:46px;text-align:center}.chip i{display:block;font:11px system-ui;font-style:normal;opacity:.8}
@@ -44,7 +44,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 .yr td.pVi{outline:2px dashed #1e88e5;outline-offset:-2px}
 .yr td.pR.pVi{outline:2px solid #e53935;box-shadow:inset 0 0 0 4px #1e88e5}
 </style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 77 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 78 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <div id="av-ctc" class="alerta hide"></div>
@@ -193,7 +193,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 77</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 78</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -1057,9 +1057,29 @@ function bingoRender(){try{const b=$('bingo'),l=ROWS[ROWS.length-1];if(!l){b.cla
   }
   if(!ti||BG_OFF===key){b.classList.add('hide');return;}
   b.className=cls;
-  b.innerHTML='<h2>'+ti+'</h2>'+(su?'<div class="bsub">'+su+'</div>':'')+'<div class="by"><b>'+l.d.slice(8)+'-'+l.d.slice(5,7)+' '+sesName(l.s)+'</b> · salió <b>'+t+'</b> (Pick 3 '+l.p3+(l.p4?' · Pick 4 '+l.p4:'')+')</div>'+body+'<div class="by3">Toca para cerrar</div>';
+  b.innerHTML='<h2>'+ti+'</h2>'+(su?'<div class="bsub">'+su+'</div>':'')+'<div class="by"><b>'+l.d.slice(8)+'-'+l.d.slice(5,7)+' '+sesName(l.s)+'</b> · salió <b>'+t+'</b> (Pick 3 '+l.p3+(l.p4?' · Pick 4 '+l.p4:'')+')</div>'+body+'<button class="bgsh" type="button">Compartir</button><div class="by3">Toca para cerrar</div>';
   b.classList.remove('hide');b.onclick=()=>{BG_OFF=key;b.classList.add('hide');};
+  const sb=b.querySelector('.bgsh');if(sb)sb.onclick=ev=>{ev.stopPropagation();bgShare(sb);};
   }catch(e){}}
+// ---- Compartir el cartel de BINGO como imagen (compilación 78) ----
+function bgCanvas(b){const W=1080,PAD=60,MW=W-PAD*2,tm=document.createElement('canvas').getContext('2d');
+  const L=[];const tx=e=>(e.textContent||'').replace(/\s+/g,' ').trim();
+  const h=b.querySelector('h2');if(h)L.push({t:tx(h),f:'900 92px system-ui,Arial,sans-serif',c:'#e53935',g:20});
+  const sb=b.querySelector('.bsub');if(sb)L.push({t:tx(sb),f:'800 46px system-ui,Arial,sans-serif',c:'#b71c1c',g:26});
+  b.querySelectorAll('.by,.by2,.bh').forEach(e=>{const k=e.className;L.push(k==='by'?{t:tx(e),f:'600 44px system-ui,Arial,sans-serif',c:'#1a1a1a',g:26}:k==='by2'?{t:tx(e),f:'700 38px system-ui,Arial,sans-serif',c:'#455a64',g:12}:{t:tx(e),f:'800 44px system-ui,Arial,sans-serif',c:'#1b5e20',g:10});});
+  const wrap=(t,f)=>{tm.font=f;const w=t.split(' '),o=[];let cur='';for(const x of w){const n=cur?cur+' '+x:x;if(tm.measureText(n).width>MW&&cur){o.push(cur);cur=x;}else cur=n;}if(cur)o.push(cur);return o;};
+  let y=PAD+10;L.forEach(l=>{l.s=parseInt(l.f.match(/(\d+)px/)[1]);l.w=wrap(l.t,l.f);l.y=y;y+=l.w.length*Math.round(l.s*1.25)+l.g;});
+  const H=y+PAD+10;const cv=document.createElement('canvas');cv.width=W;cv.height=H;const c=cv.getContext('2d');
+  c.fillStyle='#fff1f0';c.fillRect(0,0,W,H);c.strokeStyle='#e53935';c.lineWidth=14;c.strokeRect(14,14,W-28,H-28);
+  c.textAlign='center';c.textBaseline='top';
+  L.forEach(l=>{c.font=l.f;c.fillStyle=l.c;l.w.forEach((ln,i)=>c.fillText(ln,W/2,l.y+i*Math.round(l.s*1.25)));});
+  c.font='600 28px system-ui,Arial,sans-serif';c.fillStyle='#78909c';c.fillText('Florida Pick Analyzer',W/2,H-PAD+4);
+  return cv;}
+async function bgShare(btn){const o=btn.textContent;try{const b=$('bingo'),cv=bgCanvas(b);
+  const blob=await new Promise(res=>cv.toBlob(res,'image/png')),f=new File([blob],'bingo.png',{type:'image/png'});
+  if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'BINGO'});}
+  else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bingo.png';a.click();btn.textContent='Imagen guardada';setTimeout(()=>{btn.textContent=o;},2500);}
+}catch(e){if(e&&e.name==='AbortError')return;btn.textContent='No se pudo compartir';setTimeout(()=>{btn.textContent=o;},2500);}}
 // ---- Imagen para compartir: los 10 primeros (rojo) de Pronósticos + los fijos de corridos, patrones activos y cadena como números extra ----
 function gcCloud(c,x,y,w,h){const N=14,cx=x+w/2,cy=y+h/2,rx=w/2*0.92,ry=h/2*0.92;c.beginPath();
   for(let i=0;i<N;i++){const a0=i/N*2*Math.PI,a1=(i+1)/N*2*Math.PI,am=(a0+a1)/2,px=cx+rx*Math.cos(a1),py=cy+ry*Math.sin(a1),qx=cx+rx*1.14*Math.cos(am),qy=cy+ry*1.14*Math.sin(am);
@@ -1823,7 +1843,7 @@ setTimeout(()=>{try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=77;var UPD_SHOWN=false;
+const APP_BUILD=78;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
