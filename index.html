@@ -12,7 +12,7 @@ nav{display:flex;position:sticky;top:0;background:var(--card);border-bottom:1px 
 nav button{flex:1 0 auto;padding:12px 11px;border:0;background:none;color:var(--mut);font-size:13px;border-bottom:3px solid transparent}
 nav button.on{color:var(--pri);border-color:var(--pri);font-weight:600}
 nav button.redtab{color:#d32f2f;font-weight:700}
-.cal{width:100%;border-collapse:collapse;table-layout:fixed;margin:6px 0 12px}.cal th,.cal td{border:1px solid var(--bd);padding:1px;text-align:center;vertical-align:top;font-size:12px}.cal th{font-size:11px;color:var(--mut)}.cal td.off{background:rgba(128,128,128,.12)}.cal .sel{background:rgba(255,193,7,.22)}.cal .d{display:block;text-align:right;font-size:10px;color:var(--mut);padding-right:2px}.cal .m,.cal .e{display:block;font:13px monospace;line-height:1.35}.cal .m{color:#d32f2f}.cal .e{color:#1565c0}nav button.redtab.on{color:#fff;background:#d32f2f;border-color:#d32f2f}#t-gen .card{border:2px solid #d32f2f}
+.dwy{background:#fff176;border-radius:3px;padding:0 2px;color:#000}.cal{width:100%;border-collapse:collapse;table-layout:fixed;margin:6px 0 12px}.cal th,.cal td{border:1px solid var(--bd);padding:1px;text-align:center;vertical-align:top;font-size:12px}.cal th{font-size:11px;color:var(--mut)}.cal td.off{background:rgba(128,128,128,.12)}.cal .sel{background:rgba(255,193,7,.22)}.cal .d{display:block;text-align:right;font-size:10px;color:var(--mut);padding-right:2px}.cal .m,.cal .e{display:block;font:13px monospace;line-height:1.35}.cal .m{color:#d32f2f}.cal .e{color:#1565c0}nav button.redtab.on{color:#fff;background:#d32f2f;border-color:#d32f2f}#t-gen .card{border:2px solid #d32f2f}
 main{padding:12px;max-width:640px;margin:auto}.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:12px}
 label{display:block;font-size:13px;color:var(--mut);margin:8px 0 3px}
 input,select,textarea{width:100%;padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font-size:16px}
@@ -44,7 +44,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 .yr td.pVi{outline:2px dashed #1e88e5;outline-offset:-2px}
 .yr td.pR.pVi{outline:2px solid #e53935;box-shadow:inset 0 0 0 4px #1e88e5}
 </style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 74 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 75 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <div id="av-ctc" class="alerta hide"></div>
@@ -114,6 +114,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 <section id="t-dias" class="hide">
  <div class="card"><b>Números por día de la semana</b>
   <div class="row" id="dw-btns"></div>
+  <label>Buscar trasero</label><input id="dw-q" inputmode="numeric" maxlength="2" placeholder="Ej.: 64">
   <div id="dw-out"></div></div>
 </section>
 
@@ -192,7 +193,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 74</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 75</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -1407,7 +1408,7 @@ $('ch-w').onchange=()=>{CH_W=+$('ch-w').value;store('fpa_chw',CH_W);chRender();a
 $('ch-sel').onchange=()=>{CH_SEL=$('ch-sel').value;anioRender();};
 $('ch-save').onclick=()=>{const v=$('ch-txt').value,p=chParse(v),m=$('ch-msg');if(!p.length){m.className='msg bad';m.textContent='No hay ninguna cadena válida (mínimo 2 números).';return;}CH_TXT=v;store('fpa_chains',v);CH_SEL='';m.className='msg ok';m.textContent='Guardadas '+p.length+' cadenas.';chRender();anioRender();avisoRender();};
 // ---- Números por día de la semana ----
-var DW_SEL=null,DW_ONLY=false;const DW_N={Mon:'Lunes',Tue:'Martes',Wed:'Miércoles',Thu:'Jueves',Fri:'Viernes',Sat:'Sábado',Sun:'Domingo'},DW_IDX={Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6,Sun:0};
+var DW_SEL=null,DW_ONLY=false,DW_Q='';const DW_N={Mon:'Lunes',Tue:'Martes',Wed:'Miércoles',Thu:'Jueves',Fri:'Viernes',Sat:'Sábado',Sun:'Domingo'},DW_IDX={Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6,Sun:0};
 const DW_H=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'],DW_M=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 function dwPat(){try{const l=ROWS[ROWS.length-1],ns=nextSlot(l.d,l.s),WK=anWK();let d=ns.date,g=0;while(weekdayOf(d)!==DW_SEL&&g++<8)d=anAdd(d,1);
   const rows=[];for(const ses of ['MID','EVE']){if(d===ns.date&&ns.session==='EVE'&&ses==='MID')continue;
@@ -1425,7 +1426,7 @@ function dwRender(){try{
   const rep=Object.entries(cnt).filter(e=>e[1]>=2).sort((a,b)=>b[1]-a[1]||(a[0]<b[0]?-1:1));
   const dd={},tt={};rs.forEach(r=>{const x=r.p3.slice(1);dd[x[0]]=(dd[x[0]]||0)+1;tt[x[1]]=(tt[x[1]]||0)+1;});
   const top=o=>Object.keys(o).sort((a,b)=>o[b]-o[a]||a-b)[0];
-  const months=[...new Set(ROWS.map(r=>r.d.slice(0,7)))].sort(),num=p=>p?p[0]+'<b>'+p.slice(1)+'</b>':'&nbsp;',cols=DW_ONLY?[si]:[0,1,2,3,4,5,6];
+  const months=[...new Set(ROWS.map(r=>r.d.slice(0,7)))].sort(),num=p=>p?((DW_Q&&p.slice(1)===DW_Q)?'<span class="dwy">'+p[0]+'<b>'+p.slice(1)+'</b></span>':p[0]+'<b>'+p.slice(1)+'</b>'):'&nbsp;',cols=DW_ONLY?[si]:[0,1,2,3,4,5,6];
   const cal=ym=>{const y=+ym.slice(0,4),m=+ym.slice(5)-1,first=new Date(Date.UTC(y,m,1)).getUTCDay(),nd=new Date(Date.UTC(y,m+1,0)).getUTCDate();
     let h='<table class="cal"><tr>'+cols.map(c=>'<th'+(c===si?' class="sel"':'')+'>'+DW_H[c]+'</th>').join('')+'</tr>';
     for(let w=0;w<6;w++){let row='',any=false;
@@ -1435,12 +1436,15 @@ function dwRender(){try{
         row+='<td'+(c===si?' class="sel"':'')+'><span class="d">'+day+'</span><span class="m">'+num(q.MID)+'</span><span class="e">'+num(q.EVE)+'</span></td>';}
       if(any)h+='<tr>'+row+'</tr>';}
     return h+'</table>';};
-  $('dw-out').innerHTML='<div class="msg"><b>'+DW_N[DW_SEL]+'</b>: '+rs.length+' sorteos</div>'+
+  const qAll=DW_Q?ROWS.filter(r=>r.p3.slice(1)===DW_Q):[],qDay=qAll.filter(r=>weekdayOf(r.d)===DW_SEL),fmt=r=>r.d.slice(8)+'/'+r.d.slice(5,7)+(r.s==='MID'?' Día':' Noche'),
+   qMsg=DW_Q?'<div class="msg">El <b>'+DW_Q+'</b> salió <b>'+qAll.length+'</b> '+(qAll.length===1?'vez':'veces')+' en total y <b>'+qDay.length+'</b> en '+DW_N[DW_SEL]+(qDay.length?': '+qDay.slice(-12).map(fmt).join(' · ')+(qDay.length>12?' (los últimos 12)':''):'')+'. Es lo que salió, no lo que va a salir.</div>':'';
+  $('dw-out').innerHTML='<div class="msg"><b>'+DW_N[DW_SEL]+'</b>: '+rs.length+' sorteos</div>'+qMsg+
    '<div class="meth"><b>Los que más han salido ese día (trasero):</b> '+(rep.length?rep.map(e=>e[0]+' ×'+e[1]).join(' · '):'ninguno repetido todavía')+'</div>'+
    '<div class="meth">Decena que más salió: <b>'+top(dd)+'</b> · terminal que más salió: <b>'+top(tt)+'</b></div>'+
-   dwPat()+'<div class="meth">Rojo = Día · Azul = Noche. En negrita, el trasero.</div>'+
+   dwPat()+'<div class="meth">Rojo = Día · Azul = Noche. En negrita, el trasero. Escribe un trasero arriba para marcarlo en amarillo.</div>'+
    months.map((ym,i)=>'<details'+(i>=months.length-2?' open':'')+'><summary class="meth"><b>'+DW_M[+ym.slice(5)-1]+' '+ym.slice(0,4)+'</b></summary>'+cal(ym)+'</details>').join('');
   }catch(e){}}
+$('dw-q').oninput=()=>{const v=$('dw-q').value.replace(/\D/g,'').slice(0,2);DW_Q=v.length===2?v:'';dwRender();};
 $('dw-btns').addEventListener('click',e=>{const t=e.target.closest?e.target.closest('button'):null;if(!t)return;if(t.getAttribute('data-solo'))DW_ONLY=!DW_ONLY;else if(t.getAttribute('data-w'))DW_SEL=t.getAttribute('data-w');dwRender();});
 // ---- Ahorcados: número que queda entre dos de la tabla unificada (53 y 55 -> 54) ----
 function uniHang(S){const H=[];for(let n=1;n<99;n++){const k=p2(n);if(S.has(k))continue;if(S.has(p2(n-1))&&S.has(p2(n+1)))H.push(k);}return H;}
@@ -1819,7 +1823,7 @@ setTimeout(()=>{try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=74;var UPD_SHOWN=false;
+const APP_BUILD=75;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
