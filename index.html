@@ -44,7 +44,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 .yr td.pVi{outline:2px dashed #1e88e5;outline-offset:-2px}
 .yr td.pR.pVi{outline:2px solid #e53935;box-shadow:inset 0 0 0 4px #1e88e5}
 </style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 75 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 77 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <div id="av-ctc" class="alerta hide"></div>
@@ -193,7 +193,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 75</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 77</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -294,8 +294,8 @@ function candidates(base,blocks,key,rows,targetWd){
     for(const p of anWeek(WKA,sA.date,sA.session)){for(let i=0;i<10;i++)add(p.k==='T'?String(i)+p.dig:p.dig+String(i),'Patrón del año (columna semanal)');}
   }catch(e){}}
   if(targetWd)for(const n of (T.VIBRACION[targetWd]||[]))if(sig.get(n))sig.get(n).push(['Vibración del día',DIAS[targetWd]]);
-  const out=[];
-  for(const[n,items]of sig){const ms=new Set(items.map(x=>x[0]));out.push({score:ms.size*10+Math.min(items.length,6),n,nm:ms.size,items});}
+  const out=[];const RUIDO=new Set(['Atraso','Tabla fundamental','Regla II','Frecuencia histórica','Valor','Compañeros','1-Up/Down decena']); // compilación 77: reglas que en 2026 acertaron igual o por debajo del azar no cuentan como "regla que coincide"
+  for(const[n,it0]of sig){const items=it0.filter(x=>!RUIDO.has(x[0]));if(!items.length)continue;const ms=new Set(items.map(x=>x[0]));out.push({score:ms.size*10+Math.min(items.length,6),n,nm:ms.size,items});}
   out.sort((a,b)=>b.score-a.score||b.nm-a.nm||(a.n<b.n?-1:a.n>b.n?1:0));
   return out;
 }
@@ -755,7 +755,7 @@ function semResp(wk){const yr=ROWS[ROWS.length-1].d.slice(0,4),w=SEM_T[wk];let n
   for(const r of ROWS){if(!r.p3||r.p3.length!==3||weekdayOf(r.d)!==wk)continue;const x=r.p3.slice(1),hit=(+x[0]===w[0])||(+x[1]===w[1]);n++;if(hit)h++;if(r.d.slice(0,4)===yr){n2++;if(hit)h2++;}}
   const lb=(c,m)=>{if(!m)return'';const z=(c-.19*m)/Math.sqrt(m*.19*.81);return z>=2?'por encima del azar':z<=-2?'por debajo del azar':'dentro del azar';};
   return{yr,n,h,n2,h2,l1:lb(h,n),l2:lb(h2,n2),p1:n?(100*h/n).toFixed(1):'0',p2:n2?(100*h2/n2).toFixed(1):'0'};}
-// ---- TOP (desde compilación 73): probado sorteo a sorteo sobre 700 sorteos (nov-2025 a nov-2026). Solo Ensemble E (2 puntos), Tabla Abue B (1) y Únicos del mes anterior M (1); entra con 2 puntos o más. Corridos K y cadena H ya no van al frente (acertaron igual que el azar): solo se marcan si el número ya está. Cuarteta J y Seguidor S quedaron fuera. Tamaño variable (5 a 9 en la prueba) ----
+// ---- TOP (desde compilación 73): probado sorteo a sorteo sobre 700 sorteos (nov-2025 a nov-2026). Solo Ensemble E (2 puntos), Tabla Abue B (1) y Únicos del mes anterior M (1); entra con 2 puntos o más. Corridos K y cadena H ya no van al frente (acertaron igual que el azar): solo se marcan si el número ya está. Cuarteta J y Seguidor S quedaron fuera. Desde compilación 76 el Top siempre lleva 10: primero los de 2 puntos o más y se completa con el orden de candidatos (reglas que coinciden). En la prueba de 420 sorteos: 5 a 9 números acertaron 33; con 10 acertaron 48 (azar 42). ----
 function topbList(r){const base=r.base,pt={},ad=(n,l)=>{if(n&&/^\d\d$/.test(n))(pt[n]=pt[n]||new Set()).add(l);};
   const qf=qCalc(ROWS).f;try{qf['Tabla Abue'](base,r.wd).forEach(n=>ad(n,'B'));}catch(e){}
   (r.en||[]).forEach(n=>ad(n,'E'));try{uniNext(ROWS,r.n.date).set.forEach(n=>ad(n,'M'));}catch(e){}
@@ -763,7 +763,7 @@ function topbList(r){const base=r.base,pt={},ad=(n,l)=>{if(n&&/^\d\d$/.test(n))(
   const sc=n=>{const s=pt[n];let v=0;if(s.has('E'))v+=2;if(s.has('B'))v+=1;if(s.has('M'))v+=1;return v;};
   const L=Object.keys(pt).map(n=>({n,f:[...pt[n]].join(''),s:sc(n)}));
   L.sort((a,b)=>b.s-a.s||(a.n<b.n?-1:1));
-  return L.filter(x=>x.s>=2).slice(0,20);}
+  const top=L.filter(x=>x.s>=2).slice(0,10),have=new Set(top.map(x=>x.n));for(const x of (r.all||[])){if(top.length>=10)break;if(!have.has(x.n)){have.add(x.n);top.push({n:x.n,f:x.f||'',s:0});}}return top;}
 function ruleGrid(){
   const R=ROWS,out=[],tr=f=>{try{return f();}catch(e){return null;}};
   const add=(g,nm,sub,m,pe)=>{if(!m)return;let h=0,n=0,ex;if(pe!==undefined)ex=0;for(const k in m){if(m[k]===null||m[k]===undefined)continue;n++;if(m[k])h++;if(pe!==undefined)ex+=typeof pe==='function'?(pe(k)||0):pe;}out.push({g,nm,sub,m,h,n,ex});};
@@ -873,7 +873,7 @@ function genRender(){try{
   const cs=r.c.slice().sort((a,b)=>b.nm-a.nm||b.score-a.score).slice(0,12).map(x=>x.n+'('+x.nm+')').join(' ');
   const TP=finGet(r).l,TPS=new Set(TP.map(x=>x.n)),RS=r.all.filter(x=>!TPS.has(x.n)),RV=RS.filter(x=>/[KRHS]/.test(x.f)),RN=RS.filter(x=>!/[KRHS]/.test(x.f));
   $('gen-out').innerHTML=
-   '<div class="msg">Para el sorteo: <b>'+r.n.date+' ('+DIAS[r.wd]+') · '+sesName(r.n.session)+'</b><div class="meth">Último trasero '+r.base+'. El TOP (compilación 73) lleva solo las fuentes que mejor aguantaron al probarlas sorteo a sorteo: E Ensemble (vale 2), B Tabla Abue (vale 1) y M Únicos del mes anterior (vale 1); entra con 2 puntos o más. Los corridos (K) y la cadena (H) ya no van primero: solo se marcan si el número ya está. Tamaño variable. Rojo del 1 al 10, azul el resto. Los números de Anguila (G) se siguen añadiendo si los anotas.</div></div>'+
+   '<div class="msg">Para el sorteo: <b>'+r.n.date+' ('+DIAS[r.wd]+') · '+sesName(r.n.session)+'</b><div class="meth">Último trasero '+r.base+'. El TOP (compilación 76) lleva siempre 10 números: primero los de las fuentes que mejor aguantaron (E Ensemble vale 2, B Tabla Abue vale 1, M Únicos del mes anterior vale 1; entran con 2 puntos o más) y el resto hasta 10 sale del orden de candidatos (reglas que coinciden). Los corridos (K) y la cadena (H) ya no van primero: solo se marcan si el número ya está. Rojo del 1 al 10, azul el resto. Los números de Anguila (G) se siguen añadiendo si los anotas.</div></div>'+
    (r.qInfo||'')+'<div class="pg r">TOP · Rojo · del 1 al 10</div>'+g(TP.slice(0,10),'r')+(TP.length>10?'<div class="pg a">TOP · Azul · del 11 al '+TP.length+'</div>'+g(TP.slice(10),'a'):'')+(RV.length?'<div class="pg k">Violeta · fijos, seguidores, patrones o cadena que no caben en el tope de 20 ('+RV.length+')</div>'+g(RV,'k'):'')+'<div class="pg">Negro · el resto</div>'+g(RN,'n')+
    '<div class="msg"><b>Por fuente</b></div>'+
    '<div class="meth"><b>1 · Pronóstico:</b> '+(r.pr.B.join(' · ')||'—')+(r.pr.D!==undefined&&r.pr.D!==''?' · decena '+r.pr.D+' · terminal '+r.pr.T:'')+'</div>'+
@@ -1823,7 +1823,7 @@ setTimeout(()=>{try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=75;var UPD_SHOWN=false;
+const APP_BUILD=77;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
