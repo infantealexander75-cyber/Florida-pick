@@ -44,7 +44,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 .yr td.pVi{outline:2px dashed #1e88e5;outline-offset:-2px}
 .yr td.pR.pVi{outline:2px solid #e53935;box-shadow:inset 0 0 0 4px #1e88e5}
 </style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 78 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 79 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <div id="av-ctc" class="alerta hide"></div>
@@ -193,7 +193,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 78</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 79</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -296,7 +296,7 @@ function candidates(base,blocks,key,rows,targetWd){
   if(targetWd)for(const n of (T.VIBRACION[targetWd]||[]))if(sig.get(n))sig.get(n).push(['Vibración del día',DIAS[targetWd]]);
   const out=[];const RUIDO=new Set(['Atraso','Tabla fundamental','Regla II','Frecuencia histórica','Valor','Compañeros','1-Up/Down decena']); // compilación 77: reglas que en 2026 acertaron igual o por debajo del azar no cuentan como "regla que coincide"
   for(const[n,it0]of sig){const items=it0.filter(x=>!RUIDO.has(x[0]));if(!items.length)continue;const ms=new Set(items.map(x=>x[0]));out.push({score:ms.size*10+Math.min(items.length,6),n,nm:ms.size,items});}
-  out.sort((a,b)=>b.score-a.score||b.nm-a.nm||(a.n<b.n?-1:a.n>b.n?1:0));
+  out.sort((a,b)=>b.score-a.score||b.nm-a.nm||TBC(a.n,b.n,ROWS.length));
   return out;
 }
 function parseCSV(text){ // tolera copias pasadas por una hoja de cálculo: BOM, comas sobrantes, dd/mm/aaaa, ceros perdidos
@@ -755,14 +755,14 @@ function semResp(wk){const yr=ROWS[ROWS.length-1].d.slice(0,4),w=SEM_T[wk];let n
   for(const r of ROWS){if(!r.p3||r.p3.length!==3||weekdayOf(r.d)!==wk)continue;const x=r.p3.slice(1),hit=(+x[0]===w[0])||(+x[1]===w[1]);n++;if(hit)h++;if(r.d.slice(0,4)===yr){n2++;if(hit)h2++;}}
   const lb=(c,m)=>{if(!m)return'';const z=(c-.19*m)/Math.sqrt(m*.19*.81);return z>=2?'por encima del azar':z<=-2?'por debajo del azar':'dentro del azar';};
   return{yr,n,h,n2,h2,l1:lb(h,n),l2:lb(h2,n2),p1:n?(100*h/n).toFixed(1):'0',p2:n2?(100*h2/n2).toFixed(1):'0'};}
-// ---- TOP (desde compilación 73): probado sorteo a sorteo sobre 700 sorteos (nov-2025 a nov-2026). Solo Ensemble E (2 puntos), Tabla Abue B (1) y Únicos del mes anterior M (1); entra con 2 puntos o más. Corridos K y cadena H ya no van al frente (acertaron igual que el azar): solo se marcan si el número ya está. Cuarteta J y Seguidor S quedaron fuera. Desde compilación 76 el Top siempre lleva 10: primero los de 2 puntos o más y se completa con el orden de candidatos (reglas que coinciden). En la prueba de 420 sorteos: 5 a 9 números acertaron 33; con 10 acertaron 48 (azar 42). ----
+// ---- TOP (desde compilación 73): probado sorteo a sorteo sobre 700 sorteos (nov-2025 a nov-2026). Solo Ensemble E (2 puntos), Tabla Abue B (1) y Únicos del mes anterior M (1); entra con 2 puntos o más. Corridos K y cadena H ya no van al frente (acertaron igual que el azar): solo se marcan si el número ya está. Cuarteta J y Seguidor S quedaron fuera. Desde compilación 76 el Top siempre lleva 10: primero los de 2 puntos o más y se completa con el orden de candidatos (reglas que coinciden). Compilación 79: desempate neutro (antes favorecía los números bajos). En 624 sorteos de 2026 el Top de 10 acierta entre 71 y 89 veces según el desempate (media ~79; azar 62). ----
 function topbList(r){const base=r.base,pt={},ad=(n,l)=>{if(n&&/^\d\d$/.test(n))(pt[n]=pt[n]||new Set()).add(l);};
   const qf=qCalc(ROWS).f;try{qf['Tabla Abue'](base,r.wd).forEach(n=>ad(n,'B'));}catch(e){}
   (r.en||[]).forEach(n=>ad(n,'E'));try{uniNext(ROWS,r.n.date).set.forEach(n=>ad(n,'M'));}catch(e){}
   Object.keys(r.cor||{}).forEach(n=>{if(/^\d\d$/.test(n)&&pt[n])ad(n,'K');});Object.keys(r.cad||{}).forEach(n=>{if(/^\d\d$/.test(n)&&pt[n])ad(n,'H');});
   const sc=n=>{const s=pt[n];let v=0;if(s.has('E'))v+=2;if(s.has('B'))v+=1;if(s.has('M'))v+=1;return v;};
   const L=Object.keys(pt).map(n=>({n,f:[...pt[n]].join(''),s:sc(n)}));
-  L.sort((a,b)=>b.s-a.s||(a.n<b.n?-1:1));
+  L.sort((a,b)=>b.s-a.s||TBC(a.n,b.n,ROWS.length));
   const top=L.filter(x=>x.s>=2).slice(0,10),have=new Set(top.map(x=>x.n));for(const x of (r.all||[])){if(top.length>=10)break;if(!have.has(x.n)){have.add(x.n);top.push({n:x.n,f:x.f||'',s:0});}}return top;}
 function ruleGrid(){
   const R=ROWS,out=[],tr=f=>{try{return f();}catch(e){return null;}};
@@ -857,7 +857,7 @@ function genList(){
   const yhas=x=>x&&x.items.some(q=>String(q[0]).indexOf('Patrón del año')===0);
   for(let i=0;i<100;i++){const k=p2(i),P=pr.B.includes(k)?1:0,x=cm.get(k),Cn=x?x.nm/mx:0,T=0,E=ens.has(k)?1:0,U=0,Y=yhas(x)?1:0;
     all.push({n:k,sc:5*P+4*Cn+3*T+2*E+U+2.5*Y,f:[P?'P':'',x?'C':'',T?'T':'',E?'E':'','','',Y?'Y':''].join(''),cn:x?x.nm:0,cs:x?x.score:0});}
-  all.sort((a,b)=>b.sc-a.sc||b.cn-a.cn||b.cs-a.cs||(a.n<b.n?-1:1));
+  all.sort((a,b)=>b.sc-a.sc||b.cn-a.cn||b.cs-a.cs||TBC(a.n,b.n,ROWS.length));
   const cad={};try{const cc=chainNow(ROWS);if(cc&&cc.list)cc.list.forEach(x=>{(cad[x.n]=cad[x.n]||[]).push(cc.a+'→'+cc.b+' ('+x.d+')');});}catch(e){showErr(e,'cadena en el pronóstico');}
   const fol={};try{folSummary(followersTable(ROWS)[base]||[]).forEach(e=>{fol[e[0]]=e[1];});}catch(e){showErr(e,'seguidores en el pronóstico');}
   const ang=angMap(ROWS),angI=angPesos(ROWS),angW=angI.w,angS=angI.s,cor=corFijos(ROWS),isx=x=>cor[x.n]||pat[x.n]||cad[x.n]||fol[x.n]||angW[x.n]>0,mk=x=>{if(ang.has(x.n)&&x.f.indexOf('G')<0)x.f+='G';if(cor[x.n])x.f+='K';if(pat[x.n])x.f+='R';if(cad[x.n])x.f+='H';if(fol[x.n])x.f+='S';};all.forEach(x=>{if(ang.has(x.n)&&x.f.indexOf('G')<0)x.f+='G';});all.slice(0,20).forEach(mk);const kx=all.slice(20).filter(isx);kx.forEach(x=>{mk(x);x.kadd=true;});const all2=all.slice(0,20).concat(kx,all.slice(20).filter(x=>!isx(x)));const yp=c.filter(x=>yhas(x)).map(x=>x.n);let aInfo='';const qI=qCalc(ROWS),qW={},aW={};{try{const dsw=dwLift(),dst=dwStep(anWK(),n.date,n.session);dst.forEach(x=>{if(dsw.w>0)aW[x.v]=(aW[x.v]||0)+dsw.w;});aInfo='<div class="meth"><b>Paso semanal</b> (aciertos / azar): '+dsw.h+'/'+dsw.e.toFixed(1)+' (peso '+dsw.w.toFixed(1)+')'+(dst.length?' · activo ahora: <b>'+[...new Set(dst.map(x=>x.v))].join(', ')+'</b>':'')+'.</div>';}catch(e){}try{const aa=anActive(ROWS,n.date,n.session),lw=anLift();for(let i=0;i<100;i++){const k=p2(i);let v=0;if(aa.T[k[1]])v+=lw.w.T;if(aa.D[k[0]])v+=lw.w.D;if(v>0)aW[k]=v;}aInfo+='<div class="meth"><b>Año</b> (aciertos / azar): terminal '+lw.inf.T.h+'/'+lw.inf.T.e.toFixed(0)+' (peso '+lw.inf.T.w.toFixed(1)+') · decena '+lw.inf.D.h+'/'+lw.inf.D.e.toFixed(0)+' (peso '+lw.inf.D.w.toFixed(1)+'). Se suma a los números cuyo terminal o decena está activado en la pestaña Año.</div>';}catch(e){}}
@@ -873,7 +873,7 @@ function genRender(){try{
   const cs=r.c.slice().sort((a,b)=>b.nm-a.nm||b.score-a.score).slice(0,12).map(x=>x.n+'('+x.nm+')').join(' ');
   const TP=finGet(r).l,TPS=new Set(TP.map(x=>x.n)),RS=r.all.filter(x=>!TPS.has(x.n)),RV=RS.filter(x=>/[KRHS]/.test(x.f)),RN=RS.filter(x=>!/[KRHS]/.test(x.f));
   $('gen-out').innerHTML=
-   '<div class="msg">Para el sorteo: <b>'+r.n.date+' ('+DIAS[r.wd]+') · '+sesName(r.n.session)+'</b><div class="meth">Último trasero '+r.base+'. El TOP (compilación 76) lleva siempre 10 números: primero los de las fuentes que mejor aguantaron (E Ensemble vale 2, B Tabla Abue vale 1, M Únicos del mes anterior vale 1; entran con 2 puntos o más) y el resto hasta 10 sale del orden de candidatos (reglas que coinciden). Los corridos (K) y la cadena (H) ya no van primero: solo se marcan si el número ya está. Rojo del 1 al 10, azul el resto. Los números de Anguila (G) se siguen añadiendo si los anotas.</div></div>'+
+   '<div class="msg">Para el sorteo: <b>'+r.n.date+' ('+DIAS[r.wd]+') · '+sesName(r.n.session)+'</b><div class="meth">Último trasero '+r.base+'. El TOP (compilación 79) lleva siempre 10 números: primero los de las fuentes que mejor aguantaron (E Ensemble vale 2, B Tabla Abue vale 1, M Únicos del mes anterior vale 1; entran con 2 puntos o más) y el resto hasta 10 sale del orden de candidatos (reglas que coinciden). Los empates se resuelven sin favorecer ningún número. Los corridos (K) y la cadena (H) ya no van primero: solo se marcan si el número ya está. Rojo del 1 al 10, azul el resto. Los números de Anguila (G) se siguen añadiendo si los anotas.</div></div>'+
    (r.qInfo||'')+'<div class="pg r">TOP · Rojo · del 1 al 10</div>'+g(TP.slice(0,10),'r')+(TP.length>10?'<div class="pg a">TOP · Azul · del 11 al '+TP.length+'</div>'+g(TP.slice(10),'a'):'')+(RV.length?'<div class="pg k">Violeta · fijos, seguidores, patrones o cadena que no caben en el tope de 20 ('+RV.length+')</div>'+g(RV,'k'):'')+'<div class="pg">Negro · el resto</div>'+g(RN,'n')+
    '<div class="msg"><b>Por fuente</b></div>'+
    '<div class="meth"><b>1 · Pronóstico:</b> '+(r.pr.B.join(' · ')||'—')+(r.pr.D!==undefined&&r.pr.D!==''?' · decena '+r.pr.D+' · terminal '+r.pr.T:'')+'</div>'+
@@ -1568,12 +1568,14 @@ function decRender(){const f=(c,nm)=>{const r=decFreq(allRows(),undefined,c);ret
 decRender();document.querySelector('#nav button[data-t="patron"]').addEventListener('click',decRender);
 
 // ---- Ensemble: puntaje por número = en cuántas reglas aparece (igual peso); se toman los 5 de mayor puntaje ----
+// Desempate neutro (compilación 79): antes los empates se resolvían siempre por el número más bajo (00, 01, 02…) y el Top se llenaba de 00-09 (2.6 de cada 10). Ahora el desempate no favorece a ningún número y es estable para un mismo sorteo.
+function TBC(a,b,seed){const h=n=>((parseInt(n,10)+1)*2654435761+(seed|0)*40503)%100003;return h(a)-h(b)||(a<b?-1:1);}
 function ensTop5(ht){
   const a=ht[ht.length-1],ev={},rv=n=>n[1]+n[0],add=S=>{for(const n of new Set((S||[]).filter(y=>y&&y!=='?'&&/^\d\d$/.test(y))))ev[n]=(ev[n]||0)+1;};
   add(T.M1M2[a]);add(T.PLEITO[a]);add(T.CUARTETAS[a]);add(T.RODEAN[a]);add([a[0]+(+a[1]+1)%10,a[0]+(+a[1]+9)%10]);add(a!==rv(a)?[rv(a)]:[]);add([T.EQUALITY[a]]);
   const tr={};for(let i=1;i<ht.length;i++)if(ht[i-1]===a)tr[ht[i]]=(tr[ht[i]]||0)+1;
-  add(Object.entries(tr).sort((x,y)=>y[1]-x[1]||(x[0]<y[0]?-1:1)).slice(0,3).map(x=>x[0]));
-  return Object.entries(ev).sort((x,y)=>y[1]-x[1]||(x[0]<y[0]?-1:1)).slice(0,5).map(x=>x[0]);
+  add(Object.entries(tr).sort((x,y)=>y[1]-x[1]||TBC(x[0],y[0],ht.length)).slice(0,3).map(x=>x[0]));
+  return Object.entries(ev).sort((x,y)=>y[1]-x[1]||TBC(x[0],y[0],ht.length)).slice(0,5).map(x=>x[0]);
 }
 // ---- Regla fija: Ensemble, contada hacia adelante ----
 const EN_START='2026-10-11|EVE';
@@ -1843,7 +1845,7 @@ setTimeout(()=>{try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=78;var UPD_SHOWN=false;
+const APP_BUILD=79;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
