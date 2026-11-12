@@ -44,7 +44,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 .yr td.pVi{outline:2px dashed #1e88e5;outline-offset:-2px}
 .yr td.pR.pVi{outline:2px solid #e53935;box-shadow:inset 0 0 0 4px #1e88e5}
 </style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 79 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 80 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <div id="av-ctc" class="alerta hide"></div>
@@ -193,7 +193,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 79</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 80</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -618,9 +618,9 @@ function angRender(){try{const s=angSess(),m=angMap();$('an-ses').innerHTML='Ses
 function angInit(){$('an-fm').value=ANG_FUERTE.MID.map(angH).join(' ');$('an-ft').value=ANG_FUERTE.EVE.map(angH).join(' ');
   $('an-fs').onclick=()=>{ANG_FUERTE={MID:angHP($('an-fm').value,true),EVE:angHP($('an-ft').value,false)};store('fpa_angf',ANG_FUERTE);$('an-fm').value=ANG_FUERTE.MID.map(angH).join(' ');$('an-ft').value=ANG_FUERTE.EVE.map(angH).join(' ');
     $('an-msg').className='msg ok';$('an-msg').textContent='Horas fuertes: mañana '+angHN(ANG_FUERTE.MID)+' · tarde '+angHN(ANG_FUERTE.EVE)+'.';try{angRender();genRender();finRender();}catch(e){showErr(e,'horas fuertes');}};$('an-exp').onclick=()=>{try{const t='fecha,hora,n1,n2,n3\n'+ANG.map(a=>[a.d,a.h,...a.n].join(',')).join('\n'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv'}));a.download='anguila_historial.csv';document.body.appendChild(a);a.click();a.remove();$('an-msg').className='msg ok';$('an-msg').textContent='Descargado: '+ANG.length+' sorteos de Anguila.';}catch(e){showErr(e,'exportar Anguila');}};try{document.querySelector('#nav button[data-t="ang"]').addEventListener('click',()=>{$('an-d').value='';angRender();});}catch(e){}$('an-add').onclick=()=>{const m=$('an-msg'),r=angParse($('an-txt').value,$('an-d').value);m.className='msg '+(r.ok.length?'ok':'bad');m.textContent=(r.ok.length?'Anotados '+r.ok.length+': '+r.ok.map(x=>x.d.slice(5)+' '+(x.h%12||12)+(x.h<12?'AM':'PM')).join(', ')+'. ':'')+(r.ig?'Ignoré '+r.ig+' líneas que no son de Anguila. ':'')+(r.bad.length?'No entendí: '+r.bad.join(' | '):'')||'No hay nada que anotar.';if(r.ok.length||r.ig){$('an-txt').value='';angRender();try{genRender();}catch(x){showErr(x,'pronóstico');}}};angRender();}
-function ensureSnap(){try{const l=ROWS[ROWS.length-1];if(!l)return;const n=nextSlot(l.d,l.s),k=n.date+'|'+n.session;if(SNAP[k])return;const r=genList();if(!r||r.all.length<20)return;
-  SNAP[k]={r:r.top.slice(0,10).map(x=>x.n),a:r.top.slice(10,20).map(x=>x.n),t:new Date().toISOString()};store('fpa_snap',SNAP);}catch(e){showErr(e,'foto de la lista');}}
-function ensurePred(){try{ensureSnap();}catch(e){}const p=makePred(ROWS);if(!p)return;if(!PRED[p.key]){PRED[p.key]={B:p.B,F:p.F,D:p.D,T:p.T,t:new Date().toISOString()};store('fpa_pred',PRED);}else if(PRED[p.key].D===undefined){PRED[p.key].D=p.D;PRED[p.key].T=p.T;store('fpa_pred',PRED);}}
+function ensureSnap(){try{const l=ROWS[ROWS.length-1];if(!l)return;const n=nextSlot(l.d,l.s),k=n.date+'|'+n.session;const has=!!(l.p4&&l.p4.length>=4);if(SNAP[k]&&(SNAP[k].p4!==false||!has))return;const r=genList();if(!r||r.all.length<20)return;
+  SNAP[k]={r:r.top.slice(0,10).map(x=>x.n),a:r.top.slice(10,20).map(x=>x.n),p4:has,t:new Date().toISOString()};store('fpa_snap',SNAP);}catch(e){showErr(e,'foto de la lista');}}
+function ensurePred(){try{ensureSnap();}catch(e){}const p=makePred(ROWS);if(!p)return;const lp=ROWS[ROWS.length-1],has4=!!(lp&&lp.p4&&lp.p4.length>=4);if(!PRED[p.key]||(PRED[p.key].p4===false&&has4)){PRED[p.key]={B:p.B,F:p.F,D:p.D,T:p.T,p4:has4,t:new Date().toISOString()};store('fpa_pred',PRED);}else if(PRED[p.key].D===undefined){PRED[p.key].D=p.D;PRED[p.key].T=p.T;store('fpa_pred',PRED);}}
 const pct=p=>p<0.001?'<0.001':p.toFixed(3);
 function chainHtml(a,b,L){
   if(!L.length)return'<div class="meth">La cadena '+a+' → '+b+' → ? no ha salido desde 2010.</div>';
@@ -1845,7 +1845,7 @@ setTimeout(()=>{try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=79;var UPD_SHOWN=false;
+const APP_BUILD=80;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
