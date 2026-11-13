@@ -44,10 +44,11 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 .yr td.pVi{outline:2px dashed #1e88e5;outline-offset:-2px}
 .yr td.pR.pVi{outline:2px solid #e53935;box-shadow:inset 0 0 0 4px #1e88e5}
 </style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 82 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 83 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <div id="av-ctc" class="alerta hide"></div>
+<div id="bk-ban" class="alerta hide" style="border-left-color:#1e88e5"></div>
 <nav id="nav"><button data-t="nuevo" class="on">Nuevo</button><button data-t="gen" class="redtab">Pronósticos</button><button data-t="cand">Candidatos</button><button data-t="hist">Historial</button><button data-t="consulta">Consulta</button><button data-t="ang">Anguila</button><button data-t="dias">Días de semana</button><button data-t="anio">Año (Día/Noche)</button><button data-t="anc">Año consecutivo</button><button data-t="ens">Ensemble</button><button data-t="patron">Patrón</button><button data-t="copia">Copia</button></nav>
 <main>
 <div class="warn">Herramienta de entretenimiento. Las "coincidencias" no son probabilidades de ganar. Juega solo lo que estés dispuesto a perder.</div>
@@ -192,8 +193,11 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <label>Texto de la copia (copiar o pegar aquí)</label><textarea id="ta"></textarea>
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
+ <div class="card"><b>Copias automáticas</b><p class="meth">Cada vez que se guarda un sorteo, la app guarda sola una copia dentro del teléfono (las últimas 10). Sirve si cargas algo por error o algo sale mal. <b>No te protege si borras los datos de Chrome o cambias de teléfono:</b> para eso la app te avisa arriba cuando toca descargar la copia.</p>
+  <div class="meth" id="bk-st"></div><div id="bk-list"></div>
+  <button class="btn" id="bk-out">Guardar copia ahora (.json + .csv)</button><button class="btn s" id="bk-now">Hacer copia interna ahora</button><div class="msg" id="bk-msg"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 82</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 83</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -1553,7 +1557,7 @@ function csvText(){
   for(const k of Object.keys(PRED)){const p=PRED[k];t+='#pred;'+k+';'+p.B.join(' ')+';'+(p.D===undefined?'':p.D)+';'+(p.T===undefined?'':p.T)+'\n';}
   for(const k of Object.keys(MINE)){const p=MINE[k];t+='#mine;'+k+';'+p.N.join(' ')+';'+p.D+';'+p.T+'\n';}
   return t;}
-function addRows(list){for(const r of list){EXTRA=EXTRA.filter(e=>slotKey(e)!==slotKey(r));EXTRA.push(r);DEL=DEL.filter(k=>k!==slotKey(r));}const a=store('fpa_extra',EXTRA),b=store('fpa_del',DEL);return a&&b;}
+function addRows(list){for(const r of list){EXTRA=EXTRA.filter(e=>slotKey(e)!==slotKey(r));EXTRA.push(r);DEL=DEL.filter(k=>k!==slotKey(r));}const a=store('fpa_extra',EXTRA),b=store('fpa_del',DEL);try{bkSchedule();}catch(e){}return a&&b;}
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('on',x===b));
   for(const t of ['nuevo','gen','cand','hist','consulta','dias','anio','anc','ens','patron','copia','ang'])$('t-'+t).classList.toggle('hide',t!==b.dataset.t);});
 function flLine(t,nx){t=String(t).toUpperCase().replace(/[*_~]/g,' ');let d=nx.date,s=null;
@@ -1831,6 +1835,70 @@ function doImport(text){
   if(np)store('fpa_pred',PRED);if(nm)store('fpa_mine',MINE);
   if(!r.length&&!np&&!nm){m.className='msg bad';m.textContent='No encontré sorteos válidos (formato: fecha,sorteo,pick3,pick4).';return;}
   if(r.length)addRows(r);m.className='msg ok';m.textContent='Cargados '+r.length+' sorteos'+(np?', '+np+' pronósticos del programa':'')+(nm?', '+nm+' pronósticos tuyos':'')+'.';render();setNext();}
+
+// ---- Copias automáticas (compilación 83) ----
+// Al guardar un sorteo (addRows) se guarda sola una copia completa en IndexedDB (las últimas 10).
+// Esas copias viven en el mismo navegador: no sirven si se borran los datos del sitio. Por eso, además,
+// la app lleva la cuenta de los sorteos nuevos desde la última descarga y avisa arriba cuando pasan BK_N.
+const BK_N=4,BK_KEEP=10;
+function bkMeta(){try{return JSON.parse(localStorage.getItem('bk_meta')||'null');}catch(e){return null;}}
+function bkSetMeta(o){try{localStorage.setItem('bk_meta',JSON.stringify(o));}catch(e){}}
+function bkDB(){return new Promise((res,rej)=>{try{const q=indexedDB.open('fpa_bk',1);q.onupgradeneeded=()=>q.result.createObjectStore('snaps',{keyPath:'t'});q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error);}catch(e){rej(e);}});}
+function bkReq(db,mode,fn){return new Promise((res,rej)=>{const tx=db.transaction('snaps',mode),r=fn(tx.objectStore('snaps'));tx.oncomplete=()=>res(r&&r.result);tx.onerror=()=>rej(tx.error);tx.onabort=()=>rej(tx.error);});}
+function bkHash(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return String(h);}
+function bkFmt(t){try{return new Date(t).toLocaleString('es',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});}catch(e){return String(t).slice(0,16);}}
+async function bkSnap(){
+  const o=JSON.parse(fullBackup()),ds=JSON.stringify(o.data),h=bkHash(ds),db=await bkDB();
+  try{
+    const all=((await bkReq(db,'readonly',s=>s.getAll()))||[]).sort((a,b)=>a.t<b.t?-1:1);
+    if(all.length&&all[all.length-1].h===h)return false;
+    const R=allRows(),l=R[R.length-1]||{d:'',s:'MID'},rec={t:new Date().toISOString(),h,n:R.length,last:l.d+' '+sesName(l.s),data:ds};
+    await bkReq(db,'readwrite',s=>s.put(rec));
+    const extra=all.concat([rec]).slice(0,-BK_KEEP);
+    for(const x of extra)await bkReq(db,'readwrite',s=>s.delete(x.t));
+    return true;
+  }finally{db.close();}
+}
+function bkSchedule(){clearTimeout(window._bkT);window._bkT=setTimeout(()=>{bkSnap().then(()=>bkUi()).catch(e=>{try{showErr(e,'copia automática');}catch(_){}});},2500);}
+async function bkList(){const db=await bkDB();try{return((await bkReq(db,'readonly',s=>s.getAll()))||[]).sort((a,b)=>a.t<b.t?1:-1);}finally{db.close();}}
+function bkMark(){bkSetMeta({t:new Date().toISOString(),n:allRows().length});bkUi();}
+async function bkRestore(t){
+  const m=$('bk-msg');
+  try{
+    const db=await bkDB();let rec;try{rec=await bkReq(db,'readonly',s=>s.get(t));}finally{db.close();}
+    if(!rec)throw new Error('no encontré esa copia');
+    if(!confirm('¿Volver al estado del '+bkFmt(rec.t)+' (hasta '+rec.last+')? Antes se guarda una copia del estado actual para poder volver.'))return;
+    await bkSnap();
+    const d=JSON.parse(rec.data);
+    const quitar=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('fpa_')===0&&!(k in d))quitar.push(k);}
+    quitar.forEach(k=>localStorage.removeItem(k));
+    Object.keys(d).forEach(k=>{if(k.indexOf('fpa_')===0)localStorage.setItem(k,d[k]);});
+    m.className='msg ok';m.textContent='Copia restaurada. Recargando…';setTimeout(()=>location.reload(),900);
+  }catch(e){m.className='msg bad';m.textContent='No se pudo restaurar: '+e.message;try{showErr(e,'restaurar copia interna');}catch(_){}}
+}
+async function bkSaveOut(){
+  const last=(allRows().slice(-1)[0]||{d:''}).d;
+  try{
+    const fj=new File([fullBackup()],'fpa_copia_completa_'+last+'.json',{type:'application/json'}),fc=new File([csvText()],'pick3_copia_'+last+'.csv',{type:'text/csv'});
+    if(navigator.canShare&&navigator.canShare({files:[fj,fc]})){await navigator.share({files:[fj,fc],title:'Copia Florida Pick Analyzer'});bkMark();return;}
+  }catch(e){if(e&&e.name==='AbortError')return;}
+  try{$('b-full').onclick();setTimeout(()=>{try{$('b-dl').onclick();}catch(e){}},900);bkMark();}catch(e){try{showErr(e,'guardar copia');}catch(_){}}
+}
+function bkUi(){
+  try{
+    const R=allRows().length;let M=bkMeta();
+    if(!M){M={t:null,n:R};bkSetMeta(M);}
+    const pend=Math.max(0,R-(M.n||0)),ban=$('bk-ban');
+    if(pend>=BK_N){ban.classList.remove('hide');ban.innerHTML='💾 <b>Copia pendiente:</b> '+pend+' sorteos nuevos sin descargar. Si borras los datos de Chrome se pierden. <button class="btn" id="bk-go" style="padding:7px 12px;font-size:14px">Guardar copia ahora</button>';const g=$('bk-go');if(g)g.onclick=bkSaveOut;}
+    else{ban.classList.add('hide');ban.innerHTML='';}
+    $('bk-st').innerHTML='Última copia descargada: <b>'+(M.t?bkFmt(M.t):'sin registro')+'</b> · sorteos nuevos desde entonces: <b>'+pend+'</b> (avisa al llegar a '+BK_N+').';
+    bkList().then(L=>{const el=$('bk-list');el.innerHTML=L.length?'<div class="meth" style="margin-top:8px"><b>Copias internas ('+L.length+')</b></div>'+L.map(x=>'<div class="meth" style="display:flex;justify-content:space-between;align-items:center;gap:8px;border-top:1px solid var(--bd);padding:6px 0"><span>'+bkFmt(x.t)+' · hasta '+x.last+'</span><button class="btn s" data-bk="'+x.t+'" style="padding:5px 10px;font-size:13px;margin:0">Restaurar</button></div>').join(''):'<div class="meth">Todavía no hay copias internas (se crean al guardar el próximo sorteo).</div>';el.querySelectorAll('[data-bk]').forEach(b=>{b.onclick=()=>bkRestore(b.getAttribute('data-bk'));});}).catch(()=>{});
+  }catch(e){}
+}
+$('bk-out').onclick=bkSaveOut;
+$('bk-now').onclick=async()=>{const m=$('bk-msg');try{const nueva=await bkSnap();m.className='msg ok';m.textContent=nueva?'Copia interna guardada.':'Ya hay una copia interna idéntica al estado actual.';bkUi();}catch(e){m.className='msg bad';m.textContent='No se pudo guardar la copia interna: '+e.message;}};
+$('b-full').addEventListener('click',()=>{try{bkMark();}catch(e){}});
+setTimeout(()=>{bkUi();bkSnap().then(()=>bkUi()).catch(()=>{});},2000);
 $('b-imp').onclick=()=>doImport($('ta').value);
 $('fl').onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>doImport(String(rd.result));rd.readAsText(f);};
 async function doUpdate(auto){
