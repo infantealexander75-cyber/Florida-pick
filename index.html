@@ -44,7 +44,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 .yr td.pVi{outline:2px dashed #1e88e5;outline-offset:-2px}
 .yr td.pR.pVi{outline:2px solid #e53935;box-shadow:inset 0 0 0 4px #1e88e5}
 </style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 81 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 82 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <div id="av-ctc" class="alerta hide"></div>
@@ -98,7 +98,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <label style="display:flex;gap:8px;align-items:center;margin:0 0 8px"><input type="checkbox" id="av-on" checked style="width:auto"> Sonido y vibración al activarse una alerta</label>
   <div class="lg"><span style="background:#90caf9">Horizontal</span><span style="background:#a5d6a7">Vertical</span><span style="background:#ffcc80">Oblicua ↘</span><span style="background:#ce93d8">Transversal ↗</span><span style="background:#80deea">Columna semanal</span><span style="background:#f48fb1">Cadena elegida</span><span style="background:#fff176">Número que predice</span></div>
   <label>Buscar trasero</label><input id="an-q" inputmode="numeric" maxlength="2" placeholder="Ej.: 64"><div class="msg" id="an-sel"></div>
-  <div class="yr" id="an-wrap"><div id="an-grid"></div></div></div>
+  <button class="btn" id="an-sh" type="button" style="margin:6px 0">Compartir imagen</button><div class="yr" id="an-wrap"><div id="an-grid"></div></div></div>
  <div class="card"><b>Patrones activos (se actualizan solos)</b><p class="meth">Busca en el calendario líneas de 3 o más casillas con el mismo paso (la decena y el terminal suben o bajan igual en cada casilla) y calcula la casilla que sigue (también cada N días, aunque crucen de un mes a otro). También marca terminal o decena repetidos en una línea. Es seguimiento de coincidencias, no un pronóstico.</p><div id="an-pat"></div></div>
  <div class="card"><b>Cadenas semánticas (charada)</b>
   <p class="meth">Avisa cuando salen 2 o más eslabones de una cadena, en orden, dentro de la ventana, y dice cuál sigue. Las cadenas se editan abajo.</p>
@@ -115,7 +115,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
  <div class="card"><b>Números por día de la semana</b>
   <div class="row" id="dw-btns"></div>
   <label>Buscar trasero</label><input id="dw-q" inputmode="numeric" maxlength="2" placeholder="Ej.: 64">
-  <div id="dw-out"></div></div>
+  <button class="btn" id="dw-sh" type="button" style="margin:6px 0">Compartir imagen</button><div id="dw-out"></div></div>
 </section>
 
 <section id="t-hist" class="hide"><div class="card"><b>Consulta histórica 2010-2026</b><div class="row"><div><label>Día de la semana</label><select id="of-w"></select></div><div><label>Mes</label><select id="of-m"></select></div><div><label>Turno</label><select id="of-t"><option value="0">Día</option><option value="1">Noche</option><option value="2">Ambos</option></select></div></div><div id="of-out"></div></div><div class="card"><div class="row"><div><label>Turno</label><select id="h-s"><option value="">Todos</option><option value="MID">Día</option><option value="EVE">Noche</option></select></div><div><label>Buscar (fecha o número)</label><input id="h-q" placeholder="2026-10 o 38"></div></div><div id="hist-info"></div><table id="hist-tab"></table>
@@ -159,7 +159,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <p class="meth">Una columna por mes. Hacia abajo van los sorteos en orden: Día 1, Noche 1, Día 2, Noche 2… Cada casilla es el Pick 3 completo; en negrita el trasero. Los colores marcan las líneas de 3 casillas con el mismo paso, igual que en Año (Día/Noche). Toca una casilla para marcar en amarillo todas las veces que salió. Morado: el próximo sorteo.</p>
   <div class="lg"><span style="background:#90caf9">Horizontal</span><span style="background:#a5d6a7">Vertical</span><span style="background:#ffcc80">Oblicua ↘</span><span style="background:#ce93d8">Transversal ↗</span><span style="background:#fff176">Número que predice</span><span style="outline:2px solid #e53935;outline-offset:-2px;background:#fff">Número repetido en línea</span><span style="outline:2px dashed #1e88e5;outline-offset:-2px;background:#fff">Viraje en línea</span></div>
   <label>Buscar trasero</label><input id="cn-q" inputmode="numeric" maxlength="2" placeholder="Ej.: 64"><div class="msg" id="cn-sel"></div>
-  <div class="yr" id="cn-wrap"><div id="cn-grid"></div></div></div>
+  <button class="btn" id="cn-sh" type="button" style="margin:6px 0">Compartir imagen</button><div class="yr" id="cn-wrap"><div id="cn-grid"></div></div></div>
  <div class="card"><b>Patrones activos (Año consecutivo)</b><p class="meth">Se actualizan solos con cada sorteo. Cuando aparece uno nuevo, también salta la alerta de arriba y el dígito activado cuenta como en Año (Día/Noche). Es seguimiento de coincidencias, no un pronóstico.</p><div id="cn-pat"></div></div>
 </section>
 <section id="t-ens" class="hide">
@@ -193,7 +193,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <button class="btn s" id="b-imp">Cargar lo pegado</button>
   <label>O elegir un archivo .csv</label><input type="file" id="fl" accept=".csv,.json,text/csv,text/plain,application/json"><div class="msg" id="m-imp"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 81</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 82</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -1061,6 +1061,75 @@ function bingoRender(){try{const b=$('bingo'),l=ROWS[ROWS.length-1];if(!l){b.cla
   b.classList.remove('hide');b.onclick=()=>{BG_OFF=key;b.classList.add('hide');};
   const sb=b.querySelector('.bgsh');if(sb)sb.onclick=ev=>{ev.stopPropagation();bgShare(sb);};
   }catch(e){}}
+// ---- Compartir calendarios (Año, Año consecutivo) y Días de semana como imagen (compilación 82) ----
+function shCol(c){const m=/rgba?\(([^)]+)\)/.exec(c||'');if(!m)return null;const p=m[1].split(',').map(x=>parseFloat(x));return{r:p[0],g:p[1],b:p[2],a:p.length>3?p[3]:1};}
+function shRgba(c,k){return 'rgba('+c.r+','+c.g+','+c.b+','+(c.a*(k==null?1:k))+')';}
+function shBase(el){while(el){const c=shCol(getComputedStyle(el).backgroundColor);if(c&&c.a>0.95)return 'rgb('+c.r+','+c.g+','+c.b+')';el=el.parentElement;}return '#fff';}
+function shStroke(c,x,y,w,h,sh,ow,oc,os,off,S){
+  if(sh){const re=/(rgba?\([^)]*\))\s+(-?[\d.]+)px\s+(-?[\d.]+)px\s+([\d.]+)px\s+([\d.]+)px\s*(inset)?/g;let m;
+    while((m=re.exec(sh))){const sp=parseFloat(m[5])*S;if(sp>0&&m[6]){c.strokeStyle=m[1];c.lineWidth=sp;c.setLineDash([]);c.strokeRect(x+sp/2,y+sp/2,w-sp,h-sp);}}}
+  if(os&&os!=='none'&&parseFloat(ow)>0){const w2=parseFloat(ow)*S,ins=-(parseFloat(off)||0)*S-w2/2;c.strokeStyle=oc;c.lineWidth=w2;c.setLineDash(os==='dashed'?[3*S,2*S]:[]);c.strokeRect(x+ins,y+ins,w-2*ins,h-2*ins);c.setLineDash([]);}
+}
+function shDrawTable(c,t,ox,oy,S){
+  const tr=t.getBoundingClientRect();
+  t.querySelectorAll('th,td').forEach(cell=>{
+    const r=cell.getBoundingClientRect(),x=ox+(r.left-tr.left)*S,y=oy+(r.top-tr.top)*S,w=r.width*S,h=r.height*S,cs=getComputedStyle(cell);
+    const bg=shCol(cs.backgroundColor);if(bg&&bg.a>0){c.fillStyle=shRgba(bg);c.fillRect(x,y,w,h);}
+    c.strokeStyle='rgba(128,128,128,.4)';c.lineWidth=1;c.setLineDash([]);c.strokeRect(x+.5,y+.5,w-1,h-1);
+    shStroke(c,x,y,w,h,cs.boxShadow,cs.outlineWidth,cs.outlineColor,cs.outlineStyle,cs.outlineOffset,S);
+    const wk=document.createTreeWalker(cell,NodeFilter.SHOW_TEXT);let tn;
+    while((tn=wk.nextNode())){const tx=tn.nodeValue.replace(/\u00a0/g,' ');if(!tx.trim())continue;
+      const pe=tn.parentElement,ps=getComputedStyle(pe),rg=document.createRange();rg.selectNodeContents(tn);const rr=rg.getClientRects()[0];if(!rr)continue;
+      if(pe!==cell){const pb=shCol(ps.backgroundColor);if(pb&&pb.a>0){const q=pe.getBoundingClientRect();c.fillStyle=shRgba(pb);c.fillRect(ox+(q.left-tr.left)*S,oy+(q.top-tr.top)*S,q.width*S,q.height*S);}}
+      c.font=(ps.fontStyle==='italic'?'italic ':'')+ps.fontWeight+' '+(parseFloat(ps.fontSize)*S)+'px '+ps.fontFamily;
+      const col=shCol(ps.color)||{r:0,g:0,b:0,a:1},op=parseFloat(ps.opacity);c.fillStyle=shRgba(col,isNaN(op)?1:op);c.textAlign='left';c.textBaseline='middle';
+      c.fillText(tx,ox+(rr.left-tr.left)*S,oy+((rr.top+rr.bottom)/2-tr.top)*S);}
+  });
+}
+function shBuild(o){
+  const cols=o.cols||1,blocks=o.blocks,G=14,tm=document.createElement('canvas').getContext('2d'),F='system-ui,Arial,sans-serif';
+  const dims=blocks.map(b=>{const r=b.table.getBoundingClientRect();return{w:r.width,h:r.height};});
+  const tw=Math.max(...dims.map(d=>d.w)),W=Math.max(cols*tw+(cols+1)*G,420),MW=W-2*G;
+  const wrap=(t,f)=>{tm.font=f;const ws=t.split(' '),out=[];let cur='';for(const x of ws){const n=cur?cur+' '+x:x;if(tm.measureText(n).width>MW&&cur){out.push(cur);cur=x;}else cur=n;}if(cur)out.push(cur);return out;};
+  const txt=[];let y=G;
+  const tf='700 19px '+F;wrap(o.title,tf).forEach(l=>{txt.push({t:l,f:tf,y,k:1});y+=25;});y+=2;
+  const lf='400 13px '+F;(o.lines||[]).forEach(s=>{wrap(s,lf).forEach(l=>{txt.push({t:l,f:lf,y,k:.75});y+=18;});y+=3;});
+  const chips=[];if((o.legend||[]).length){y+=3;let x=G;tm.font='400 12px '+F;o.legend.forEach(e=>{const w=Math.ceil(tm.measureText(e.t).width)+14;if(x+w>W-G&&x>G){x=G;y+=24;}chips.push({e,x,y,w});x+=w+6;});y+=28;}
+  const pos=[];let rowH=0,col=0,rowY=y;
+  blocks.forEach((b,i)=>{const lh=b.label?22:0;const bx=G+col*(tw+G);pos.push({b,x:bx,y:rowY,lh,h:dims[i].h});rowH=Math.max(rowH,lh+dims[i].h);col++;if(col===cols||i===blocks.length-1){rowY+=rowH+G;rowH=0;col=0;}});
+  const H=rowY+22,S=Math.min(2,1800/W,3200/H),cv=document.createElement('canvas');cv.width=Math.round(W*S);cv.height=Math.round(H*S);
+  const c=cv.getContext('2d'),base=shBase(blocks[0].table),tc=shCol(getComputedStyle(document.body).color)||{r:20,g:20,b:20,a:1};
+  c.fillStyle=base;c.fillRect(0,0,cv.width,cv.height);c.textAlign='left';c.textBaseline='top';
+  txt.forEach(l=>{c.font=l.f.replace(/(\d+)px/,(m,n)=>(n*S)+'px');c.fillStyle=shRgba(tc,l.k);c.fillText(l.t,G*S,l.y*S);});
+  chips.forEach(ch=>{const e=ch.e,x=ch.x*S,yy=ch.y*S,w=ch.w*S,h=20*S;const bg=shCol(e.bg);c.fillStyle=(bg&&bg.a>0)?shRgba(bg):'#fff';c.fillRect(x,yy,w,h);shStroke(c,x,yy,w,h,'',e.ow,e.oc,e.os,'-2px',S);c.font='400 '+(12*S)+'px '+F;c.fillStyle='#000';c.textBaseline='middle';c.fillText(e.t,x+7*S,yy+h/2);c.textBaseline='top';});
+  pos.forEach(p=>{if(p.b.label){c.font='700 '+(14*S)+'px '+F;c.fillStyle=shRgba(tc,1);c.textBaseline='top';c.fillText(p.b.label,p.x*S,p.y*S+2*S);}shDrawTable(c,p.b.table,p.x*S,(p.y+p.lh)*S,S);});
+  c.font='600 '+(11*S)+'px '+F;c.fillStyle=shRgba(tc,.55);c.textBaseline='top';c.textAlign='center';c.fillText('Florida Pick Analyzer',cv.width/2,(H-17)*S);
+  return cv;
+}
+function shLegend(card){return[...card.querySelectorAll('.lg span')].map(sp=>{const cs=getComputedStyle(sp);return{t:sp.textContent.trim(),bg:cs.backgroundColor,os:cs.outlineStyle,ow:cs.outlineWidth,oc:cs.outlineColor};});}
+function shYear(){return ROWS.length?ROWS[ROWS.length-1].d.slice(0,4):'';}
+function shCvAnio(gridId,wrapId,tabId,desc){
+  const w=$(wrapId),sl=w.scrollLeft,st=w.scrollTop;w.scrollLeft=0;w.scrollTop=0;
+  try{const t=$(gridId).querySelector('table');if(!t)return null;const card=$(tabId).querySelector('.card');
+    return shBuild({title:card.querySelector('b').textContent.replace(/\s*\(.*$/,'')+' '+shYear(),lines:[desc],legend:shLegend(card),blocks:[{table:t}],cols:1});
+  }finally{w.scrollLeft=sl;w.scrollTop=st;}
+}
+function shCvDias(){
+  const out=$('dw-out'),dets=[...out.querySelectorAll('details')],was=dets.map(d=>d.open);dets.forEach(d=>d.open=true);
+  try{const lines=[];[...out.children].forEach(e=>{if(e.tagName==='DETAILS')return;const t=(e.textContent||'').replace(/\s+/g,' ').trim();if(!t||/^Rojo = D/.test(t))return;lines.push(t);});
+    lines.push('Rojo = Día · Azul = Noche · En negrita, el trasero.');
+    const blocks=dets.slice(-12).map(d=>({label:d.querySelector('summary').textContent.trim(),table:d.querySelector('table')})).filter(b=>b.table);
+    if(!blocks.length)return null;
+    return shBuild({title:'Números por día de la semana · '+DW_N[DW_SEL],lines:lines,legend:[],blocks:blocks,cols:3});
+  }finally{dets.forEach((d,i)=>{d.open=was[i];});}
+}
+async function shShare(btn,mk,name){const o=btn.textContent;try{const cv=mk();if(!cv){btn.textContent='No hay datos';setTimeout(()=>{btn.textContent=o;},2000);return;}
+  const blob=await new Promise(res=>cv.toBlob(res,'image/png')),f=new File([blob],name+'.png',{type:'image/png'});
+  if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:name});}
+  else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name+'.png';a.click();btn.textContent='Imagen guardada';setTimeout(()=>{btn.textContent=o;},2500);}
+}catch(e){if(e&&e.name==='AbortError')return;btn.textContent='No se pudo compartir';setTimeout(()=>{btn.textContent=o;},2500);}}
+const SH_AN='Cada casilla es el Pick 3 completo; en negrita el trasero. Los colores marcan líneas de casillas con el mismo paso (patrones). Amarillo: el número marcado. Morado: el próximo sorteo. Es un registro de lo que pasó, no un pronóstico.';
+
 // ---- Compartir el cartel de BINGO como imagen (compilación 78) ----
 function bgCanvas(b){const W=1080,PAD=60,MW=W-PAD*2,tm=document.createElement('canvas').getContext('2d');
   const L=[];const tx=e=>(e.textContent||'').replace(/\s+/g,' ').trim();const tt=e=>{const c=e.cloneNode(true);c.querySelectorAll('.src').forEach(x=>x.remove());let t=tx(c);if(e.querySelector('.src'))t=t.replace(/[:.]\s*$/,'')+'.';return t;};
@@ -1464,6 +1533,9 @@ function dwRender(){try{
    dwPat()+'<div class="meth">Rojo = Día · Azul = Noche. En negrita, el trasero. Escribe un trasero arriba para marcarlo en amarillo.</div>'+
    months.map((ym,i)=>'<details'+(i>=months.length-2?' open':'')+'><summary class="meth"><b>'+DW_M[+ym.slice(5)-1]+' '+ym.slice(0,4)+'</b></summary>'+cal(ym)+'</details>').join('');
   }catch(e){}}
+$('an-sh').onclick=function(){shShare(this,()=>shCvAnio('an-grid','an-wrap','t-anio',SH_AN),'calendario-anio');};
+$('cn-sh').onclick=function(){shShare(this,()=>shCvAnio('cn-grid','cn-wrap','t-anc',SH_AN),'anio-consecutivo');};
+$('dw-sh').onclick=function(){shShare(this,shCvDias,'dias-de-semana');};
 $('dw-q').oninput=()=>{const v=$('dw-q').value.replace(/\D/g,'').slice(0,2);DW_Q=v.length===2?v:'';dwRender();};
 $('dw-btns').addEventListener('click',e=>{const t=e.target.closest?e.target.closest('button'):null;if(!t)return;if(t.getAttribute('data-solo'))DW_ONLY=!DW_ONLY;else if(t.getAttribute('data-w'))DW_SEL=t.getAttribute('data-w');dwRender();});
 // ---- Ahorcados: número que queda entre dos de la tabla unificada (53 y 55 -> 54) ----
@@ -1845,7 +1917,7 @@ setTimeout(()=>{try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=81;var UPD_SHOWN=false;
+const APP_BUILD=82;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
