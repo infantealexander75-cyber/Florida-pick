@@ -44,7 +44,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 .yr td.pVi{outline:2px dashed #1e88e5;outline-offset:-2px}
 .yr td.pR.pVi{outline:2px solid #e53935;box-shadow:inset 0 0 0 4px #1e88e5}
 </style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 85 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 88 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <div id="av-ctc" class="alerta hide"></div>
@@ -84,7 +84,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 
 <section id="t-gen" class="hide">
  <div class="card"><b style="color:#d32f2f">Pronósticos (todas las fuentes en una lista)</b>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><button class="btn" id="g-share">Compartir imagen</button><button class="btn" id="g-sharet">Compartir números</button></div><div class="msg" id="g-msg"></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><button class="btn" id="g-share">Compartir imagen</button><button class="btn" id="g-sharet">Compartir números</button><button class="btn" id="g-sharej">Compartir jugada completa</button></div><div class="msg" id="g-msg"></div>
   <div class="msg" id="g-fin"></div>
   <div id="g-mode"></div><div class="meth" id="g-prob"></div>
   <canvas id="g-cv" style="width:100%;border-radius:10px;display:none;margin-bottom:8px"></canvas><div id="gen-out"></div>
@@ -197,7 +197,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <div class="meth" id="bk-st"></div><div id="bk-list"></div>
   <button class="btn" id="bk-out">Guardar copia ahora (.json + .csv)</button><button class="btn s" id="bk-now">Hacer copia interna ahora</button><div class="msg" id="bk-msg"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 85</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 88</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -1202,6 +1202,17 @@ $('g-sharet').onclick=async()=>{const m=$('g-msg');try{const tx=finText();if(!tx
   if(navigator.share){await navigator.share({text:tx});m.className='msg ok';m.textContent='Listo.';}
   else{await navigator.clipboard.writeText(tx);m.className='msg ok';m.textContent='Números copiados. Pégalos donde quieras.';}
 }catch(e){if(e&&e.name==='AbortError')return;m.className='msg bad';m.textContent='No se pudo compartir.';try{m.textContent+=' '+finText();}catch(x){}}};
+function finTextoJ(f,dia,fecha,ses){
+  const set=new Set(f.l.concat(f.x||[]).map(x=>x.n)),d=+f.d,t=+f.t;
+  for(let i=0;i<10;i++){set.add(String(d*10+i).padStart(2,'0'));set.add(String(i*10+t).padStart(2,'0'));}
+  return [...set].sort().join(' ');
+}
+function finTextJ(){const r=genList();if(!r)return'';finFreeze(r);try{finRender();}catch(e){}const f=finGet(r),si=shInfo(),d=r.n.date;
+  return finTextoJ(f,si.dia,d.slice(8)+'/'+d.slice(5,7),r.n.session==='MID'?'Día':'Noche');}
+$('g-sharej').onclick=async()=>{const m=$('g-msg');try{const tx=finTextJ();if(!tx){m.className='msg bad';m.textContent='Todavía no hay datos.';return;}
+  if(navigator.share){await navigator.share({text:tx});m.className='msg ok';m.textContent='Listo.';}
+  else{await navigator.clipboard.writeText(tx);m.className='msg ok';m.textContent='Jugada completa copiada. Pégala donde quieras.';}
+}catch(e){if(e&&e.name==='AbortError')return;m.className='msg bad';m.textContent='No se pudo compartir.';}};
 
 // ---- Calendario del año: Día/Noche por mes y patrones ----
 var AN_SEL='',AN_ST=null;
@@ -1855,7 +1866,7 @@ function doImport(text){
   if(!r.length&&!np&&!nm){m.className='msg bad';m.textContent='No encontré sorteos válidos (formato: fecha,sorteo,pick3,pick4).';return;}
   if(r.length)addRows(r);m.className='msg ok';m.textContent='Cargados '+r.length+' sorteos'+(np?', '+np+' pronósticos del programa':'')+(nm?', '+nm+' pronósticos tuyos':'')+'.';render();setNext();}
 
-// ---- Copias automáticas (compilación 85) ----
+// ---- Copias automáticas (compilación 88) ----
 // Al guardar un sorteo (addRows) se guarda sola una copia completa en IndexedDB (las últimas 10).
 // Esas copias viven en el mismo navegador: no sirven si se borran los datos del sitio. Por eso, además,
 // la app lleva la cuenta de los sorteos nuevos desde la última descarga y avisa arriba cuando pasan BK_N.
@@ -2004,7 +2015,7 @@ setTimeout(()=>{try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=85;var UPD_SHOWN=false;
+const APP_BUILD=88;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
