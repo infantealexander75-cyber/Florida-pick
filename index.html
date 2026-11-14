@@ -44,7 +44,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 .yr td.pVi{outline:2px dashed #1e88e5;outline-offset:-2px}
 .yr td.pR.pVi{outline:2px solid #e53935;box-shadow:inset 0 0 0 4px #1e88e5}
 </style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 83 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 84 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <div id="av-ctc" class="alerta hide"></div>
@@ -197,7 +197,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <div class="meth" id="bk-st"></div><div id="bk-list"></div>
   <button class="btn" id="bk-out">Guardar copia ahora (.json + .csv)</button><button class="btn s" id="bk-now">Hacer copia interna ahora</button><div class="msg" id="bk-msg"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 83</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 84</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -1810,11 +1810,21 @@ function suRender(){
    (r.miss.length?'<div class="meth">Sin coincidencia: '+r.miss.join(', ')+'</div>':'')+
    '<div class="meth">Rojo: los 5 primeros · azul: del 6 al 10.</div>';}
 $('su-go').onclick=suRender;$('su-clear').onclick=()=>{$('su-q').value='';$('su-out').innerHTML='';};
+var CH_TX='';
+function chTexto(q,num,r){
+  const k0=x=>x[0]==='00'?'00 (=100)':x[0];
+  if(num){const x=r[0];return 'Charada '+k0(x)+': '+x[1].join(' · ')+(x[2].length?'\nPalabras: '+x[2].join(', '):'');}
+  return 'Charada «'+q+'»:\n'+r.map(x=>k0(x)+' — '+x[1].join(' · ')+(x[2].length?' ('+x[2].slice(0,12).join(', ')+')':'')).join('\n');
+}
+$('ch-out').onclick=async e=>{const b=e.target.closest('#ch-sh');if(!b||!CH_TX)return;
+  try{if(navigator.share){await navigator.share({text:CH_TX});}else{await navigator.clipboard.writeText(CH_TX);b.textContent='Copiado ✓';setTimeout(()=>{b.textContent='Compartir';},2000);}}
+  catch(er){if(er&&er.name==='AbortError')return;try{await navigator.clipboard.writeText(CH_TX);b.textContent='Copiado ✓';setTimeout(()=>{b.textContent='Compartir';},2000);}catch(e2){}}};
 $('ch-q').oninput=()=>{const q=$('ch-q').value.trim(),num=/^\d+$/.test(q);
   if(!q){$('ch-out').innerHTML='';return;}
   if(!num&&normTxt(q).length<2){$('ch-out').innerHTML='<div class="meth">Escribe al menos 2 letras.</div>';return;}
   const r=charadaSearch(q);
-  $('ch-out').innerHTML=r.length?'<table>'+r.map(x=>'<tr><td><b>'+x[0]+(x[0]==='00'?' (=100)':'')+'</b></td><td><b>'+x[1].join(' · ')+'</b><div class="meth">'+(num?x[2].join(', '):x[2].slice(0,12).join(', ')+(x[2].length>12?' … (+'+(x[2].length-12)+')':''))+'</div></td></tr>').join('')+'</table>':'<div class="meth">No encontré eso en la charada.</div>';};
+  $('ch-out').innerHTML=r.length?'<table>'+r.map(x=>'<tr><td><b>'+x[0]+(x[0]==='00'?' (=100)':'')+'</b></td><td><b>'+x[1].join(' · ')+'</b><div class="meth">'+(num?x[2].join(', '):x[2].slice(0,12).join(', ')+(x[2].length>12?' … (+'+(x[2].length-12)+')':''))+'</div></td></tr>').join('')+'</table>':'<div class="meth">No encontré eso en la charada.</div>';
+  CH_TX=r.length?chTexto(q,num,r):'';if(r.length)$('ch-out').innerHTML+='<button class="btn s" id="ch-sh">Compartir</button>';};
 $('c-w').oninput=()=>{const r=cartilla($('c-w').value);$('c-out').innerHTML=r.shown.length?r.shown.join(' · ')+'<br>Secuencia: <b>'+r.vals.join(' – ')+'</b>':'';};
 $('h-s').onchange=renderHist;$('h-q').oninput=renderHist;
 $('b-more').onclick=()=>{SHOWALL=!SHOWALL;renderCand();};
@@ -1836,7 +1846,7 @@ function doImport(text){
   if(!r.length&&!np&&!nm){m.className='msg bad';m.textContent='No encontré sorteos válidos (formato: fecha,sorteo,pick3,pick4).';return;}
   if(r.length)addRows(r);m.className='msg ok';m.textContent='Cargados '+r.length+' sorteos'+(np?', '+np+' pronósticos del programa':'')+(nm?', '+nm+' pronósticos tuyos':'')+'.';render();setNext();}
 
-// ---- Copias automáticas (compilación 83) ----
+// ---- Copias automáticas (compilación 84) ----
 // Al guardar un sorteo (addRows) se guarda sola una copia completa en IndexedDB (las últimas 10).
 // Esas copias viven en el mismo navegador: no sirven si se borran los datos del sitio. Por eso, además,
 // la app lleva la cuenta de los sorteos nuevos desde la última descarga y avisa arriba cuando pasan BK_N.
@@ -1985,7 +1995,7 @@ setTimeout(()=>{try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=83;var UPD_SHOWN=false;
+const APP_BUILD=84;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
