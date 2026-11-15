@@ -44,7 +44,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 .yr td.pVi{outline:2px dashed #1e88e5;outline-offset:-2px}
 .yr td.pR.pVi{outline:2px solid #e53935;box-shadow:inset 0 0 0 4px #1e88e5}
 </style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 94 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 95 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <div id="av-ctc" class="alerta hide"></div>
@@ -87,6 +87,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><button class="btn" id="g-share">Compartir imagen</button><button class="btn" id="g-sharet">Compartir números</button><button class="btn" id="g-sharec">Compartir jugada completa del Top</button><button class="btn" id="g-sharer">Compartir solo la regla</button><button class="btn" id="g-sharej">Compartir jugada Top + regla</button><button class="btn" id="g-shared">Compartir reducido (Top + regla + alertas)</button></div><div class="meth" style="margin:4px 0">Límite de números de la regla de cifras en "Compartir jugada completa" (100 = todos) · Día: <input id="g-rd" type="number" min="0" max="100" style="width:62px;font-size:16px"> Noche: <input id="g-rn" type="number" min="0" max="100" style="width:62px;font-size:16px"> (0 = no usar la regla)</div>
   <div class="msg" id="g-msg"></div>
   <div class="msg" id="g-fin"></div>
+  <div id="seg-box" style="margin:10px 0;border-top:1px solid var(--bd);padding-top:8px"></div>
   <div id="g-mode"></div><div class="meth" id="g-prob"></div>
   <canvas id="g-cv" style="width:100%;border-radius:10px;display:none;margin-bottom:8px"></canvas><div id="gen-out"></div>
   <div class="msg" id="g-cor"></div>
@@ -198,7 +199,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <div class="meth" id="bk-st"></div><div id="bk-list"></div>
   <button class="btn" id="bk-out">Guardar copia ahora (.json + .csv)</button><button class="btn s" id="bk-now">Hacer copia interna ahora</button><div class="msg" id="bk-msg"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 94</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 95</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -592,7 +593,7 @@ function render(){
   try{const bl=BASE.reduce((a,b)=>!a||ordKey(b)>ordKey(a)?b:a,null);if(l&&bl)$('hdr-data').textContent='Datos hasta: '+l.d+' '+sesName(l.s)+(ordKey(l)>ordKey(bl)?' (base '+bl.d+' '+sesName(bl.s)+' + actualizaciones)':'');}catch(e){}
   $('last').innerHTML=l?`<span class="num">${l.p3}</span> ${l.p4?'· Pick 4 <b>'+l.p4+'</b> ':''}<div class="meth">${l.d} · ${sesName(l.s)} · ${ROWS.length} sorteos en total</div>`:'Sin datos';
   ensurePred();renderCand();genRender();dwRender();renderHist();renderAcier();renderFoll();renderChain();
-  try{generarPanelPatrones();}catch(e){}try{anioRender();}catch(e){}try{acRender();}catch(e){}try{chRender();}catch(e){}try{avisoRender();}catch(e){}try{redTrackRender();}catch(e){}try{corRender();}catch(e){}try{parRender();}catch(e){}try{finRender();}catch(e){}try{bingoRender();}catch(e){}
+  try{generarPanelPatrones();}catch(e){}try{anioRender();}catch(e){}try{acRender();}catch(e){}try{chRender();}catch(e){}try{avisoRender();}catch(e){}try{redTrackRender();}catch(e){}try{corRender();}catch(e){}try{parRender();}catch(e){}try{finRender();}catch(e){}try{bingoRender();}catch(e){}try{segRender();}catch(e){}
 }
 let SNAP=load('fpa_snap',{});
 let ANG=load('fpa_ang',[]);
@@ -1445,6 +1446,48 @@ const prioTx=()=>{$('pat-b').textContent='Patrones: '+(PRIO_PAT?'Activado':'Desa
 $('pat-b').onclick=()=>{PRIO_PAT=!PRIO_PAT;store('fpa_priopat',PRIO_PAT?1:0);prioTx();render();};
 $('prio-b').onclick=()=>{PRIO_ON=!PRIO_ON;store('fpa_prio',PRIO_ON?1:0);prioTx();render();};
 
+// ---- Seguimiento: reducido, regla y jugada completa del Top (compilación 95) ----
+// Antes de cada sorteo se guarda solo las tres listas del sorteo que viene. Cuando se anota el resultado, se cuenta si cayó dentro.
+// "Esperado" = aciertos que daría el azar con esa misma cantidad de números (suma de tamaño/100).
+var SEG_SEED={"2026-11-01|MID":{"t":"000210122021262930313739404649505559606166697074757679808182838485868788899099","g":"000102030405060708091013162023263031323334353637383940434650535660616263646566676869707376808386909396","r":"31394046606169","o":"rec"},"2026-11-01|EVE":{"t":"03040711131723252733374347505152535455565758596366677273747883879399","g":"00010203040506070809101213162021222324252627282930313233343536373839404243465052535660616263646566676869707273768082838690929396","r":"03072737435267","o":"rec"},"2026-11-02|MID":{"t":"000102030405060708091013172030374043495051566070808188899094","g":"02030409121314192021222324252627282930313233343536373839404142434445464748495253545962636469727374798283848990919293949596979899","r":"020437499094","o":"rec"},"2026-11-02|EVE":{"t":"01041121242528303141444951606162636465666768697173757678819192","g":"020304060912131416192021222324252627282930313233343536373839404142434445464748495253545659606162636465666768697273747679828384868990919293949596979899","r":"3041446567689192","o":"rec"},"2026-11-03|MID":{"t":"010409101424303132333435363738394448546264667484869194","g":"040614162426343640414243444546474849545660616263646566676869747684869496","r":"0436668694","o":"rec"},"2026-11-03|EVE":{"t":"000209121319202429333839434446495859606162636465666768697981838999","g":"040614162426343640414243444546474849545660616263646566676869747684869496","r":"244346496066","o":"rec"},"2026-11-04|MID":{"t":"000102030405060708091020303740465056606466697074778090","g":"00010203040506070809101112131415161718192021242630313436404142434445464748495051545660616263646566676869707174768081848690919496","r":"000506102030405060646669708090","o":"rec"},"2026-11-04|EVE":{"t":"000810202630373840505160667071727374757677787980828790","g":"000102030405060708091011121314151617181920212223242526272829303132343536404142434445464748495051525354555657585960616263646566676869707172747576808182848586909192949596","r":"2026307175","o":"rec"},"2026-11-05|MID":{"t":"030506080913232433374347536371737781838490919293949596979899","g":"020508121518202122232425262728293235384245485051525354555657585962656872757880818283848586878889929598","r":"8192","o":"rec"},"2026-11-05|EVE":{"t":"000102030405060708091115182128303538424448575862687274787982889198","g":"020507080912151718192021222324252627282932353738394245474849505152535455565758596265676869707172737475767778798081828384858687888990919293949596979899","r":"020515354262687282","o":"rec"},"2026-11-06|MID":{"t":"000102030405060708091018283839454858596878818485889298","g":"03070809131718192327282930313233343536373839434748495357585963676869707172737475767778798081828384858687888990919293949596979899","r":"081828384858687884889298","o":"rec"},"2026-11-06|EVE":{"t":"0001020304050607080910171819202427283438474850535455586468717378888998","g":"000102030405060708091012131718192021222324252627282930313233343536373839404243474849505253575859606263676869707172737475767778798081828384858687888990919293949596979899","r":"00030510182027344750717378","o":"rec"},"2026-11-07|MID":{"t":"00020306091214202232404243505152535455565758596270727475768182879298","g":"00010203040506070809101215182021222324252627282930323538404245485051525354555657585960626568707275788081828384858687888990929598","r":"0203505152535455565758597098","o":"rec"},"2026-11-07|EVE":{"t":"000205081215161821222830324247495051525354555657585962667282859295","g":"00010203040506070809101215182021222324252627282930323538404245485051525354555657585960626568707275788081828384858687888990929598","r":"00020508182850515253545556575859628285","o":"rec"},"2026-11-08|MID":{"t":"000102030405060708091323334349536368738393","g":"040509141519242529343539404142434445464748495051525354555657585964656974757984858990919293949596979899","r":"094349","o":"rec"},"2026-11-08|EVE":{"t":"00010203040506070809122224323336394042445257626469728082848589909298","g":"040509141519242529343539404142434445464748495051525354555657585964656974757984858990919293949596979899","r":"0405092439404244","o":"rec"},"2026-11-09|MID":{"t":"00010203040506070809131518192729333539495968697079838999","g":"010409101112131415161718192124293134394041424344454647484951545961646971747981848990919293949596979899","r":"0915192939495969798999","o":"rec"},"2026-11-09|EVE":{"t":"00010210111213141516171819213031354144515561718185889091","g":"00010203040506070809101112131415161718192021242930313439404142434445464748495051545960616469707174798081848990919293949596979899","r":"1217619091","o":"rec"},"2026-11-10|MID":{"t":"030508182830313233343536373839444849586878838898","g":"000102030405060708091011121314151617181920212430313440414243444546474849505154606164707174808184909194","r":"030508184448","o":"rec"},"2026-11-10|EVE":{"t":"021112181922323442526162707172737475767778798292","g":"00010203040506070809101112131415161718192021242730313437404142434445464748495051545760616467707172737475767778798081848790919497","r":"0234707476","o":"rec"},"2026-11-11|MID":{"t":"03132328333743535863697071738081828384858687888993","g":"010708101112131415161718192127283137384147485157586167687071727374757677787980818283848586878889919798","r":"2870717385","o":"rec"},"2026-11-11|EVE":{"t":"0607131720212223242526272829374547565767747779818797","g":"01020708101112131415161718192021222324252627282931323738414247485152575861626768707172737475767778798081828384858687888991929798","r":"071720212223242526272829","o":"rec"},"2026-11-12|MID":{"t":"00010203040506070809131516182124282935384147485455586368747578808185889298","g":"020507121517202122232425262728293235374245475051525354555657585962656770717273747576777879828587929597","r":"02050715242854587892","o":"rec"},"2026-11-12|EVE":{"t":"0001020304050607080916172735363744475355576774778797","g":"02040507121415172021222324252627282932343537404142434445464748495051525354555657585962646567707172737475767778798284858792949597","r":"020405076777","o":"rec"},"2026-11-13|MID":{"t":"0004121419242534444854596474808182838485868788899194","g":"00010203040506070809101415192024252930343539404142434445464748495051525354555657585960646569707475798084858990919293949596979899","r":"002559748094","o":"rec"},"2026-11-13|EVE":{"t":"0001021012192022324041424344454647484952536270727476818287929799","g":"00010203040506070809101415192024252930343539404142434445464748495051525354555657585960646569707475798084858990919293949596979899","r":"00011019204043497074","o":"rec"},"2026-11-14|MID":{"t":"00010203040506070809171926293139404142495969707379899599","g":"000102030405060708091014192024293034394041424344454647484950545960646970747980848990919293949596979899","r":"060809192939495969798999","o":"rec"},"2026-11-14|EVE":{"t":"01111415213141485158606162636465666768697177819196","g":"000102030405060708091014161719202426272930343637394041424344454647484950545657596061626364656667686970717273747576777879808486878990919293949596979899","r":"14486061626364656667686996","o":"rec"},"2026-11-15|MID":{"t":"020708121720212223242526272829324252556272747781828892","g":"020607121617202122232425262728293236374246475256576061626364656667686970717273747576777879828687929697","r":"21284274","o":"rec"},"2026-11-15|EVE":{"t":"08182021222324252627282938424858666870727879889598","g":"02060709121617192021222324252627282932363739424647495256575960616263646566676869707172737475767778798286878990919293949596979899","r":"2129426668","o":"real"}};
+var SEG_C=null;
+function segGet(){if(!SEG_C){SEG_C=load('fpa_seg',{});let ch=false;for(const k in SEG_SEED)if(!SEG_C[k]){SEG_C[k]=SEG_SEED[k];ch=true;}if(ch)store('fpa_seg',SEG_C);}return SEG_C;}
+function segPack(L){return [...new Set(L)].sort().join('');}
+function segUn(s){return s?(s.match(/\d\d/g)||[]):[];}
+function segSnap(){
+  const r=genList();if(!r)return;const ses=r.n.session,d=r.n.date,key=d+'|'+ses,S=segGet();
+  if(S[key]&&S[key].o==='real')return;
+  if(allRows().some(x=>x.d===d&&x.s===ses))return;           // ya tiene resultado: no tocar
+  const f=finGet(r),top=finTextoJ(f,'','','',[],'top').split(', ').filter(Boolean),reg=reglaCifras(ses,d,100),gs=new Set(reg),al=new Set(AV_NUMS||[]);
+  const e={t:segPack(top),g:segPack(reg),r:segPack(top.filter(n=>gs.has(n)&&al.has(n))),o:'vivo'},old=S[key];
+  if(old&&old.t===e.t&&old.g===e.g&&old.r===e.r)return;
+  S[key]=e;store('fpa_seg',S);
+}
+function segCalc(fl){
+  const S=segGet(),by={};allRows().forEach(x=>{by[x.d+'|'+x.s]=x;});
+  const M={r:{h:0,e:0,t:0},g:{h:0,e:0,t:0},t:{h:0,e:0,t:0}},pend=[],det=[];let N=0;
+  Object.keys(S).sort().forEach(k=>{const e=S[k];if(!fl(e))return;const L={r:segUn(e.r),g:segUn(e.g),t:segUn(e.t)},row=by[k];
+    if(!row){pend.push([k,L]);return;}
+    const tr=row.p3.slice(1);N++;for(const m of['r','g','t']){M[m].h+=L[m].includes(tr)?1:0;M[m].e+=L[m].length/100;M[m].t+=L[m].length;}
+    det.push([k,tr,L.r.includes(tr),L.g.includes(tr),L.t.includes(tr)]);});
+  return{N,M,pend,det};
+}
+function segLbl(k){const a=k.split('|');return a[0].slice(8)+'/'+a[0].slice(5,7)+' '+(a[1]==='MID'?'Día':'Noche');}
+function segTabla(c){
+  if(!c.N)return '<div class="meth">Todavía sin sorteos con resultado.</div>';
+  const nm={r:'Reducido (Top + regla + alertas)',g:'Regla de cifras',t:'Jugada completa del Top'};
+  return '<table><tr><td></td><td><b>Aciertos</b></td><td><b>Esperado</b></td><td><b>Tamaño medio</b></td></tr>'+['r','g','t'].map(m=>'<tr><td>'+nm[m]+'</td><td><b>'+c.M[m].h+' de '+c.N+'</b></td><td>'+c.M[m].e.toFixed(1)+'</td><td>'+(c.M[m].t/c.N).toFixed(1)+'</td></tr>').join('')+'</table>';
+}
+function segHtml(){
+  const viv=segCalc(e=>e.o!=='rec'),rec=segCalc(e=>e.o==='rec'),mk=b=>b?'✅':'·';
+  let h='<b>Seguimiento de aciertos</b><div class="meth">Se guarda solo, antes de cada sorteo, el reducido, la regla y la jugada completa del Top. Esperado = lo que daría el azar con esa misma cantidad de números. Si un método sirve, sus aciertos tienen que quedar bien por encima del esperado.</div>';
+  h+='<div class="meth" style="margin-top:6px"><b>En vivo</b></div>'+segTabla(viv);
+  if(viv.det.length)h+='<div class="meth">'+viv.det.slice(-8).reverse().map(x=>segLbl(x[0])+' · salió <b>'+x[1]+'</b> · reducido '+mk(x[2])+' regla '+mk(x[3])+' completa '+mk(x[4])).join('<br>')+'</div>';
+  viv.pend.forEach(p=>{h+='<div class="meth">⏳ Pendiente <b>'+segLbl(p[0])+'</b>: reducido '+p[1].r.length+' · regla '+p[1].g.length+' · completa '+p[1].t.length+' números</div>';});
+  h+='<div class="meth" style="margin-top:8px"><b>Reconstruido (1 al 15 nov)</b> · calculado después con los datos de entonces</div>'+segTabla(rec);
+  return h;
+}
+function segRender(){try{segSnap();}catch(e){}try{const b=$('seg-box');if(b)b.innerHTML=segHtml();}catch(e){}}
 // ---- Números que nombran las alertas activas para el PRÓXIMO sorteo (para el reducido) ----
 var AV_NUMS=[];
 function avNums(it,excl){
@@ -1920,7 +1963,7 @@ function doImport(text){
   if(!r.length&&!np&&!nm){m.className='msg bad';m.textContent='No encontré sorteos válidos (formato: fecha,sorteo,pick3,pick4).';return;}
   if(r.length)addRows(r);m.className='msg ok';m.textContent='Cargados '+r.length+' sorteos'+(np?', '+np+' pronósticos del programa':'')+(nm?', '+nm+' pronósticos tuyos':'')+'.';render();setNext();}
 
-// ---- Copias automáticas (compilación 94) ----
+// ---- Copias automáticas (compilación 95) ----
 // Al guardar un sorteo (addRows) se guarda sola una copia completa en IndexedDB (las últimas 10).
 // Esas copias viven en el mismo navegador: no sirven si se borran los datos del sitio. Por eso, además,
 // la app lleva la cuenta de los sorteos nuevos desde la última descarga y avisa arriba cuando pasan BK_N.
@@ -2069,7 +2112,7 @@ setTimeout(()=>{try{avisoRender();}catch(e){}},700);
 
 setTimeout(()=>doUpdate(true),400);
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=94;var UPD_SHOWN=false;
+const APP_BUILD=95;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
