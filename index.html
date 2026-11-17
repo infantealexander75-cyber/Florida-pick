@@ -44,7 +44,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
 .yr td.pVi{outline:2px dashed #1e88e5;outline-offset:-2px}
 .yr td.pR.pVi{outline:2px solid #e53935;box-shadow:inset 0 0 0 4px #1e88e5}
 </style></head><body>
-<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 99 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
+<header><h1>Florida Pick Analyzer</h1><small>v1.0 · compilación 100 · funciona sin Internet</small><br><small id="hdr-data">Datos base hasta: 2026-10-22 Día</small></header>
 <div id="bingo" class="bingo hide"></div>
 <div id="alerta" class="alerta hide"></div>
 <div id="av-ctc" class="alerta hide"></div>
@@ -205,7 +205,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:5px 4px;b
   <div class="meth" id="bk-st"></div><div id="bk-list"></div>
   <button class="btn" id="bk-out">Guardar copia ahora (.json + .csv)</button><button class="btn s" id="bk-now">Hacer copia interna ahora</button><div class="msg" id="bk-msg"></div></div>
 </section>
-<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 99</div>
+<div class="meth" style="text-align:center;margin-top:18px">Florida Pick Analyzer v1.0 · compilación 100</div>
 </main>
 <script>
 function showErr(e,w){try{const m=(w?w+': ':'')+(e&&e.message?e.message:String(e));let b=document.getElementById('errbar');
@@ -2134,11 +2134,12 @@ function cmpRow(nm,g,P,A,note){const n=P.length,h=A.reduce((s,x)=>s+x,0),e=P.red
 async function cmpRun(){
   const o=$('cm-out'),b=$('cm-go');b.disabled=true;
   try{
-  const R=ROWS,yr=R[R.length-1].d.slice(0,4),cfg=reglaCfg(),f=qCalc(R).f,ht=R.map(r=>r.p3.slice(1)),idx=[],acc={},res=[],nope=[];
+  const R=ROWS,yr=R[R.length-1].d.slice(0,4),mo=R[R.length-1].d.slice(0,7),cfg=reglaCfg(),f=qCalc(R).f,ht=R.map(r=>r.p3.slice(1)),idx=[],acc={},nope=[];
   for(let i=1;i<R.length;i++)if(R[i].d.slice(0,4)===yr)idx.push(i);
-  const put=(nm,g,p,a,note)=>{const z=acc[nm]=acc[nm]||{g,note,P:[],A:[]};z.P.push(p);z.A.push(a?1:0);};
+  let cd='';
+  const put=(nm,g,p,a,note)=>{const z=acc[nm]=acc[nm]||{nm,g,note,P:[],A:[],D:[]};z.P.push(p);z.A.push(a?1:0);z.D.push(cd);};
   const cnt=[Array(10).fill(0),Array(10).fill(0)];
-  for(let j=0;j<idx.length;j++){const i=idx[j],r=R[i],t=ht[i],wd=weekdayOf(r.d);
+  for(let j=0;j<idx.length;j++){const i=idx[j],r=R[i],t=ht[i],wd=weekdayOf(r.d);cd=r.d;
     for(const nm in f){let L;try{L=[...new Set(f[nm](ht[i-1],wd))].filter(x=>/^\d\d$/.test(x));}catch(e){continue;}if(L.length)put(CMP_NM[nm]||nm,'Tablas',L.length/100,L.includes(t));}
     try{const L=ensTop5(ht.slice(0,i));if(L.length)put('Ensemble (top 5)','Reglas',L.length/100,L.includes(t));}catch(e){}
     try{const L=reglaCifras(r.s,r.d,r.s==='MID'?cfg.d:cfg.n);if(L.length)put('Regla de cifras (2 sorteos anteriores)','Reglas',L.length/100,L.includes(t),'tamaño variable');}catch(e){}
@@ -2147,35 +2148,35 @@ async function cmpRun(){
     {const all=ROWS;ROWS=all.slice(0,i);try{const pr=makePred(ROWS);if(pr&&pr.B.length)put('Top 5 por puntaje (Candidatos)','Top',pr.B.length/100,pr.B.includes(t),'recalculado con datos hasta ese sorteo');}catch(e){}finally{ROWS=all;}}
     if(j%6===0){o.innerHTML='<div class="msg">Calculando… '+j+' de '+idx.length+' sorteos</div>';await new Promise(z=>setTimeout(z,0));}
   }
-  for(const nm in acc){const z=acc[nm];res.push(cmpRow(nm,z.g,z.P,z.A,z.note));}
-  // Reglas que la app ya mide hacia adelante (congeladas desde su fecha de inicio)
+  const items=Object.values(acc);
   for(const x of ruleGrid()){
     if(x.g==='Mis pronósticos'||x.nm==='Ensemble (top 5)')continue;
     if(/^Parlés/.test(x.nm)){nope.push([x.nm,'son parejas (parlé), no un número de 00 a 99']);continue;}
     if(!x.pk||!x.n){nope.push([x.nm,'no guarda cuántos números proponía en cada sorteo (solo si acertó), así que no se puede calcular su pᵢ']);continue;}
-    const P=[],A=[];for(const k in x.pk)if(x.pk[k]>0){P.push(x.pk[k]);A.push(x.m[k]?1:0);}
-    if(P.length)res.push(cmpRow(x.nm,x.g,P,A,x.sub));
+    const z={nm:x.nm,g:x.g,note:x.sub,P:[],A:[],D:[]};for(const k in x.pk)if(x.pk[k]>0){z.P.push(x.pk[k]);z.A.push(x.m[k]?1:0);z.D.push(k.slice(0,10));}
+    if(z.P.length)items.push(z);
   }
-  // Reducido, jugada completa y unión Top + regla: listas guardadas ANTES de cada sorteo
-  try{const S=segGet(),by={};allRows().forEach(x=>{by[x.d+'|'+x.s]=x;});const Q={r:{P:[],A:[]},t:{P:[],A:[]},u:{P:[],A:[]}};
+  try{const S=segGet(),by={};allRows().forEach(x=>{by[x.d+'|'+x.s]=x;});const Q={r:{P:[],A:[],D:[]},t:{P:[],A:[],D:[]},u:{P:[],A:[],D:[]}};
     for(const k of Object.keys(S).sort()){const row=by[k];if(!row)continue;const e=S[k],tr=row.p3.slice(1),t=segUn(e.t),L={r:segUn(e.r),t,u:[...new Set(t.concat(segUn(e.g)))]};
-      for(const q in L)if(L[q].length){Q[q].P.push(L[q].length/100);Q[q].A.push(L[q].includes(tr)?1:0);}}
+      for(const q in L)if(L[q].length){Q[q].P.push(L[q].length/100);Q[q].A.push(L[q].includes(tr)?1:0);Q[q].D.push(k.slice(0,10));}}
     const nz={r:'Reducido (Top + regla + alertas)',t:'Jugada completa del Top',u:'Unión Top + regla de cifras'};
-    for(const q in Q)if(Q[q].P.length)res.push(cmpRow(nz[q],'Top',Q[q].P,Q[q].A,'lista guardada antes del sorteo (desde 1-nov)'));}catch(e){}
-  nope.push(['Top de 10 / lista compartida (formula actual)','su fórmula se eligió mirando 700 sorteos de 2026; la prueba limpia es el seguimiento guardado (filas de arriba)']);
-  res.sort((a,b)=>b.adv-a.adv);
-  const N=res.length,vd=x=>x.h<x.e?'🔻 Por debajo':x.p<0.05?'✅ Supera al azar':'⚪ No se distingue',fp=p=>p<0.001?'<0.001':p.toFixed(3),top=res[0];
-  let h='';
-  if(top)h+='<div class="msg"><b>'+(top.p<0.05?'La regla que más supera al azar es ':'Ninguna supera al azar con claridad. La de mayor ventaja es ')+top.nm+'</b> con ventaja '+(top.adv>=0?'+':'')+top.adv.toFixed(1)+' y valor p '+fp(top.p)+'. Como se probaron '+N+' reglas a la vez, el valor p corregido es <b>'+fp(Math.min(1,top.p*N))+'</b>'+(top.p*N<0.05?'.':' (no pasa de 0.05: puede ser suerte).')+'</div>';
-  h+='<div style="overflow-x:auto"><table class="rg"><tr><th class="nm">Regla / fuente</th><th>Sorteos</th><th>Aciertos</th><th>Esperado azar</th><th>Ventaja</th><th>Valor p</th><th>Veredicto</th></tr>'+res.map(x=>'<tr><td class="nm">'+x.nm+(x.note?'<div class="sb">'+x.note+'</div>':'')+'</td><td>'+x.n+'</td><td>'+x.h+'</td><td>'+x.e.toFixed(1)+'</td><td>'+(x.adv>=0?'+':'')+x.adv.toFixed(1)+'</td><td>'+fp(x.p)+'</td><td style="white-space:normal">'+vd(x)+'</td></tr>').join('')+'</table></div>';
-  h+='<div class="meth" style="margin-top:8px"><b>Fuera de la tabla</b> (y por qué):<br>'+nope.map(x=>'• '+x[0]+': '+x[1]).join('<br>')+'</div>';
-  o.innerHTML=h;
+    for(const q in Q)if(Q[q].P.length)items.push({nm:nz[q],g:'Top',note:'lista guardada antes del sorteo (desde 1-nov)',P:Q[q].P,A:Q[q].A,D:Q[q].D});}catch(e){}
+  nope.push(['Top de 10 / lista compartida (formula actual)','su fórmula se eligió mirando 700 sorteos de 2026; la prueba limpia es el seguimiento guardado (filas de listas guardadas)']);
+  const fp=p=>p<0.001?'<0.001':p.toFixed(3),vd=x=>x.h<x.e?'🔻 Por debajo':x.p<0.05?'✅ Supera al azar':'⚪ No se distingue';
+  const tabla=(pref,tit)=>{
+    const res=[];for(const z of items){const P=[],A=[];z.D.forEach((d,i)=>{if(d.startsWith(pref)){P.push(z.P[i]);A.push(z.A[i]);}});if(P.length)res.push(cmpRow(z.nm,z.g,P,A,z.note));}
+    res.sort((a,b)=>b.adv-a.adv);const N=res.length,top=res[0];
+    let h='<div class="msg" style="margin-top:10px"><b>'+tit+'</b></div>';
+    if(!top)return h+'<div class="meth">Todavía no hay sorteos para evaluar.</div>';
+    h+='<div class="msg">'+(top.p<0.05?'La regla que más supera al azar es ':'Ninguna supera al azar con claridad. La de mayor ventaja es ')+'<b>'+top.nm+'</b> con ventaja '+(top.adv>=0?'+':'')+top.adv.toFixed(1)+' y valor p '+fp(top.p)+'. Como se probaron '+N+' reglas a la vez, el valor p corregido es <b>'+fp(Math.min(1,top.p*N))+'</b>'+(top.p*N<0.05?'.':' (no pasa de 0.05: puede ser suerte).')+'</div>';
+    return h+'<div style="overflow-x:auto"><table class="rg"><tr><th class="nm">Regla / fuente</th><th>Sorteos</th><th>Aciertos</th><th>Esperado azar</th><th>Ventaja</th><th>Valor p</th><th>Veredicto</th></tr>'+res.map(x=>'<tr><td class="nm">'+x.nm+(x.note?'<div class="sb">'+x.note+'</div>':'')+'</td><td>'+x.n+'</td><td>'+x.h+'</td><td>'+x.e.toFixed(1)+'</td><td>'+(x.adv>=0?'+':'')+x.adv.toFixed(1)+'</td><td>'+fp(x.p)+'</td><td style="white-space:normal">'+vd(x)+'</td></tr>').join('')+'</table></div>';};
+  o.innerHTML=tabla(yr,'Año '+yr+' completo')+tabla(mo,'Mes en curso ('+mo+')')+'<div class="meth">Con pocos sorteos en el mes, casi todo sale ⚪: un mes solo sirve para ir viendo la tendencia, no para decidir.</div><div class="meth" style="margin-top:8px"><b>Fuera de la tabla</b> (y por qué):<br>'+nope.map(x=>'• '+x[0]+': '+x[1]).join('<br>')+'</div>';
   }catch(e){o.innerHTML='<div class="msg bad">No se pudo calcular.</div>';try{showErr(e,'Vs azar');}catch(x){}}
   b.disabled=false;}
 $('cm-go').onclick=cmpRun;
 
 // ---- Aviso de versión nueva: compara la compilación publicada con la que está abierta ----
-const APP_BUILD=99;var UPD_SHOWN=false;
+const APP_BUILD=100;var UPD_SHOWN=false;
 function chkUpd(){try{if(UPD_SHOWN||!navigator.onLine)return;
   fetch('index.html',{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=/v1\.0 · compilación (\d+)/.exec(t);if(!m||+m[1]<=APP_BUILD||UPD_SHOWN)return;UPD_SHOWN=true;
     const b=document.createElement('div');b.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;background:#5b36b3;color:#fff;padding:12px 14px;border-radius:12px;font-size:15px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
